@@ -1,9 +1,9 @@
 # ADR 0003: Admin console
 
-* **Status:** Proposed
+* **Status:** Accepted, 14 October 2026
 * **Date:** 14 October 2026
 * **Drafted by:** Claude Code
-* **Approver:** Technical lead (not yet named)
+* **Approver:** Eyitayo Falana, technical lead
 * **Source:** Development Roadmap v1, section 4; Product Architecture v1
 
 ## Context
