@@ -1,8 +1,10 @@
-# Knowledge and Learning Platform
+# Mantle
+
+Mantle is the working name, chosen on 14 October 2026, for the Knowledge and Learning Platform. Product owner: Eyitayo Falana. Technical lead: not yet named.
 
 One global product that helps organisations in any industry keep, teach and prove their institutional knowledge. Design Streams builds it, and SUNU Assurances Nigeria is the first customer, going live on the dedicated tier in week 13, three months after signing.
 
-This repository holds the whole product. It currently contains the version 1 starting structure only: folders, rules and the roadmap. No application code or dependencies have been added yet, because every line of the proposed technology stack must first be approved in a decision record (see [docs/adr](docs/adr/README.md)).
+This repository holds the whole product. It currently contains the version 1 starting structure: folders, rules, the roadmap, the proposed decision records and a draft threat model. No application code or dependencies have been added yet, because every line of the proposed technology stack must first be approved in a decision record (see [docs/adr](docs/adr/README.md)).
 
 ## Source documents
 
@@ -52,6 +54,7 @@ Prepared but not built in version 1: shared tier self sign up, observed assessme
 | [infra](infra) | Infrastructure for all environments |
 | [tests/e2e](tests/e2e) | End to end and isolation tests |
 | [docs/adr](docs/adr) | Architecture decision records |
+| [docs/security](docs/security) | Threat model |
 | [docs/work_packages](docs/work_packages) | Work package specs |
 | [CLAUDE.md](CLAUDE.md) | Rules every Claude Code session follows |
 
