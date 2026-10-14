@@ -48,4 +48,10 @@ Claude Code works in development and staging only and never holds production cre
 
 ## Commands
 
-Not defined yet. Build, test and lint commands are added here once the technology stack decision records are approved.
+Node 20 or newer and npm workspaces (apps/* and packages/*).
+
+* `npm install`: install dependencies for every workspace
+* `npm run lint`: ESLint, including the rule that blocks database drivers outside packages/db
+* `npm run typecheck`: TypeScript in strict mode
+* `npm run test`: Vitest unit and integration tests
+* `npm run check`: all three, in that order; run before opening a pull request
