@@ -7,3 +7,5 @@ Covers creating, suspending and offboarding tenants; choosing tier, domain and h
 Proposed in the roadmap: a separate Next.js app. Not confirmed until the decision record is approved.
 
 Epic: E13.
+
+Shell in place: a separate Next.js app on port 3001 with one page. Screen text lives in messages/en.json until the translation setup (E1) replaces it.
