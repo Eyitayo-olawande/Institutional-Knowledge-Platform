@@ -55,3 +55,5 @@ Node 20 or newer and npm workspaces (apps/* and packages/*).
 * `npm run typecheck`: TypeScript in strict mode
 * `npm run test`: Vitest unit and integration tests
 * `npm run check`: all three, in that order; run before opening a pull request
+
+GitHub Actions runs the same checks, plus `npm audit` for high or critical vulnerabilities, on every pull request and every push to main (.github/workflows/ci.yml). Dependabot opens weekly update pull requests.
