@@ -58,6 +58,10 @@ Prepared but not built in version 1: shared tier self sign up, observed assessme
 | [docs/work_packages](docs/work_packages) | Work package specs |
 | [CLAUDE.md](CLAUDE.md) | Rules every Claude Code session follows |
 
+## Local development
+
+See [docs/local_development.md](docs/local_development.md).
+
 ## Roadmap
 
 The version 1 plan, with epics, sprints and milestones, is in [docs/ROADMAP_v1.md](docs/ROADMAP_v1.md).
