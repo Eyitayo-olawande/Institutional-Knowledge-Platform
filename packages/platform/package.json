@@ -3,9 +3,11 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./translation": "./src/translation.ts"
+    "./translation": "./src/translation.ts",
+    "./tenancy": "./src/tenancy/index.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit"
-  }
+  },
+  "devDependencies": {}
 }
