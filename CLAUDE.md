@@ -15,7 +15,7 @@ Rules every Claude Code session in this repository follows. They come from Produ
 * Every data access goes through the tenant context; direct database connections elsewhere are blocked by a lint rule.
 * No personal data in the control database, logs or usage events.
 * Every change that alters data writes to the activity log.
-* No screen text typed into code; all text comes from translation files.
+* No screen text typed into code; all text comes from translation files through `t()` (apps/*/messages/<locale>.json; a lint rule blocks text typed into JSX).
 * Every structural word comes from the tenant's wording labels.
 * New behaviour arrives with tests; bug fixes arrive with a test that fails before the fix.
 * Migrations are safe on a live system and run against every tenant database in tests.

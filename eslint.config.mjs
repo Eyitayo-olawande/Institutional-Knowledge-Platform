@@ -43,6 +43,20 @@ export default tseslint.config(
     },
   },
   {
+    // No screen text typed into code: JSX text must come from t() (ADR 0011).
+    files: ["apps/**/*.tsx", "packages/ui/**/*.tsx"],
+    ignores: ["**/*.test.tsx"],
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: "JSXText[value=/\\S/]",
+          message: "Screen text must come from the message files through t().",
+        },
+      ],
+    },
+  },
+  {
     files: ["packages/db/**"],
     rules: {
       "no-restricted-imports": "off",

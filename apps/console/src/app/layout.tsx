@@ -1,12 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { color, font } from "@mantle/ui";
-import messages from "../../messages/en.json";
+import { t } from "../i18n.ts";
 
 export const viewport: Viewport = { width: "device-width", initialScale: 1 };
 
 export const metadata: Metadata = {
-  title: messages.app.title,
+  title: t("app.title"),
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

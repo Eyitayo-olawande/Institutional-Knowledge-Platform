@@ -24,6 +24,7 @@ The roadmap asks for one decision record per line of the proposed stack. All 16 
 | [0014 Pipeline](0014_pipeline.md) | GitHub with GitHub Actions | Accepted |
 | [0015 Monitoring](0015_monitoring.md) | Error tracking, uptime checks and a public status page | Accepted; provider deferred |
 | [0016 Hosting](0016_hosting.md) | A major cloud provider with a region close to Nigeria, or in country hosting if SUNU requires it | Accepted; provider deferred |
+| [0017 Translation lookup](0017_translation_lookup.md) | Small built in lookup over JSON message files (answers the open question in 0011) | Proposed |
 
 ## Statuses
 
