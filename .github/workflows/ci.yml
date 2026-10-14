@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   check:
-    name: Lint, type check and test
+    name: Lint, type check, test and build
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -29,6 +29,9 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run test
+      - run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
 
   dependencies:
     name: Dependency scan
