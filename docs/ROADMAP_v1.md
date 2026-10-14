@@ -95,8 +95,8 @@ Merge to main deploys to staging automatically; production releases are approved
 
 These come from the roadmap (section 14) and the architecture (section 16). Progress is noted against each item; the threat model draft is in [docs/security](security/threat_model_v1.md).
 
-* [ ] Name the product owner and technical lead, and confirm the technical lead's daily review time (product owner: Eyitayo Falana; technical lead not yet named)
-* [ ] Approve the technology stack, one decision record per line of the stack table (all 16 drafted as Proposed in [docs/adr](adr/README.md))
+* [ ] Name the product owner and technical lead, and confirm the technical lead's daily review time (both: Eyitayo Falana; daily review time not yet confirmed)
+* [x] Approve the technology stack, one decision record per line of the stack table (all 16 accepted on 14 October 2026, see [docs/adr](adr/README.md))
 * [x] Create the GitHub organisation and repository, and connect it to Claude Code
 * [ ] Open the cloud account and choose the default region; create development and staging environments (deferred)
 * [ ] Choose the transactional email provider and register the sending domain (deferred)

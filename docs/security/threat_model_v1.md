@@ -1,6 +1,6 @@
 # Threat model, version 1 (draft)
 
-* **Status:** Draft, for technical lead approval in Sprint 1
+* **Status:** Draft, for approval by the technical lead (Eyitayo Falana) in Sprint 1
 * **Scope:** tenancy, sign in and support access, as set by Development Roadmap v1 section 10
 * **Drafted by:** Claude Code, 14 October 2026
 
