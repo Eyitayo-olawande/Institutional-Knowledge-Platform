@@ -1,0 +1,11 @@
+{
+  "name": "@mantle/platform",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./translation": "./src/translation.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  }
+}
