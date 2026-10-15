@@ -1,6 +1,6 @@
 # ADR 0017: Translation lookup
 
-* **Status:** Proposed
+* **Status:** Accepted, 15 October 2026
 * **Date:** 14 October 2026
 * **Drafted by:** Claude Code
 * **Approver:** Eyitayo Falana, technical lead
