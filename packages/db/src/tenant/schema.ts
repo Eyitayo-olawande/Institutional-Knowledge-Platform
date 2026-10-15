@@ -178,3 +178,41 @@ export const libraryItemVersions = pgTable(
   },
   (t) => [uniqueIndex("library_item_versions_item_version_unique").on(t.itemId, t.version)],
 );
+
+// Notifications (Product Architecture v1, section 8). In app notices a
+// person sees in the product, and a delivery record for every message on
+// every channel, used as evidence that, for example, a change alert was sent.
+export const notificationChannel = pgEnum("notification_channel", ["email", "in_app"]);
+export const deliveryStatus = pgEnum("delivery_status", ["sent", "failed"]);
+
+export const notices = pgTable(
+  "notices",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id),
+    event: text("event").notNull(),
+    subject: text("subject").notNull(),
+    body: text("body").notNull(),
+    readAt: timestamp("read_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("notices_user_idx").on(t.userId)],
+);
+
+export const deliveryRecords = pgTable(
+  "delivery_records",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id),
+    event: text("event").notNull(),
+    channel: notificationChannel("channel").notNull(),
+    status: deliveryStatus("status").notNull(),
+    error: text("error"),
+    at: timestamp("at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("delivery_records_user_idx").on(t.userId), index("delivery_records_event_idx").on(t.event)],
+);

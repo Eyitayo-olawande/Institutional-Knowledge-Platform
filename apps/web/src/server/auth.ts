@@ -5,7 +5,7 @@ import type { TenantRecord } from "@mantle/platform/tenancy";
 import { headers } from "next/headers";
 import { requestHostFrom } from "./tenant.ts";
 
-const mailer = developmentOutbox();
+export const mailer = developmentOutbox();
 
 // The sign in instance for the tenant this request was resolved to.
 export function authFor(tenant: TenantRecord, host: string, protocol = "http"): TenantAuth {

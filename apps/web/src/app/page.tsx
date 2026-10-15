@@ -4,7 +4,8 @@ import Link from "next/link";
 import { t } from "../i18n.ts";
 import { authFor, requestHost } from "../server/auth.ts";
 import { can } from "@mantle/platform/identity";
-import { featureOn } from "../server/session.ts";
+import { featureOn, tenantDb } from "../server/session.ts";
+import { unreadCount } from "@mantle/db/tenant";
 import { resolveRequestTenant } from "../server/tenant.ts";
 import { tenantView } from "../server/tenant_view.ts";
 import { signOut } from "./actions.ts";
@@ -18,10 +19,12 @@ export default async function Home() {
   let canManageRoles = false;
   let canViewActivity = false;
   let canViewLibrary = false;
+  let unread = 0;
   if (resolution.ok) {
     const { host, protocol } = await requestHost();
     const session = await authFor(resolution.tenant, host, protocol).api.getSession({ headers: await headers() });
     signedInAs = session?.user.name;
+    if (session) unread = await unreadCount(tenantDb(resolution.tenant), session.user.id);
     const roles = (session?.user as { roles?: string } | undefined)?.roles;
     isWordingAdmin = can(roles, "wording.edit");
     canManageRoles = can(roles, "roles.manage");
@@ -36,6 +39,9 @@ export default async function Home() {
       {resolution.ok && signedInAs && (
         <form action={signOut}>
           <p>{t("auth.signed_in_as", { name: signedInAs })}</p>
+          <p>
+            <Link href="/notices">{unread > 0 ? t("notices.link", { count: unread }) : t("notices.link_none")}</Link>
+          </p>
           {canViewLibrary && (
             <p>
               <Link href="/library">{t("library.manage")}</Link>

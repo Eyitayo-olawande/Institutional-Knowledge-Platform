@@ -1,0 +1,8 @@
+{
+  "roles": {
+    "changed": {
+      "subject": "Your roles have changed",
+      "body": "Hello {name}, your roles at {organisation} are now: {roles}."
+    }
+  }
+}
