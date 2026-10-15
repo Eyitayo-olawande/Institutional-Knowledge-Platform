@@ -22,6 +22,17 @@ export function tenantDb(tenant: TenantRecord): TenantDb {
   return db;
 }
 
+// Resolves the tenant and the signed in person, without a permission check.
+export async function requireSignedIn() {
+  const resolution = await resolveRequestTenant();
+  if (!resolution.ok) redirect("/");
+  const { host, protocol } = await requestHost();
+  const session = await authFor(resolution.tenant, host, protocol).api.getSession({ headers: await headers() });
+  if (!session) redirect("/sign-in");
+  const roles = (session.user as { roles?: string }).roles ?? "";
+  return { tenant: resolution.tenant, user: session.user, roles, db: tenantDb(resolution.tenant) };
+}
+
 // Resolves the tenant and the signed in person, and checks a permission on
 // the server (Product Architecture v1, section 7). Redirects otherwise.
 export async function requirePermission(action: Action) {

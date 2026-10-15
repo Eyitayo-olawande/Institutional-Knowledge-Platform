@@ -4,6 +4,10 @@ import { ACTIONS, can, formatRoles, parseRoles, ROLES } from "./permissions.ts";
 // Permission tests: each role tried against each action it must not
 // perform (Development Roadmap v1, section 9).
 const ALLOWED: Record<string, readonly string[]> = {
+  learner: ["library.view"],
+  line_manager: ["library.view"],
+  content_owner: ["library.view", "library.edit"],
+  compliance_reviewer: ["library.view"],
   learning_administrator: ACTIONS,
 };
 
