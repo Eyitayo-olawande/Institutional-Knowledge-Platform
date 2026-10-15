@@ -2,7 +2,7 @@ import { sql } from "drizzle-orm";
 import pg from "pg";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { databaseUrl } from "../config.ts";
-import { connectControl, controlTenantDirectory, seedControl, type ControlDb } from "./index.ts";
+import { connectControl, controlTenantDirectory, listTenants, provisionTenant, seedControl, type ControlDb } from "./index.ts";
 import { migrateControl } from "./migrate.ts";
 import { tenants } from "./schema.ts";
 
@@ -78,5 +78,17 @@ describe.skipIf(!serverUrl)("control database", { timeout: 60_000 }, () => {
       sql`select column_name from information_schema.columns where table_schema = 'public' and column_name ~ '(email|phone|first_name|last_name|password)'`,
     );
     expect(result.rows).toEqual([]);
+  });
+
+  it("provisions a tenant with its own database and refuses a second on the same domain", async () => {
+    const tenant = { name: "Gamma Cover (fictional)", domain: `gamma${process.pid}.localhost`, tier: "shared" as const, hostingLocation: "local", changedBy: "test" };
+    const first = await provisionTenant(db, serverUrl ?? "", tenant);
+    expect(first.ok).toBe(true);
+    if (first.ok) {
+      expect((await listTenants(db)).map((t) => t.domain)).toContain(tenant.domain);
+      expect(await controlTenantDirectory(db).findByDomain(tenant.domain)).toMatchObject({ name: tenant.name });
+      await admin(`drop database if exists ${first.databaseName}`);
+    }
+    expect(await provisionTenant(db, serverUrl ?? "", tenant)).toEqual({ ok: false, reason: "domain_taken" });
   });
 });
