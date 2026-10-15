@@ -3,7 +3,8 @@ import { headers } from "next/headers";
 import Link from "next/link";
 import { t } from "../i18n.ts";
 import { authFor, requestHost } from "../server/auth.ts";
-import { featureOn, hasRole } from "../server/session.ts";
+import { can } from "@mantle/platform/identity";
+import { featureOn } from "../server/session.ts";
 import { resolveRequestTenant } from "../server/tenant.ts";
 import { tenantView } from "../server/tenant_view.ts";
 import { signOut } from "./actions.ts";
@@ -14,12 +15,17 @@ export default async function Home() {
   let signedInAs: string | undefined;
   let isAdministrator = false;
   let isWordingAdmin = false;
+  let canManageRoles = false;
+  let canViewActivity = false;
   if (resolution.ok) {
     const { host, protocol } = await requestHost();
     const session = await authFor(resolution.tenant, host, protocol).api.getSession({ headers: await headers() });
     signedInAs = session?.user.name;
-    isWordingAdmin = hasRole((session?.user as { roles?: string } | undefined)?.roles, "learning_administrator");
-    isAdministrator = isWordingAdmin && (await featureOn(resolution.tenant, "people_import"));
+    const roles = (session?.user as { roles?: string } | undefined)?.roles;
+    isWordingAdmin = can(roles, "wording.edit");
+    canManageRoles = can(roles, "roles.manage");
+    canViewActivity = can(roles, "activity.view");
+    isAdministrator = can(roles, "people.view") && (await featureOn(resolution.tenant, "people_import"));
   }
   return (
     <main style={{ padding: space.md }}>
@@ -36,6 +42,16 @@ export default async function Home() {
           {isWordingAdmin && (
             <p>
               <Link href="/admin/wording">{t("wording.manage")}</Link>
+            </p>
+          )}
+          {canManageRoles && (
+            <p>
+              <Link href="/admin/roles">{t("roles.manage")}</Link>
+            </p>
+          )}
+          {canViewActivity && (
+            <p>
+              <Link href="/admin/activity">{t("activity.manage")}</Link>
             </p>
           )}
           <Button type="submit" variant="secondary">{t("auth.sign_out")}</Button>

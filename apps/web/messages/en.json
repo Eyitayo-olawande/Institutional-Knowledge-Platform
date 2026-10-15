@@ -82,5 +82,36 @@
       "location": "Location",
       "role_level": "Role level"
     }
+  },
+  "roles": {
+    "manage": "Roles",
+    "heading": "Roles at {name}",
+    "explain": "Choose what each person can do. Roles combine, so one person can hold several.",
+    "save": "Save roles",
+    "saved": "Roles saved.",
+    "errors": {
+      "unknown_person": "That person was not found.",
+      "own_admin": "You cannot remove your own learning administrator role."
+    },
+    "names": {
+      "learner": "Learner",
+      "line_manager": "Line manager",
+      "content_owner": "Content owner",
+      "compliance_reviewer": "Compliance reviewer",
+      "learning_administrator": "Learning administrator",
+      "group_viewer": "Group viewer",
+      "external_learner": "External learner"
+    }
+  },
+  "activity": {
+    "manage": "Activity log",
+    "heading": "Activity at {name}",
+    "explain": "The latest 100 changes and sign ins. Entries cannot be changed or removed.",
+    "columns": {
+      "at": "When (UTC)",
+      "action": "What",
+      "actor": "Who",
+      "entity": "Record"
+    }
   }
 }

@@ -2,13 +2,13 @@ import { wording, type WordingKey } from "@mantle/db/tenant";
 import { Button, color, space } from "@mantle/ui";
 import Link from "next/link";
 import { t } from "../../../i18n.ts";
-import { requireRole } from "../../../server/session.ts";
+import { requirePermission } from "../../../server/session.ts";
 import { saveWording } from "./actions.ts";
 
 const input = { minHeight: 44, padding: space.sm, fontSize: 16 } as const;
 
 export default async function Wording({ searchParams }: { searchParams: Promise<{ saved?: string; error?: string }> }) {
-  const { tenant, db } = await requireRole("learning_administrator");
+  const { tenant, db } = await requirePermission("wording.edit");
   const labels = await wording(db);
   const { saved, error } = await searchParams;
 
