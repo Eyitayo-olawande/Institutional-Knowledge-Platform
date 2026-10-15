@@ -16,7 +16,8 @@
     "test": "vitest run",
     "check": "npm run lint && npm run typecheck && npm run test",
     "build": "npm run build --workspaces --if-present",
-    "db:setup": "npm run setup -w @mantle/db"
+    "db:setup": "npm run setup -w @mantle/db && npm run control:seed -w @mantle/db",
+    "db:migrate": "npm run control:migrate -w @mantle/db"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
