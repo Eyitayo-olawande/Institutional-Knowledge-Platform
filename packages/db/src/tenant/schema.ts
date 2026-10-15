@@ -1,4 +1,5 @@
-import { boolean, index, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, index, pgEnum, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
+import { auditColumns } from "../columns.ts";
 
 // Tenant database (Product Architecture v1, section 6). One per customer;
 // all personal data lives here and nowhere else.
@@ -14,6 +15,9 @@ export const users = pgTable("user", {
   email: text("email").notNull().unique(),
   emailVerified: boolean("email_verified").notNull().default(false),
   image: text("image"),
+  // Role names, comma separated, for example "learner,learning_administrator".
+  // Full roles and scopes arrive with the identity epic (E3).
+  roles: text("roles").notNull().default("learner"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
@@ -68,4 +72,46 @@ export const verifications = pgTable(
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [index("verification_identifier_idx").on(t.identifier)],
+);
+
+// People and organisation (Product Architecture v1, section 5). A person is
+// a member of staff known to the organisation; signing in is separate and
+// linked through userId.
+export const personStatus = pgEnum("person_status", ["active", "left"]);
+export const employmentEventType = pgEnum("employment_event_type", ["join", "move", "leave"]);
+
+export const people = pgTable(
+  "people",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    employeeId: text("employee_id").notNull(),
+    fullName: text("full_name").notNull(),
+    workEmail: text("work_email").notNull(),
+    department: text("department"),
+    managerEmployeeId: text("manager_employee_id"),
+    status: personStatus("status").notNull().default("active"),
+    userId: text("user_id").references(() => users.id),
+    joinedAt: timestamp("joined_at", { withTimezone: true }).notNull().defaultNow(),
+    leftAt: timestamp("left_at", { withTimezone: true }),
+    ...auditColumns,
+  },
+  (t) => [uniqueIndex("people_employee_id_unique").on(t.employeeId), uniqueIndex("people_work_email_unique").on(t.workEmail)],
+);
+
+// Joiners, movers and leavers drive everything (section 5): later work
+// packages react to these events (paths, handover packs).
+export const employmentEvents = pgTable(
+  "employment_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    personId: uuid("person_id")
+      .notNull()
+      .references(() => people.id),
+    type: employmentEventType("type").notNull(),
+    // For a move: the department before and after.
+    fromDepartment: text("from_department"),
+    toDepartment: text("to_department"),
+    ...auditColumns,
+  },
+  (t) => [index("employment_events_person_idx").on(t.personId)],
 );

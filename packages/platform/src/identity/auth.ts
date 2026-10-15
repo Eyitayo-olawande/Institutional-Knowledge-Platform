@@ -35,6 +35,8 @@ export function createTenantAuth(db: TenantDb, options: TenantAuthOptions) {
         verification: tenantSchema.verifications,
       },
     }),
+    // Roles until full roles and scopes arrive (E3); never set by the person.
+    user: { additionalFields: { roles: { type: "string", input: false, defaultValue: "learner" } } },
     // People are added by the staff import (E4), never by signing up.
     emailAndPassword: { enabled: true, disableSignUp: true, minPasswordLength: 10 },
     rateLimit: { enabled: true, window: 60, max: 20 },

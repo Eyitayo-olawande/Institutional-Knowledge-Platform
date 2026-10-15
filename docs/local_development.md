@@ -41,6 +41,10 @@ The customer app works out which organisation you are visiting from the address,
 
 `npm run db:setup` adds one fictional person to each development tenant: `ada@alpha.test` on alpha.localhost and `ada@beta.test` on beta.localhost. The password is in `packages/platform/src/identity/seed_cli.ts` (development only). Sign in at http://alpha.localhost:3000/sign-in with the password, or ask for an emailed code: until an email provider is chosen, codes are written to `apps/web/.data/outbox.log` (ignored by git).
 
+## Importing staff
+
+Ada on each development tenant is a learning administrator, so after signing in the home page shows "Manage staff" (http://alpha.localhost:3000/admin/people). Upload `docs/samples/staff_import_example.csv` to add four fictional people. Imported people sign in with an emailed code. The file columns are provisional until the SUNU staff file format is agreed.
+
 ## Before opening a pull request
 
 Run `npm run check` and `npm run build`. GitHub runs the same checks on every pull request, and nothing merges with failing checks.
