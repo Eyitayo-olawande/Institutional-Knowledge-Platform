@@ -8,6 +8,13 @@
       "when": 1792062847255,
       "tag": "0000_tenant_sign_in",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792065611115,
+      "tag": "0001_people",
+      "breakpoints": true
     }
   ]
 }

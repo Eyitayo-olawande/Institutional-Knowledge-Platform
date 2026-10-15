@@ -1,0 +1,5 @@
+employee_id,full_name,work_email,department,manager_employee_id
+AL001,Chidi Okafor (fictional),chidi@alpha.test,Claims,
+AL002,Funke Adeyemi (fictional),funke@alpha.test,Claims,AL001
+AL003,Musa Bello (fictional),musa@alpha.test,Underwriting,
+AL004,Ngozi Eze (fictional),ngozi@alpha.test,Underwriting,AL003

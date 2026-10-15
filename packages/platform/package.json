@@ -5,7 +5,8 @@
   "exports": {
     "./translation": "./src/translation.ts",
     "./tenancy": "./src/tenancy/index.ts",
-    "./identity": "./src/identity/index.ts"
+    "./identity": "./src/identity/index.ts",
+    "./people": "./src/people/index.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",

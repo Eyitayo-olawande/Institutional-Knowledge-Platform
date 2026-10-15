@@ -14,8 +14,8 @@ try {
     const prefix = tenant.domain.split(".")[0];
     const { db, close } = connectTenant(config.serverUrl, tenant.databaseName);
     try {
-      await seedTestPerson(db, { name: `Ada ${prefix} (fictional)`, email: `ada@${prefix}.test`, password: DEV_PASSWORD });
-      console.log(`Fictional person ada@${prefix}.test can sign in on ${tenant.domain}.`);
+      await seedTestPerson(db, { name: `Ada ${prefix} (fictional)`, email: `ada@${prefix}.test`, password: DEV_PASSWORD, roles: "learner,learning_administrator" });
+      console.log(`Fictional person ada@${prefix}.test can sign in on ${tenant.domain} as a learning administrator.`);
     } finally {
       await close();
     }

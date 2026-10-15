@@ -23,5 +23,48 @@
       "wrong_details": "That email and password do not match.",
       "wrong_code": "That code is wrong or has expired."
     }
+  },
+  "people": {
+    "back": "Back to home",
+    "heading": "People at {name}",
+    "list_heading": "Staff ({count})",
+    "empty": "No staff yet. Import a staff file to add people.",
+    "manage": "Manage staff",
+    "columns": {
+      "employee_id": "Employee ID",
+      "name": "Name",
+      "email": "Work email",
+      "department": "Department",
+      "status": "Status"
+    },
+    "statuses": {
+      "active": "Active",
+      "left": "Left"
+    },
+    "import": {
+      "heading": "Import staff",
+      "format": "Upload a CSV file with the columns employee_id, full_name and work_email, plus department and manager_employee_id if you have them. Each import adds joiners and records movers.",
+      "mark_leavers": "Mark people who are not in this file as leavers",
+      "submit": "Import file",
+      "line": "Line {line}: ",
+      "counts": {
+        "joined": "Joined: {count}",
+        "moved": "Moved department: {count}",
+        "updated": "Details updated: {count}",
+        "unchanged": "Unchanged: {count}",
+        "left": "Left: {count}"
+      },
+      "problems": {
+        "no_file": "Choose a CSV file to import.",
+        "too_large": "The file is larger than 2 MB.",
+        "empty_file": "The file is empty.",
+        "missing_columns": "The file is missing these columns: {columns}.",
+        "no_employee_id": "No employee ID, so this row was skipped.",
+        "no_name": "No name, so this row was skipped.",
+        "bad_email": "The work email is not valid, so this row was skipped.",
+        "duplicate_id": "This employee ID appears earlier in the file, so this row was skipped.",
+        "duplicate_email": "This work email appears earlier in the file, so this row was skipped."
+      }
+    }
   }
 }
