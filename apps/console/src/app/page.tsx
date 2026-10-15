@@ -2,14 +2,24 @@ import { listTenants } from "@mantle/db/control";
 import { Button, color, space } from "@mantle/ui";
 import { t } from "../i18n.ts";
 import { consoleOpen, control } from "../server/control.ts";
-import { createTenant } from "./actions.ts";
+import { addTenantAdministrator, createTenant } from "./actions.ts";
 
-const ERRORS = new Set(["name_required", "domain_invalid", "tier_invalid", "location_required", "domain_taken", "database_taken"]);
+const ERRORS = new Set([
+  "name_required",
+  "domain_invalid",
+  "tier_invalid",
+  "location_required",
+  "domain_taken",
+  "database_taken",
+  "admin_name_required",
+  "admin_email_invalid",
+  "tenant_unknown",
+]);
 
 const field = { display: "grid", gap: space.xs, marginBottom: space.md } as const;
 const input = { minHeight: 44, padding: space.sm, fontSize: 16 } as const;
 
-export default async function Home({ searchParams }: { searchParams: Promise<{ created?: string; error?: string }> }) {
+export default async function Home({ searchParams }: { searchParams: Promise<{ created?: string; admin_added?: string; error?: string }> }) {
   if (!consoleOpen()) {
     return (
       <main style={{ padding: space.md }}>
@@ -18,7 +28,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ c
       </main>
     );
   }
-  const { created, error } = await searchParams;
+  const { created, admin_added: adminAdded, error } = await searchParams;
   const tenants = await listTenants(control());
 
   return (
@@ -26,6 +36,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ c
       <h1>{t("app.title")}</h1>
 
       {created && <p role="status" style={{ color: color.success }}>{t("tenants.created", { domain: created })}</p>}
+      {adminAdded && <p role="status" style={{ color: color.success }}>{t("tenants.admin_added", { domain: adminAdded })}</p>}
       {error && ERRORS.has(error) && <p role="alert" style={{ color: color.danger }}>{t(`tenants.errors.${error}`)}</p>}
 
       <h2>{t("tenants.heading")}</h2>
@@ -75,8 +86,44 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ c
           {t("tenants.create.hosting_location")}
           <input name="hostingLocation" required defaultValue="local" style={input} />
         </label>
+        <label style={field}>
+          {t("tenants.admin.name")}
+          <input name="adminName" required style={input} />
+        </label>
+        <label style={field}>
+          {t("tenants.admin.email")}
+          <input name="adminEmail" type="email" required style={input} />
+        </label>
         <Button type="submit">{t("tenants.create.submit")}</Button>
       </form>
+
+      {tenants.length > 0 && (
+        <>
+          <h2>{t("tenants.admin.heading")}</h2>
+          <p>{t("tenants.admin.explain")}</p>
+          <form action={addTenantAdministrator}>
+            <label style={field}>
+              {t("tenants.admin.organisation")}
+              <select name="tenantId" style={input}>
+                {tenants.map((tenant) => (
+                  <option key={tenant.id} value={tenant.id}>
+                    {tenant.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label style={field}>
+              {t("tenants.admin.name")}
+              <input name="adminName" required style={input} />
+            </label>
+            <label style={field}>
+              {t("tenants.admin.email")}
+              <input name="adminEmail" type="email" required style={input} />
+            </label>
+            <Button type="submit" variant="secondary">{t("tenants.admin.submit")}</Button>
+          </form>
+        </>
+      )}
     </main>
   );
 }

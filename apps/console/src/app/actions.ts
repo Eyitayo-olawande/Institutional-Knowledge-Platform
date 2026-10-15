@@ -1,10 +1,11 @@
 "use server";
 
-import { provisionTenant } from "@mantle/db/control";
+import { listTenants, provisionTenant } from "@mantle/db/control";
+import { addAdministrator } from "@mantle/db/tenant";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { consoleOpen, control, serverUrl } from "../server/control.ts";
-import { readTenantForm } from "../server/tenant_form.ts";
+import { consoleOpen, control, serverUrl, tenantDbByName } from "../server/control.ts";
+import { readAdminFields, readTenantForm } from "../server/tenant_form.ts";
 
 export async function createTenant(form: FormData): Promise<void> {
   if (!consoleOpen()) redirect("/");
@@ -15,7 +16,19 @@ export async function createTenant(form: FormData): Promise<void> {
     // Replaced by the signed in Design Streams user once sign in exists.
     changedBy: "console:development",
   });
-  revalidatePath("/");
   if (!result.ok) redirect(`/?error=${result.reason}`);
+  await addAdministrator(tenantDbByName(result.databaseName), parsed.admin);
+  revalidatePath("/");
   redirect(`/?created=${encodeURIComponent(parsed.value.domain)}`);
+}
+
+export async function addTenantAdministrator(form: FormData): Promise<void> {
+  if (!consoleOpen()) redirect("/");
+  const tenantId = String(form.get("tenantId") ?? "");
+  const tenant = (await listTenants(control())).find((t) => t.id === tenantId);
+  if (!tenant) redirect("/?error=tenant_unknown");
+  const admin = readAdminFields(form);
+  if (!admin.ok) redirect(`/?error=${admin.error}`);
+  await addAdministrator(tenantDbByName(tenant.databaseName), admin.value);
+  redirect(`/?admin_added=${encodeURIComponent(tenant.domain)}`);
 }

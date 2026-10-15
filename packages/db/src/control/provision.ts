@@ -68,6 +68,7 @@ export async function listTenants(control: ControlDb) {
       tier: tenants.tier,
       status: tenants.status,
       hostingLocation: tenants.hostingLocation,
+      databaseName: tenants.databaseName,
     })
     .from(tenants)
     .orderBy(asc(tenants.name));

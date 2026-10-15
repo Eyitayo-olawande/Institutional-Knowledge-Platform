@@ -7,13 +7,14 @@ function form(values: Record<string, string>): FormData {
   return data;
 }
 
-const valid = { name: " Gamma Cover ", domain: "Gamma.Localhost:3000", tier: "shared", hostingLocation: "local" };
+const valid = { name: " Gamma Cover ", domain: "Gamma.Localhost:3000", tier: "shared", hostingLocation: "local", adminName: "Kemi", adminEmail: "Kemi@Gamma.test" };
 
 describe("readTenantForm", () => {
   it("accepts and normalises a valid tenant", () => {
     expect(readTenantForm(form(valid))).toEqual({
       ok: true,
       value: { name: "Gamma Cover", domain: "gamma.localhost", tier: "shared", hostingLocation: "local" },
+      admin: { name: "Kemi", email: "kemi@gamma.test" },
     });
   });
 
@@ -23,6 +24,8 @@ describe("readTenantForm", () => {
     [{ domain: "10.0.0.1" }, "domain_invalid"],
     [{ tier: "premium" }, "tier_invalid"],
     [{ hostingLocation: " " }, "location_required"],
+    [{ adminName: "" }, "admin_name_required"],
+    [{ adminEmail: "not an email" }, "admin_email_invalid"],
   ])("rejects %o", (change, error) => {
     expect(readTenantForm(form({ ...valid, ...change }))).toEqual({ ok: false, error });
   });

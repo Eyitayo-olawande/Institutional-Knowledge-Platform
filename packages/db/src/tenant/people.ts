@@ -133,3 +133,28 @@ export async function listPeople(db: TenantDb) {
 export async function setUserRoles(db: TenantDb, userId: string, roles: string): Promise<void> {
   await db.update(users).set({ roles, updatedAt: new Date() }).where(eq(users.id, userId));
 }
+
+// Adds a learning administrator who signs in with an emailed code, or
+// gives an existing sign in account that role. Used when Design Streams
+// sets up an organisation (assisted onboarding).
+export async function addAdministrator(db: TenantDb, person: { name: string; email: string }): Promise<"added" | "promoted"> {
+  const email = person.email.trim().toLowerCase();
+  const [found] = await db.select({ id: users.id, roles: users.roles }).from(users).where(eq(users.email, email));
+  if (found) {
+    const roles = new Set(found.roles.split(",").map((r) => r.trim()).filter(Boolean));
+    roles.add("learning_administrator");
+    await setUserRoles(db, found.id, [...roles].join(","));
+    return "promoted";
+  }
+  const now = new Date();
+  await db.insert(users).values({
+    id: randomUUID(),
+    name: person.name.trim(),
+    email,
+    emailVerified: true,
+    roles: "learner,learning_administrator",
+    createdAt: now,
+    updatedAt: now,
+  });
+  return "added";
+}
