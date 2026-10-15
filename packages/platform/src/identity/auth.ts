@@ -1,4 +1,4 @@
-import { connectTenant, tenantSchema, type TenantDb } from "@mantle/db/tenant";
+import { connectTenant, recordActivity, tenantSchema, type TenantDb } from "@mantle/db/tenant";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
@@ -40,6 +40,21 @@ export function createTenantAuth(db: TenantDb, options: TenantAuthOptions) {
     // People are added by the staff import (E4), never by signing up.
     emailAndPassword: { enabled: true, disableSignUp: true, minPasswordLength: 10 },
     rateLimit: { enabled: true, window: 60, max: 20 },
+    // Sign ins and sign outs go to the activity log (section 9).
+    databaseHooks: {
+      session: {
+        create: {
+          after: async (session) => {
+            await recordActivity(db, { actor: `user:${session.userId}`, action: "auth.signed_in", entityType: "user", entityId: session.userId });
+          },
+        },
+        delete: {
+          after: async (session) => {
+            await recordActivity(db, { actor: `user:${session.userId}`, action: "auth.signed_out", entityType: "user", entityId: session.userId });
+          },
+        },
+      },
+    },
     plugins: [
       emailOTP({
         disableSignUp: true,

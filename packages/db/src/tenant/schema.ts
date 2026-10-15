@@ -1,4 +1,4 @@
-import { boolean, index, pgEnum, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
+import { boolean, index, jsonb, pgEnum, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
 import { auditColumns } from "../columns.ts";
 
 // Tenant database (Product Architecture v1, section 6). One per customer;
@@ -114,4 +114,25 @@ export const employmentEvents = pgTable(
     ...auditColumns,
   },
   (t) => [index("employment_events_person_idx").on(t.personId)],
+);
+
+// Activity log (Product Architecture v1, section 5): an append only record
+// of every change and result. Updates and deletes are refused by the
+// database itself (see the migration). Retention (E14) will archive rows
+// through a separate, audited path.
+export const activityLog = pgTable(
+  "activity_log",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    at: timestamp("at", { withTimezone: true }).notNull().defaultNow(),
+    // Who: a user id ("user:<id>"), a Design Streams actor, or "system:<job>".
+    actor: text("actor").notNull(),
+    // What happened, as a dotted name, for example "people.joined".
+    action: text("action").notNull(),
+    entityType: text("entity_type").notNull(),
+    entityId: text("entity_id"),
+    // Field names and before/after values where useful.
+    details: jsonb("details").$type<Record<string, unknown>>(),
+  },
+  (t) => [index("activity_log_entity_idx").on(t.entityType, t.entityId), index("activity_log_at_idx").on(t.at)],
 );
