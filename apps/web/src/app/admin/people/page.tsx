@@ -3,14 +3,14 @@ import { Button, color, space } from "@mantle/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { t } from "../../../i18n.ts";
-import { requireFeature, requireRole } from "../../../server/session.ts";
+import { requireFeature, requirePermission } from "../../../server/session.ts";
 import { importStaff } from "./actions.ts";
 import { RESULT_COOKIE, type ImportResult } from "./import_result.ts";
 
 const COUNTS = ["joined", "moved", "updated", "unchanged", "left"] as const;
 
 export default async function People() {
-  const { tenant, db } = await requireRole("learning_administrator");
+  const { tenant, db } = await requirePermission("people.view");
   await requireFeature(tenant, "people_import");
   const people = await listPeople(db);
   const labels = await wording(db);

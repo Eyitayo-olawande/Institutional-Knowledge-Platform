@@ -2,10 +2,10 @@
 
 import { isWordingKey, setWording } from "@mantle/db/tenant";
 import { redirect } from "next/navigation";
-import { requireRole } from "../../../server/session.ts";
+import { requirePermission } from "../../../server/session.ts";
 
 export async function saveWording(form: FormData): Promise<void> {
-  const { db, user } = await requireRole("learning_administrator");
+  const { db, user } = await requirePermission("wording.edit");
   const key = String(form.get("key") ?? "");
   const singular = String(form.get("singular") ?? "").trim();
   const plural = String(form.get("plural") ?? "").trim();

@@ -189,3 +189,18 @@ export async function addAdministrator(
   await recordActivity(db, { actor, action: "roles.granted", entityType: "user", entityId: id, details: { role: "learning_administrator", new_account: true } });
   return "added";
 }
+
+export async function listUsers(db: TenantDb) {
+  return db.select({ id: users.id, name: users.name, email: users.email, roles: users.roles }).from(users).orderBy(users.name);
+}
+
+// Changes someone's roles and records it, in one transaction.
+export async function changeUserRoles(db: TenantDb, userId: string, roles: string, actor: string): Promise<void> {
+  await db.transaction(async (tx) => {
+    const [before] = await tx.select({ roles: users.roles }).from(users).where(eq(users.id, userId));
+    if (!before) throw new Error("No such user.");
+    if (before.roles === roles) return;
+    await tx.update(users).set({ roles, updatedAt: new Date() }).where(eq(users.id, userId));
+    await recordActivity(tx, { actor, action: "roles.changed", entityType: "user", entityId: userId, details: { from: before.roles, to: roles } });
+  });
+}
