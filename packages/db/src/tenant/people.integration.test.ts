@@ -2,7 +2,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createDatabase, dropDatabase } from "../setup.ts";
 import { connectTenant, type TenantDb } from "./client.ts";
 import { migrateTenant } from "./migrate.ts";
-import { applyStaffImport, listPeople } from "./people.ts";
+import { addAdministrator, applyStaffImport, listPeople } from "./people.ts";
 import * as schema from "./schema.ts";
 
 const serverUrl = process.env.MANTLE_PG_SERVER_URL;
@@ -59,5 +59,30 @@ describe.skipIf(!serverUrl)("staff import", { timeout: 60_000 }, () => {
     const summary = await applyStaffImport(db, [row("E1", "Ada", "Underwriting"), row("E2", "Bola", "Sales")], opts);
     expect(summary).toMatchObject({ joined: 1, unchanged: 1 });
     expect((await listPeople(db)).find((p) => p.employeeId === "E2")?.status).toBe("active");
+  });
+});
+
+describe.skipIf(!serverUrl)("first administrator", { timeout: 60_000 }, () => {
+  const dbName = `itest_admin_${process.pid}_${Date.now()}`;
+  let db: TenantDb;
+  let close: () => Promise<void>;
+
+  beforeAll(async () => {
+    await createDatabase(serverUrl ?? "", dbName);
+    await migrateTenant(serverUrl ?? "", dbName);
+    ({ db, close } = connectTenant(serverUrl ?? "", dbName));
+  });
+
+  afterAll(async () => {
+    await close?.();
+    await dropDatabase(serverUrl ?? "", dbName);
+  });
+
+  it("adds a new administrator, then promotes rather than duplicates", async () => {
+    expect(await addAdministrator(db, { name: "Kemi", email: " Kemi@Org.test " })).toBe("added");
+    expect(await addAdministrator(db, { name: "Kemi", email: "kemi@org.test" })).toBe("promoted");
+    const all = await db.select().from(schema.users);
+    expect(all).toHaveLength(1);
+    expect(all[0]?.roles).toBe("learner,learning_administrator");
   });
 });

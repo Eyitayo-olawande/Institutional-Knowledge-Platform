@@ -9,7 +9,7 @@
   "tenants": {
     "heading": "Organisations",
     "empty": "No organisations yet.",
-    "created": "Created {domain}. Open it in the customer app on port 3000.",
+    "created": "Created {domain} with its first administrator. Open it in the customer app on port 3000.",
     "columns": {
       "name": "Name",
       "domain": "Address",
@@ -41,7 +41,19 @@
       "tier_invalid": "Choose shared or dedicated hosting.",
       "location_required": "Enter the hosting location.",
       "domain_taken": "Another organisation already uses that address.",
-      "database_taken": "A database for that address already exists."
-    }
+      "database_taken": "A database for that address already exists.",
+      "admin_name_required": "Enter the administrator's name.",
+      "admin_email_invalid": "Enter the administrator's work email.",
+      "tenant_unknown": "That organisation was not found."
+    },
+    "admin": {
+      "heading": "Add an administrator",
+      "explain": "Gives someone the learning administrator role in an organisation. They sign in on its address with an emailed code.",
+      "organisation": "Organisation",
+      "name": "Administrator's name",
+      "email": "Administrator's work email",
+      "submit": "Add administrator"
+    },
+    "admin_added": "Administrator added to {domain}. They can sign in there with an emailed code."
   }
 }
