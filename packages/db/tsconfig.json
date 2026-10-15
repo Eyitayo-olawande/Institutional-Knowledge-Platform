@@ -2,6 +2,7 @@
   "extends": "../../tsconfig.base.json",
   "include": [
     "src",
-    "drizzle.control.config.ts"
+    "drizzle.control.config.ts",
+    "drizzle.tenant.config.ts"
   ]
 }

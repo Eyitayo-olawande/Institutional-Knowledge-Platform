@@ -13,6 +13,8 @@ export interface TenantRecord {
   readonly domain: string;
   readonly tier: TenantTier;
   readonly status: string;
+  // The tenant's own database; routing data, not personal data.
+  readonly databaseName: string;
 }
 
 export interface TenantDirectory {
