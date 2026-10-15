@@ -9,7 +9,7 @@ export function controlTenantDirectory(db: ControlDb) {
   return {
     async findByDomain(domain: string) {
       const [row] = await db
-        .select({ id: tenants.id, name: tenants.name, domain: tenants.domain, tier: tenants.tier, status: tenants.status })
+        .select({ id: tenants.id, name: tenants.name, domain: tenants.domain, tier: tenants.tier, status: tenants.status, databaseName: tenants.databaseName })
         .from(tenants)
         .where(eq(tenants.domain, domain))
         .limit(1);

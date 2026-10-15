@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { tenantView } from "./tenant_view.ts";
 
-const tenant = { id: "t1", name: "Alpha Insurance", domain: "alpha.localhost", tier: "dedicated" as const, status: "active" };
+const tenant = { id: "t1", name: "Alpha Insurance", domain: "alpha.localhost", tier: "dedicated" as const, status: "active", databaseName: "t1" };
 
 describe("tenantView", () => {
   it("welcomes a resolved tenant by name", () => {

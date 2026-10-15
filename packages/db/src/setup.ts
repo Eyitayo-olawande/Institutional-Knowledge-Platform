@@ -48,3 +48,26 @@ export async function canConnect(serverUrl: string, database: string): Promise<b
     await client.end().catch(() => {});
   }
 }
+
+// For tests and provisioning scripts: create or drop one database by name.
+export async function createDatabase(serverUrl: string, name: string): Promise<void> {
+  assertSafeName(name);
+  const client = new pg.Client({ connectionString: serverUrl });
+  await client.connect();
+  try {
+    await client.query(`create database ${name}`);
+  } finally {
+    await client.end();
+  }
+}
+
+export async function dropDatabase(serverUrl: string, name: string): Promise<void> {
+  assertSafeName(name);
+  const client = new pg.Client({ connectionString: serverUrl });
+  await client.connect();
+  try {
+    await client.query(`drop database if exists ${name} with (force)`);
+  } finally {
+    await client.end();
+  }
+}

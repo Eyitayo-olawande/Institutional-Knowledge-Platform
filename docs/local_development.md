@@ -37,6 +37,10 @@ GitHub Actions always runs them against its own PostgreSQL 18.
 
 The customer app works out which organisation you are visiting from the address, so plain http://localhost:3000 shows a hint instead of a tenant.
 
+## Signing in
+
+`npm run db:setup` adds one fictional person to each development tenant: `ada@alpha.test` on alpha.localhost and `ada@beta.test` on beta.localhost. The password is in `packages/platform/src/identity/seed_cli.ts` (development only). Sign in at http://alpha.localhost:3000/sign-in with the password, or ask for an emailed code: until an email provider is chosen, codes are written to `apps/web/.data/outbox.log` (ignored by git).
+
 ## Before opening a pull request
 
 Run `npm run check` and `npm run build`. GitHub runs the same checks on every pull request, and nothing merges with failing checks.

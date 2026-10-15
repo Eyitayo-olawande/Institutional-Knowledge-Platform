@@ -4,10 +4,18 @@
   "type": "module",
   "exports": {
     "./translation": "./src/translation.ts",
-    "./tenancy": "./src/tenancy/index.ts"
+    "./tenancy": "./src/tenancy/index.ts",
+    "./identity": "./src/identity/index.ts"
   },
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "seed:people": "tsx src/identity/seed_cli.ts"
   },
-  "devDependencies": {}
+  "dependencies": {
+    "better-auth": "^1.7.9",
+    "@mantle/db": "*"
+  },
+  "devDependencies": {
+    "tsx": "^4.23.15"
+  }
 }

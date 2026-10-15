@@ -26,6 +26,7 @@ The roadmap asks for one decision record per line of the proposed stack. All 16 
 | [0016 Hosting](0016_hosting.md) | A major cloud provider with a region close to Nigeria, or in country hosting if SUNU requires it | Accepted; provider deferred |
 | [0017 Translation lookup](0017_translation_lookup.md) | Small built in lookup over JSON message files (answers the open question in 0011) | Accepted |
 | [0018 Drizzle](0018_drizzle.md) | Drizzle ORM and Drizzle Kit over the pg driver (answers the open question in 0005) | Accepted |
+| [0019 Better Auth](0019_better_auth.md) | Better Auth, one sign in instance per tenant database (answers the open question in 0009) | Accepted |
 
 ## Statuses
 

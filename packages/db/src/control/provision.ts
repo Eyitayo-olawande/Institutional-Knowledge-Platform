@@ -1,5 +1,6 @@
 import { asc, eq } from "drizzle-orm";
 import pg from "pg";
+import { migrateTenant } from "../tenant/migrate.ts";
 import type { ControlDb } from "./client.ts";
 import { tenants } from "./schema.ts";
 
@@ -24,9 +25,8 @@ export function databaseNameFor(domain: string): string {
 }
 
 // Creates the tenant's own database, then records the tenant in the control
-// database. If recording fails, the new database is dropped again so no
-// orphan is left behind. Tenant schema migrations run here once tenant
-// tables exist (later work packages).
+// database. If migrating or recording fails, the new database is dropped
+// again so no orphan is left behind.
 export async function provisionTenant(
   control: ControlDb,
   serverUrl: string,
@@ -43,6 +43,7 @@ export async function provisionTenant(
     if (found.rowCount) return { ok: false, reason: "database_taken" };
     await admin.query(`create database ${databaseName}`);
     try {
+      await migrateTenant(serverUrl, databaseName);
       const [row] = await control
         .insert(tenants)
         .values({ ...tenant, databaseName, status: "onboarding" })
@@ -70,4 +71,10 @@ export async function listTenants(control: ControlDb) {
     })
     .from(tenants)
     .orderBy(asc(tenants.name));
+}
+
+// Every tenant database name in the control database.
+export async function tenantDatabaseNames(control: ControlDb): Promise<string[]> {
+  const rows = await control.select({ databaseName: tenants.databaseName }).from(tenants);
+  return rows.map((row) => row.databaseName);
 }

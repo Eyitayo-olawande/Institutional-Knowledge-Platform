@@ -57,7 +57,8 @@ Node 20 or newer and npm workspaces (apps/* and packages/*).
 * `npm run check`: all three, in that order; run before opening a pull request
 * `npm run build`: production build of every app
 * `npm run db:setup`: create the local control and fictional tenant databases (Postgres.app), migrate and seed
-* `npm run db:migrate`: apply control database migrations
+* `npm run db:migrate`: apply control database migrations, then tenant migrations to every tenant database
+* `npm run tenant:generate -w @mantle/db`: same for packages/db/src/tenant/schema.ts
 * `npm run control:generate -w @mantle/db`: generate a migration after changing packages/db/src/control/schema.ts; review the SQL before committing
 * `npm run dev -w @mantle/web` (port 3000), `npm run dev -w @mantle/console` (port 3001), `npm run dev -w @mantle/worker`: run one app locally
 

@@ -7,5 +7,21 @@
     "welcome": "Welcome to {name}.",
     "unknown": "This address is not set up for any organisation.",
     "no_domain": "Open this app on your organisation's address, for example alpha.localhost:3000 in development."
+  },
+  "auth": {
+    "sign_in": "Sign in",
+    "sign_in_to": "Sign in to {name}",
+    "sign_out": "Sign out",
+    "signed_in_as": "Signed in as {name}.",
+    "email": "Work email",
+    "password": "Password",
+    "or_code_heading": "Or get a sign in code by email",
+    "send_code": "Email me a code",
+    "code_sent": "If that address belongs to someone here, a six digit code is on its way. It expires in ten minutes.",
+    "code": "Six digit code",
+    "errors": {
+      "wrong_details": "That email and password do not match.",
+      "wrong_code": "That code is wrong or has expired."
+    }
   }
 }
