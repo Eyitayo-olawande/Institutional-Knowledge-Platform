@@ -170,7 +170,22 @@
     "due": "review by {date}",
     "overdue": "review overdue since {date}",
     "title": "Library",
-    "new_sub": "Write the content now; it stays a draft until you publish it."
+    "new_sub": "Write the content now; it stays a draft until you publish it.",
+    "files": {
+      "heading": "Files",
+      "add": "Attach files (PDF, Word, Excel, PowerPoint, image or MP4; up to 10 files of 25 MB each)",
+      "upload": "Upload files",
+      "added": "Files attached: {count}.",
+      "size": "{kb} KB",
+      "errors": {
+        "empty": "Choose at least one file to upload.",
+        "too_many": "Upload up to 10 files at a time.",
+        "too_large": "A file is larger than 25 MB. Nothing was saved.",
+        "type_not_allowed": "A file is of a type that is not allowed. Nothing was saved.",
+        "content_mismatch": "A file's contents do not match its type. Nothing was saved.",
+        "infected": "A file failed the malware scan. Nothing was saved."
+      }
+    }
   },
   "notices": {
     "link": "Notices ({count} new)",

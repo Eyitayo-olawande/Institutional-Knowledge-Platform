@@ -1,7 +1,7 @@
 import { and, asc, desc, eq, isNull, lte, max } from "drizzle-orm";
 import { recordActivity } from "./activity.ts";
 import type { TenantDb } from "./client.ts";
-import { libraryItems, libraryItemVersions } from "./schema.ts";
+import { files, libraryItemFiles, libraryItems, libraryItemVersions } from "./schema.ts";
 
 export interface NewItem {
   readonly title: string;
@@ -124,4 +124,40 @@ export async function itemsDueForReview(db: TenantDb, today: string, days = 30) 
   const until = limit.toISOString().slice(0, 10);
   const rows = await db.select().from(libraryItems).where(lte(libraryItems.reviewDate, until)).orderBy(asc(libraryItems.reviewDate));
   return rows.filter((r) => r.status !== "retired").map((r) => ({ ...r, overdue: (r.reviewDate ?? "") < today }));
+}
+
+// Records an uploaded file against an item, with an activity log entry.
+export async function attachFileToItem(
+  db: TenantDb,
+  itemId: string,
+  file: { storageKey: string; name: string; contentType: string; size: number; sha256: string },
+  actor: string,
+): Promise<string> {
+  return db.transaction(async (tx) => {
+    const [row] = await tx.insert(files).values({ ...file, changedBy: actor }).returning({ id: files.id });
+    if (!row) throw new Error("File was not recorded.");
+    await tx.insert(libraryItemFiles).values({ itemId, fileId: row.id, changedBy: actor });
+    await recordActivity(tx, { actor, action: "library.file_attached", entityType: "library_item", entityId: itemId, details: { file_id: row.id, size: file.size } });
+    return row.id;
+  });
+}
+
+export async function itemFiles(db: TenantDb, itemId: string) {
+  return db
+    .select({ id: files.id, name: files.name, size: files.size, contentType: files.contentType })
+    .from(libraryItemFiles)
+    .innerJoin(files, eq(libraryItemFiles.fileId, files.id))
+    .where(eq(libraryItemFiles.itemId, itemId))
+    .orderBy(files.name);
+}
+
+// A file with the item it belongs to, so callers can check who may open it.
+export async function fileWithItem(db: TenantDb, fileId: string) {
+  const [row] = await db
+    .select({ file: files, itemId: libraryItemFiles.itemId, itemStatus: libraryItems.status })
+    .from(files)
+    .innerJoin(libraryItemFiles, eq(libraryItemFiles.fileId, files.id))
+    .innerJoin(libraryItems, eq(libraryItems.id, libraryItemFiles.itemId))
+    .where(eq(files.id, fileId));
+  return row ?? null;
 }

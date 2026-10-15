@@ -2,7 +2,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createDatabase, dropDatabase } from "../setup.ts";
 import { recentActivity } from "./activity.ts";
 import { connectTenant, type TenantDb } from "./client.ts";
-import { createLibraryItem, getLibraryItem, itemsDueForReview, listLibraryItems, publishDraft, saveDraft, searchLibrary } from "./library.ts";
+import { attachFileToItem, createLibraryItem, fileWithItem, getLibraryItem, itemFiles, itemsDueForReview, listLibraryItems, publishDraft, saveDraft, searchLibrary } from "./library.ts";
 import { migrateTenant } from "./migrate.ts";
 
 const serverUrl = process.env.MANTLE_PG_SERVER_URL;
@@ -77,5 +77,12 @@ describe.skipIf(!serverUrl)("knowledge library", { timeout: 60_000 }, () => {
       ["Claims SOP", false],
       ["Secret draft about claims", false],
     ]);
+  });
+
+  it("attaches files to an item and finds the item from a file", async () => {
+    const fileId = await attachFileToItem(db, id, { storageKey: "k1", name: "form.pdf", contentType: "application/pdf", size: 10, sha256: "x" }, "user:a");
+    expect((await itemFiles(db, id)).map((f) => f.name)).toEqual(["form.pdf"]);
+    expect(await fileWithItem(db, fileId)).toMatchObject({ itemId: id, itemStatus: "published" });
+    expect((await recentActivity(db, 1))[0]?.action).toBe("library.file_attached");
   });
 });
