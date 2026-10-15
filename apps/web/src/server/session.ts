@@ -1,11 +1,12 @@
 import "server-only";
 import { loadConfig } from "@mantle/db";
 import { connectTenant, type TenantDb } from "@mantle/db/tenant";
+import { isFeatureOn, type Feature } from "@mantle/db/control";
 import type { TenantRecord } from "@mantle/platform/tenancy";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { authFor, requestHost } from "./auth.ts";
-import { resolveRequestTenant } from "./tenant.ts";
+import { controlDb, resolveRequestTenant } from "./tenant.ts";
 
 export function hasRole(roles: string | undefined | null, role: string): boolean {
   return (roles ?? "").split(",").map((r) => r.trim()).includes(role);
@@ -34,4 +35,13 @@ export async function requireRole(role: string) {
   if (!session) redirect("/sign-in");
   if (!hasRole((session.user as { roles?: string }).roles, role)) redirect("/");
   return { tenant: resolution.tenant, user: session.user, db: tenantDb(resolution.tenant) };
+}
+
+// Unfinished or switched off features are hidden per tenant (CLAUDE.md).
+export async function featureOn(tenant: TenantRecord, feature: Feature): Promise<boolean> {
+  return isFeatureOn(controlDb(), tenant.id, feature);
+}
+
+export async function requireFeature(tenant: TenantRecord, feature: Feature): Promise<void> {
+  if (!(await featureOn(tenant, feature))) redirect("/");
 }

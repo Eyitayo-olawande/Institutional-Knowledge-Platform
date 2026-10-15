@@ -1,6 +1,6 @@
 "use server";
 
-import { listTenants, provisionTenant } from "@mantle/db/control";
+import { isFeature, listTenants, provisionTenant, setFeature } from "@mantle/db/control";
 import { addAdministrator } from "@mantle/db/tenant";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -31,4 +31,15 @@ export async function addTenantAdministrator(form: FormData): Promise<void> {
   if (!admin.ok) redirect(`/?error=${admin.error}`);
   await addAdministrator(tenantDbByName(tenant.databaseName), admin.value);
   redirect(`/?admin_added=${encodeURIComponent(tenant.domain)}`);
+}
+
+export async function toggleFeature(form: FormData): Promise<void> {
+  if (!consoleOpen()) redirect("/");
+  const tenantId = String(form.get("tenantId") ?? "");
+  const feature = String(form.get("feature") ?? "");
+  const tenant = (await listTenants(control())).find((t) => t.id === tenantId);
+  if (!tenant || !isFeature(feature)) redirect("/?error=tenant_unknown");
+  await setFeature(control(), tenant.id, feature, form.get("enabled") === "true", "console:development");
+  revalidatePath("/");
+  redirect("/#features");
 }

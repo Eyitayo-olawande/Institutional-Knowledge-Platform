@@ -1,8 +1,8 @@
-import { listTenants } from "@mantle/db/control";
+import { FEATURES, featureStates, listTenants, type Feature } from "@mantle/db/control";
 import { Button, color, space } from "@mantle/ui";
 import { t } from "../i18n.ts";
 import { consoleOpen, control } from "../server/control.ts";
-import { addTenantAdministrator, createTenant } from "./actions.ts";
+import { addTenantAdministrator, createTenant, toggleFeature } from "./actions.ts";
 
 const ERRORS = new Set([
   "name_required",
@@ -30,6 +30,8 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ c
   }
   const { created, admin_added: adminAdded, error } = await searchParams;
   const tenants = await listTenants(control());
+  const features = Object.keys(FEATURES) as Feature[];
+  const states = await Promise.all(tenants.map((tenant) => featureStates(control(), tenant.id)));
 
   return (
     <main style={{ padding: space.md, maxWidth: 720 }}>
@@ -123,6 +125,44 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ c
             <Button type="submit" variant="secondary">{t("tenants.admin.submit")}</Button>
           </form>
         </>
+      )}
+      {tenants.length > 0 && (
+        <section id="features">
+          <h2>{t("features.heading")}</h2>
+          <p>{t("features.explain")}</p>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr>
+                <th align="left">{t("tenants.columns.name")}</th>
+                {features.map((feature) => (
+                  <th key={feature} align="left">{t(`features.names.${feature}`)}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {tenants.map((tenant, i) => (
+                <tr key={tenant.id}>
+                  <td>{tenant.name}</td>
+                  {features.map((feature) => {
+                    const on = states[i]?.[feature] ?? false;
+                    return (
+                      <td key={feature}>
+                        <form action={toggleFeature}>
+                          <input type="hidden" name="tenantId" value={tenant.id} />
+                          <input type="hidden" name="feature" value={feature} />
+                          <input type="hidden" name="enabled" value={on ? "false" : "true"} />
+                          <Button type="submit" variant={on ? "primary" : "secondary"}>
+                            {t(on ? "features.on" : "features.off")}
+                          </Button>
+                        </form>
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
       )}
     </main>
   );

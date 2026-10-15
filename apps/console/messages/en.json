@@ -55,5 +55,15 @@
       "submit": "Add administrator"
     },
     "admin_added": "Administrator added to {domain}. They can sign in there with an emailed code."
+  },
+  "features": {
+    "heading": "Feature switches",
+    "explain": "Turn features on or off for one organisation. Unfinished features start off.",
+    "on": "On",
+    "off": "Off",
+    "names": {
+      "people_import": "Staff import",
+      "knowledge_library": "Knowledge library"
+    }
   }
 }

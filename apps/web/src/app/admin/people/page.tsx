@@ -3,7 +3,7 @@ import { Button, color, space } from "@mantle/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { t } from "../../../i18n.ts";
-import { requireRole } from "../../../server/session.ts";
+import { requireFeature, requireRole } from "../../../server/session.ts";
 import { importStaff } from "./actions.ts";
 import { RESULT_COOKIE, type ImportResult } from "./import_result.ts";
 
@@ -11,6 +11,7 @@ const COUNTS = ["joined", "moved", "updated", "unchanged", "left"] as const;
 
 export default async function People() {
   const { tenant, db } = await requireRole("learning_administrator");
+  await requireFeature(tenant, "people_import");
   const people = await listPeople(db);
   const raw = (await cookies()).get(RESULT_COOKIE)?.value;
   const result = raw ? (JSON.parse(raw) as ImportResult) : undefined;
