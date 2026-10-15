@@ -6,14 +6,26 @@ How to run Mantle on a developer machine. Development uses the fictional test in
 
 * Node 20 or newer (`.nvmrc`). On the product owner's Mac, Node 20 lives in `~/.local/node20` and new Terminal windows pick it up from `~/.bash_profile`.
 * Git with access to the GitHub repository.
-* PostgreSQL: **not chosen yet.** Needed once the control database work package starts. Options under consideration: Postgres.app or Docker Desktop.
+* PostgreSQL 18 through [Postgres.app](https://postgresapp.com), chosen on 15 October 2026. Open it and keep it running (green "Running" light, port 5432).
+* File storage: a local folder (`.data/files`, ignored by git) stands in for S3 compatible storage in development.
 
 ## First run
 
 ```bash
 npm install
+npm run db:setup
 npm run check
 ```
+
+`npm run db:setup` creates the control database and two fictional tenant databases (`mantle_control`, `mantle_tenant_alpha`, `mantle_tenant_beta`). It is safe to run again. Defaults are in `.env.example`.
+
+Database integration tests run when `MANTLE_PG_SERVER_URL` is set, for example:
+
+```bash
+MANTLE_PG_SERVER_URL=postgres://localhost:5432/postgres npm run test
+```
+
+GitHub Actions always runs them against its own PostgreSQL 18.
 
 ## Running the apps
 

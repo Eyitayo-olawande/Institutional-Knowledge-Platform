@@ -19,6 +19,21 @@ jobs:
     name: Lint, type check, test and build
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    services:
+      # Real PostgreSQL for integration tests (Development Roadmap v1, section 9).
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_PASSWORD: ci_only_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      MANTLE_PG_SERVER_URL: postgres://postgres:ci_only_password@localhost:5432/postgres
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
