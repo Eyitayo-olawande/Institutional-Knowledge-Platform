@@ -2,5 +2,10 @@
   "app": {
     "title": "Mantle",
     "status": "The customer application is being built."
+  },
+  "tenant": {
+    "welcome": "Welcome to {name}.",
+    "unknown": "This address is not set up for any organisation.",
+    "no_domain": "Open this app on your organisation's address, for example alpha.localhost:3000 in development."
   }
 }

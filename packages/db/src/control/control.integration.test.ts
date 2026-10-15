@@ -2,7 +2,8 @@ import { sql } from "drizzle-orm";
 import pg from "pg";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { databaseUrl } from "../config.ts";
-import { connectControl, controlTenantDirectory, migrateControl, seedControl, type ControlDb } from "./index.ts";
+import { connectControl, controlTenantDirectory, seedControl, type ControlDb } from "./index.ts";
+import { migrateControl } from "./migrate.ts";
 import { tenants } from "./schema.ts";
 
 // Runs against a real PostgreSQL server; skipped without MANTLE_PG_SERVER_URL.
