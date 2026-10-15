@@ -10,8 +10,8 @@ import {
 } from "./index.ts";
 
 // Two test tenants, as the isolation tests require (Development Roadmap v1, section 9).
-const alpha: TenantRecord = { id: "t_alpha", domain: "learn.alpha-insurance.test", tier: "dedicated", status: "active" };
-const beta: TenantRecord = { id: "t_beta", domain: "beta.mantle.test", tier: "shared", status: "active" };
+const alpha: TenantRecord = { id: "t_alpha", name: "Alpha", domain: "learn.alpha-insurance.test", tier: "dedicated", status: "active" };
+const beta: TenantRecord = { id: "t_beta", name: "Beta", domain: "beta.mantle.test", tier: "shared", status: "active" };
 
 const directory: TenantDirectory = {
   async findByDomain(domain) {

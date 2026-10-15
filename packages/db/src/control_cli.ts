@@ -1,5 +1,6 @@
 import { databaseUrl, loadConfig } from "./config.ts";
-import { connectControl, migrateControl, seedControl } from "./control/index.ts";
+import { connectControl, seedControl } from "./control/index.ts";
+import { migrateControl } from "./control/migrate.ts";
 
 // Usage: control_cli.ts migrate | seed
 const command = process.argv[2];

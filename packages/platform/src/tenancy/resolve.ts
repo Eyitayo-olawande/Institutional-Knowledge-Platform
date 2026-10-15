@@ -8,6 +8,8 @@ export type TenantTier = "shared" | "dedicated";
 // The control database fields needed to route a request. No personal data.
 export interface TenantRecord {
   readonly id: string;
+  // Organisation name, not personal data.
+  readonly name: string;
   readonly domain: string;
   readonly tier: TenantTier;
   readonly status: string;
