@@ -1,4 +1,4 @@
-import { and, desc, eq, isNull, max } from "drizzle-orm";
+import { and, asc, desc, eq, isNull, lte, max } from "drizzle-orm";
 import { recordActivity } from "./activity.ts";
 import type { TenantDb } from "./client.ts";
 import { libraryItems, libraryItemVersions } from "./schema.ts";
@@ -94,4 +94,34 @@ export async function getLibraryItem(db: TenantDb, itemId: string) {
     published: versions.find((v) => v.version === item.publishedVersion) ?? null,
     draft: versions.find((v) => v.publishedAt === null) ?? null,
   };
+}
+
+// Searches titles and published content. Staff only ever search published
+// versions; editors also find drafts by title.
+export async function searchLibrary(db: TenantDb, query: string, options: { publishedOnly: boolean }) {
+  const words = query.trim().toLowerCase().split(/\s+/).filter(Boolean).slice(0, 8);
+  if (words.length === 0) return listLibraryItems(db, options);
+  const items = await listLibraryItems(db, options);
+  const published = await db
+    .select({ itemId: libraryItemVersions.itemId, version: libraryItemVersions.version, body: libraryItemVersions.body })
+    .from(libraryItemVersions);
+  const bodyOf = new Map<string, string>();
+  for (const item of items) {
+    const v = published.find((p) => p.itemId === item.id && p.version === item.publishedVersion);
+    if (v) bodyOf.set(item.id, v.body.toLowerCase());
+  }
+  return items.filter((item) => {
+    const haystack = `${item.title.toLowerCase()} ${bodyOf.get(item.id) ?? ""}`;
+    return words.every((w) => haystack.includes(w));
+  });
+}
+
+// Items whose review date has passed or falls within the next `days` days,
+// soonest first. Owners use this to keep content current.
+export async function itemsDueForReview(db: TenantDb, today: string, days = 30) {
+  const limit = new Date(`${today}T00:00:00Z`);
+  limit.setUTCDate(limit.getUTCDate() + days);
+  const until = limit.toISOString().slice(0, 10);
+  const rows = await db.select().from(libraryItems).where(lte(libraryItems.reviewDate, until)).orderBy(asc(libraryItems.reviewDate));
+  return rows.filter((r) => r.status !== "retired").map((r) => ({ ...r, overdue: (r.reviewDate ?? "") < today }));
 }
