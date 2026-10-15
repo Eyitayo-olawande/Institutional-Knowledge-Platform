@@ -1,6 +1,7 @@
 import { eq } from "drizzle-orm";
 import type { TenantDb } from "./client.ts";
 import * as tenantSchema from "./schema.ts";
+import { recordActivity } from "./activity.ts";
 import { randomUUID } from "node:crypto";
 
 // A checked staff file row (see @mantle/platform/people for the file rules).
@@ -61,7 +62,10 @@ export async function applyStaffImport(db: TenantDb, rows: readonly StaffRow[], 
         const [person] = current
           ? await tx.update(people).set(values).where(eqId(current.id)).returning({ id: people.id })
           : await tx.insert(people).values(values).returning({ id: people.id });
-        if (person) await tx.insert(employmentEvents).values({ personId: person.id, type: "join", toDepartment: row.department, changedBy });
+        if (person) {
+          await tx.insert(employmentEvents).values({ personId: person.id, type: "join", toDepartment: row.department, changedBy });
+          await recordActivity(tx, { actor: changedBy, action: "people.joined", entityType: "person", entityId: person.id, details: { department: row.department } });
+        }
         counts.joined++;
         continue;
       }
@@ -85,6 +89,13 @@ export async function applyStaffImport(db: TenantDb, rows: readonly StaffRow[], 
       } else {
         counts.updated++;
       }
+      await recordActivity(tx, {
+        actor: changedBy,
+        action: moved ? "people.moved" : "people.updated",
+        entityType: "person",
+        entityId: current.id,
+        details: { fields: changedFields(current, row), ...(moved ? { from: current.department, to: row.department } : {}) },
+      });
     }
 
     if (options.markMissingAsLeavers) {
@@ -92,12 +103,25 @@ export async function applyStaffImport(db: TenantDb, rows: readonly StaffRow[], 
         if (person.status !== "active" || inFile.has(person.employeeId)) continue;
         await tx.update(people).set({ status: "left", leftAt: now, updatedAt: now, changedBy }).where(eqId(person.id));
         await tx.insert(employmentEvents).values({ personId: person.id, type: "leave", fromDepartment: person.department, changedBy });
+        await recordActivity(tx, { actor: changedBy, action: "people.left", entityType: "person", entityId: person.id });
         if (person.userId) await tx.delete(tenantSchema.sessions).where(eqSessionUser(person.userId));
         counts.left++;
       }
     }
     return counts;
   });
+}
+
+function changedFields(
+  current: { fullName: string; workEmail: string; department: string | null; managerEmployeeId: string | null },
+  row: StaffRow,
+): string[] {
+  const fields: string[] = [];
+  if (current.fullName !== row.fullName) fields.push("full_name");
+  if (current.workEmail !== row.workEmail) fields.push("work_email");
+  if ((current.department ?? null) !== row.department) fields.push("department");
+  if ((current.managerEmployeeId ?? null) !== row.managerEmployeeId) fields.push("manager_employee_id");
+  return fields;
 }
 
 type Tx = Parameters<Parameters<TenantDb["transaction"]>[0]>[0];
@@ -137,18 +161,24 @@ export async function setUserRoles(db: TenantDb, userId: string, roles: string):
 // Adds a learning administrator who signs in with an emailed code, or
 // gives an existing sign in account that role. Used when Design Streams
 // sets up an organisation (assisted onboarding).
-export async function addAdministrator(db: TenantDb, person: { name: string; email: string }): Promise<"added" | "promoted"> {
+export async function addAdministrator(
+  db: TenantDb,
+  person: { name: string; email: string },
+  actor = "console:development",
+): Promise<"added" | "promoted"> {
   const email = person.email.trim().toLowerCase();
   const [found] = await db.select({ id: users.id, roles: users.roles }).from(users).where(eq(users.email, email));
   if (found) {
     const roles = new Set(found.roles.split(",").map((r) => r.trim()).filter(Boolean));
     roles.add("learning_administrator");
     await setUserRoles(db, found.id, [...roles].join(","));
+    await recordActivity(db, { actor, action: "roles.granted", entityType: "user", entityId: found.id, details: { role: "learning_administrator" } });
     return "promoted";
   }
   const now = new Date();
+  const id = randomUUID();
   await db.insert(users).values({
-    id: randomUUID(),
+    id,
     name: person.name.trim(),
     email,
     emailVerified: true,
@@ -156,5 +186,6 @@ export async function addAdministrator(db: TenantDb, person: { name: string; ema
     createdAt: now,
     updatedAt: now,
   });
+  await recordActivity(db, { actor, action: "roles.granted", entityType: "user", entityId: id, details: { role: "learning_administrator", new_account: true } });
   return "added";
 }

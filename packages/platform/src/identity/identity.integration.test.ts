@@ -1,4 +1,4 @@
-import { connectTenant, type TenantDb } from "@mantle/db/tenant";
+import { connectTenant, recentActivity, type TenantDb } from "@mantle/db/tenant";
 import { migrateTenant } from "@mantle/db/tenant/migrate";
 import { createDatabase, dropDatabase } from "@mantle/db";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -44,6 +44,8 @@ describe.skipIf(!serverUrl)("sign in per tenant", { timeout: 60_000 }, () => {
     const result = await authA.api.signInEmail({ body: { email: "ada@a.test", password: PASSWORD } });
     expect(result.user.email).toBe("ada@a.test");
     expect(result.token).toBeTruthy();
+    const entries = await recentActivity(conns[0]!.db, 5);
+    expect(entries.some((e) => e.action === "auth.signed_in" && e.entityId === result.user.id)).toBe(true);
   });
 
   it("refuses a wrong password", async () => {
