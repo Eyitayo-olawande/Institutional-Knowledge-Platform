@@ -15,7 +15,15 @@ export const ROLES = [
 
 export type Role = (typeof ROLES)[number];
 
-export const ACTIONS = ["people.view", "people.import", "roles.manage", "wording.edit", "activity.view"] as const;
+export const ACTIONS = [
+  "people.view",
+  "people.import",
+  "roles.manage",
+  "wording.edit",
+  "activity.view",
+  "library.view",
+  "library.edit",
+] as const;
 
 export type Action = (typeof ACTIONS)[number];
 
@@ -26,6 +34,9 @@ const GRANTS: Record<Action, readonly Role[]> = {
   "roles.manage": ["learning_administrator"],
   "wording.edit": ["learning_administrator"],
   "activity.view": ["learning_administrator"],
+  // External learners only see what is assigned to them (later work).
+  "library.view": ["learner", "line_manager", "content_owner", "compliance_reviewer", "learning_administrator"],
+  "library.edit": ["content_owner", "learning_administrator"],
 };
 
 export function isRole(value: string): value is Role {

@@ -113,5 +113,40 @@
       "actor": "Who",
       "entity": "Record"
     }
+  },
+  "library": {
+    "manage": "Knowledge library",
+    "heading": "Knowledge library at {name}",
+    "new": "Add an item",
+    "back": "Back to the library",
+    "empty": "Nothing has been published yet.",
+    "create": "Create draft",
+    "statuses": {
+      "draft": "(draft)",
+      "published": "(published)",
+      "retired": "(retired)"
+    },
+    "fields": {
+      "title": "Title",
+      "body": "Content",
+      "review_date": "Review by",
+      "change_note": "What changed"
+    },
+    "saved": "Draft saved.",
+    "published_now": "Published. Staff now see this version.",
+    "not_published": "Not published yet. Staff cannot see this item.",
+    "published_version": "Version {version}",
+    "review_by": "Review by {date}",
+    "draft_heading": "Draft version {version}",
+    "edit_heading": "Start a new version",
+    "save_draft": "Save draft",
+    "publish": "Publish version {version}",
+    "history": "Versions",
+    "history_published": "Version {version}, published. {note}",
+    "history_draft": "Version {version}, draft. {note}",
+    "errors": {
+      "missing": "Enter a title and content.",
+      "no_draft": "There is no draft to publish."
+    }
   }
 }

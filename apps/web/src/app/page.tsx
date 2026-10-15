@@ -17,6 +17,7 @@ export default async function Home() {
   let isWordingAdmin = false;
   let canManageRoles = false;
   let canViewActivity = false;
+  let canViewLibrary = false;
   if (resolution.ok) {
     const { host, protocol } = await requestHost();
     const session = await authFor(resolution.tenant, host, protocol).api.getSession({ headers: await headers() });
@@ -25,6 +26,7 @@ export default async function Home() {
     isWordingAdmin = can(roles, "wording.edit");
     canManageRoles = can(roles, "roles.manage");
     canViewActivity = can(roles, "activity.view");
+    canViewLibrary = can(roles, "library.view") && (await featureOn(resolution.tenant, "knowledge_library"));
     isAdministrator = can(roles, "people.view") && (await featureOn(resolution.tenant, "people_import"));
   }
   return (
@@ -34,6 +36,11 @@ export default async function Home() {
       {resolution.ok && signedInAs && (
         <form action={signOut}>
           <p>{t("auth.signed_in_as", { name: signedInAs })}</p>
+          {canViewLibrary && (
+            <p>
+              <Link href="/library">{t("library.manage")}</Link>
+            </p>
+          )}
           {isAdministrator && (
             <p>
               <Link href="/admin/people">{t("people.manage")}</Link>

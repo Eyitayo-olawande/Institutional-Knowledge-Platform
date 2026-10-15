@@ -1,4 +1,4 @@
-import { boolean, index, jsonb, pgEnum, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
+import { boolean, date, index, integer, jsonb, pgEnum, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
 import { auditColumns } from "../columns.ts";
 
 // Tenant database (Product Architecture v1, section 6). One per customer;
@@ -146,3 +146,35 @@ export const wordingLabels = pgTable("wording_labels", {
   plural: text("plural").notNull(),
   ...auditColumns,
 });
+
+// Knowledge library (Product Architecture v1, section 5): items with
+// versions, owners, review dates and a publishing workflow. Staff see the
+// published version; editors work on a draft until it is published.
+export const libraryItemStatus = pgEnum("library_item_status", ["draft", "published", "retired"]);
+
+export const libraryItems = pgTable("library_items", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  title: text("title").notNull(),
+  ownerUserId: text("owner_user_id").references(() => users.id),
+  reviewDate: date("review_date"),
+  status: libraryItemStatus("status").notNull().default("draft"),
+  publishedVersion: integer("published_version"),
+  ...auditColumns,
+});
+
+export const libraryItemVersions = pgTable(
+  "library_item_versions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    itemId: uuid("item_id")
+      .notNull()
+      .references(() => libraryItems.id),
+    version: integer("version").notNull(),
+    body: text("body").notNull(),
+    changeNote: text("change_note"),
+    publishedAt: timestamp("published_at", { withTimezone: true }),
+    publishedBy: text("published_by"),
+    ...auditColumns,
+  },
+  (t) => [uniqueIndex("library_item_versions_item_version_unique").on(t.itemId, t.version)],
+);
