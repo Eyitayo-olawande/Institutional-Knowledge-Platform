@@ -2,5 +2,46 @@
   "app": {
     "title": "Mantle console",
     "status": "The Design Streams admin console is being built."
+  },
+  "console": {
+    "locked": "The console opens once Design Streams sign in is in place."
+  },
+  "tenants": {
+    "heading": "Organisations",
+    "empty": "No organisations yet.",
+    "created": "Created {domain}. Open it in the customer app on port 3000.",
+    "columns": {
+      "name": "Name",
+      "domain": "Address",
+      "tier": "Hosting",
+      "status": "Status"
+    },
+    "tiers": {
+      "shared": "Shared",
+      "dedicated": "Dedicated"
+    },
+    "statuses": {
+      "onboarding": "Onboarding",
+      "active": "Active",
+      "read_only": "Read only",
+      "suspended": "Suspended",
+      "offboarded": "Offboarded"
+    },
+    "create": {
+      "heading": "Add an organisation",
+      "name": "Organisation name",
+      "domain": "Address (for example gamma.localhost)",
+      "tier": "Hosting",
+      "hosting_location": "Hosting location",
+      "submit": "Create organisation"
+    },
+    "errors": {
+      "name_required": "Enter the organisation name.",
+      "domain_invalid": "Enter an address such as gamma.localhost.",
+      "tier_invalid": "Choose shared or dedicated hosting.",
+      "location_required": "Enter the hosting location.",
+      "domain_taken": "Another organisation already uses that address.",
+      "database_taken": "A database for that address already exists."
+    }
   }
 }

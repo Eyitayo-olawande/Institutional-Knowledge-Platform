@@ -32,7 +32,7 @@ GitHub Actions always runs them against its own PostgreSQL 18.
 | App | Command | Address |
 | --- | --- | --- |
 | Customer app | `npm run dev -w @mantle/web` | http://alpha.localhost:3000 and http://beta.localhost:3000 (one per fictional tenant) |
-| Admin console | `npm run dev -w @mantle/console` | http://localhost:3001 |
+| Admin console | `npm run dev -w @mantle/console` | http://localhost:3001 (lists organisations and adds new ones; development only until sign in exists) |
 | Worker | `npm run dev -w @mantle/worker` | (no address) |
 
 The customer app works out which organisation you are visiting from the address, so plain http://localhost:3000 shows a hint instead of a tenant.
