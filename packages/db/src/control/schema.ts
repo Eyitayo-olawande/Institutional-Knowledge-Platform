@@ -1,4 +1,4 @@
-import { check, integer, pgEnum, pgTable, text, uniqueIndex, uuid } from "drizzle-orm/pg-core";
+import { boolean, check, integer, pgEnum, pgTable, primaryKey, text, uniqueIndex, uuid } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { auditColumns } from "../columns.ts";
 
@@ -78,3 +78,19 @@ export const tenantReleases = pgTable("tenant_releases", {
     .references(() => releases.id),
   ...auditColumns,
 });
+
+// Per tenant feature switches (Product Architecture v1, section 12): a
+// release can go everywhere while a feature is offered to selected
+// customers first. A missing row means the feature's default applies.
+export const featureSwitches = pgTable(
+  "feature_switches",
+  {
+    tenantId: uuid("tenant_id")
+      .notNull()
+      .references(() => tenants.id),
+    feature: text("feature").notNull(),
+    enabled: boolean("enabled").notNull(),
+    ...auditColumns,
+  },
+  (t) => [primaryKey({ columns: [t.tenantId, t.feature] })],
+);

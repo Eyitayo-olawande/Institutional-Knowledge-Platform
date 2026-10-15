@@ -4,12 +4,13 @@ import { applyStaffImport } from "@mantle/db/tenant";
 import { readStaffFile } from "@mantle/platform/people";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { requireRole } from "../../../server/session.ts";
+import { requireFeature, requireRole } from "../../../server/session.ts";
 import { RESULT_COOKIE, type ImportResult } from "./import_result.ts";
 
 const MAX_BYTES = 2 * 1024 * 1024;
 export async function importStaff(form: FormData): Promise<void> {
-  const { db, user } = await requireRole("learning_administrator");
+  const { db, user, tenant } = await requireRole("learning_administrator");
+  await requireFeature(tenant, "people_import");
   const file = form.get("file");
   const result: ImportResult = { problems: [] };
   if (!(file instanceof File) || file.size === 0) {

@@ -2,7 +2,7 @@ import { sql } from "drizzle-orm";
 import pg from "pg";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { databaseUrl } from "../config.ts";
-import { connectControl, controlTenantDirectory, listTenants, provisionTenant, seedControl, type ControlDb } from "./index.ts";
+import { connectControl, controlTenantDirectory, featureStates, isFeatureOn, listTenants, provisionTenant, seedControl, setFeature, type ControlDb } from "./index.ts";
 import { migrateControl } from "./migrate.ts";
 import { tenants } from "./schema.ts";
 
@@ -90,5 +90,14 @@ describe.skipIf(!serverUrl)("control database", { timeout: 60_000 }, () => {
       await admin(`drop database if exists ${first.databaseName}`);
     }
     expect(await provisionTenant(db, serverUrl ?? "", tenant)).toEqual({ ok: false, reason: "domain_taken" });
+  });
+
+  it("uses feature defaults until a tenant switch is set, per tenant only", async () => {
+    const [alpha, beta] = await listTenants(db);
+    expect(await featureStates(db, alpha!.id)).toEqual({ people_import: true, knowledge_library: false });
+    await setFeature(db, alpha!.id, "knowledge_library", true, "test");
+    await setFeature(db, alpha!.id, "knowledge_library", true, "test");
+    expect(await isFeatureOn(db, alpha!.id, "knowledge_library")).toBe(true);
+    expect(await isFeatureOn(db, beta!.id, "knowledge_library")).toBe(false);
   });
 });
