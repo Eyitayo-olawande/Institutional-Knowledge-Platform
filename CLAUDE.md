@@ -56,6 +56,7 @@ Node 20 or newer and npm workspaces (apps/* and packages/*).
 * `npm run test`: Vitest unit and integration tests
 * `npm run check`: all three, in that order; run before opening a pull request
 * `npm run build`: production build of every app
+* `npm run db:setup`: create the local control and fictional tenant databases (Postgres.app)
 * `npm run dev -w @mantle/web` (port 3000), `npm run dev -w @mantle/console` (port 3001), `npm run dev -w @mantle/worker`: run one app locally
 
 GitHub Actions runs the same checks, plus `npm audit` for high or critical vulnerabilities, on every pull request and every push to main (.github/workflows/ci.yml). Dependabot opens weekly update pull requests.

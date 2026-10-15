@@ -1,0 +1,19 @@
+{
+  "name": "@mantle/db",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "setup": "tsx src/setup_cli.ts"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.23.1",
+    "tsx": "^4.23.15"
+  },
+  "dependencies": {
+    "pg": "^8.23.1"
+  }
+}
