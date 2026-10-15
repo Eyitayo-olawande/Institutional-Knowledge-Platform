@@ -12,7 +12,11 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body style={{ margin: 0, fontFamily: font.family, color: color.text, background: color.background }}>
+      <body
+        // Browser extensions (for example Grammarly) add attributes to body before
+        // React loads; ignore those differences on this element only.
+        suppressHydrationWarning
+        style={{ margin: 0, fontFamily: font.family, color: color.text, background: color.background }}>
         {children}
       </body>
     </html>
