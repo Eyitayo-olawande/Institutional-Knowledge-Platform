@@ -101,7 +101,8 @@
       "learning_administrator": "Learning administrator",
       "group_viewer": "Group viewer",
       "external_learner": "External learner"
-    }
+    },
+    "none": "no roles"
   },
   "activity": {
     "manage": "Activity log",
@@ -155,5 +156,13 @@
     "due_heading": "Due for review",
     "due": "review by {date}",
     "overdue": "review overdue since {date}"
+  },
+  "notices": {
+    "link": "Notices ({count} new)",
+    "link_none": "Notices",
+    "heading": "Your notices",
+    "empty": "No notices yet.",
+    "mark_read": "Mark all as read",
+    "new": "New"
   }
 }
