@@ -1,4 +1,4 @@
-import { listPeople } from "@mantle/db/tenant";
+import { listPeople, wording } from "@mantle/db/tenant";
 import { Button, color, space } from "@mantle/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -13,6 +13,7 @@ export default async function People() {
   const { tenant, db } = await requireRole("learning_administrator");
   await requireFeature(tenant, "people_import");
   const people = await listPeople(db);
+  const labels = await wording(db);
   const raw = (await cookies()).get(RESULT_COOKIE)?.value;
   const result = raw ? (JSON.parse(raw) as ImportResult) : undefined;
 
@@ -69,7 +70,7 @@ export default async function People() {
               <th align="left">{t("people.columns.employee_id")}</th>
               <th align="left">{t("people.columns.name")}</th>
               <th align="left">{t("people.columns.email")}</th>
-              <th align="left">{t("people.columns.department")}</th>
+              <th align="left">{labels.department.singular}</th>
               <th align="left">{t("people.columns.status")}</th>
             </tr>
           </thead>
