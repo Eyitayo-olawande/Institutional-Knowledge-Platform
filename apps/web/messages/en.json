@@ -147,6 +147,13 @@
     "errors": {
       "missing": "Enter a title and content.",
       "no_draft": "There is no draft to publish."
-    }
+    },
+    "search": "Search",
+    "search_label": "Search the library",
+    "search_placeholder": "Search titles and content",
+    "no_results": "Nothing matches that search.",
+    "due_heading": "Due for review",
+    "due": "review by {date}",
+    "overdue": "review overdue since {date}"
   }
 }
