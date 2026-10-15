@@ -13,13 +13,13 @@ export default async function Home() {
   const view = tenantView(resolution);
   let signedInAs: string | undefined;
   let isAdministrator = false;
+  let isWordingAdmin = false;
   if (resolution.ok) {
     const { host, protocol } = await requestHost();
     const session = await authFor(resolution.tenant, host, protocol).api.getSession({ headers: await headers() });
     signedInAs = session?.user.name;
-    isAdministrator =
-      hasRole((session?.user as { roles?: string } | undefined)?.roles, "learning_administrator") &&
-      (await featureOn(resolution.tenant, "people_import"));
+    isWordingAdmin = hasRole((session?.user as { roles?: string } | undefined)?.roles, "learning_administrator");
+    isAdministrator = isWordingAdmin && (await featureOn(resolution.tenant, "people_import"));
   }
   return (
     <main style={{ padding: space.md }}>
@@ -31,6 +31,11 @@ export default async function Home() {
           {isAdministrator && (
             <p>
               <Link href="/admin/people">{t("people.manage")}</Link>
+            </p>
+          )}
+          {isWordingAdmin && (
+            <p>
+              <Link href="/admin/wording">{t("wording.manage")}</Link>
             </p>
           )}
           <Button type="submit" variant="secondary">{t("auth.sign_out")}</Button>

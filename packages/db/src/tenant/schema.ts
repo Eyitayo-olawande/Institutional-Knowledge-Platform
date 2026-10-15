@@ -136,3 +136,13 @@ export const activityLog = pgTable(
   },
   (t) => [index("activity_log_entity_idx").on(t.entityType, t.entityId), index("activity_log_at_idx").on(t.at)],
 );
+
+// Wording labels (Product Architecture v1, section 3): every structural
+// term shown to people is a label the template sets and the organisation
+// can change, so a hospital sees "ward" where an insurer sees "department".
+export const wordingLabels = pgTable("wording_labels", {
+  key: text("key").primaryKey(),
+  singular: text("singular").notNull(),
+  plural: text("plural").notNull(),
+  ...auditColumns,
+});

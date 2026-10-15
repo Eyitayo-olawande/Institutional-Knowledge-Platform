@@ -66,5 +66,21 @@
         "duplicate_email": "This work email appears earlier in the file, so this row was skipped."
       }
     }
+  },
+  "wording": {
+    "heading": "Wording at {name}",
+    "explain": "Choose the words people see for your structure. For example, a hospital might call a department a ward.",
+    "singular": "{term}, one",
+    "plural": "More than one",
+    "save": "Save",
+    "saved": "Saved.",
+    "error": "Enter both forms of the word.",
+    "manage": "Wording",
+    "terms": {
+      "department": "Department",
+      "unit": "Unit",
+      "location": "Location",
+      "role_level": "Role level"
+    }
   }
 }
