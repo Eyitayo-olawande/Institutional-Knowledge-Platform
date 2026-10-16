@@ -1,6 +1,12 @@
 # Version 1 Roadmap
 
-Source: Development Roadmap v1.1 (sections 7 to 9, 12 and 13) and Product Architecture v1.1 (section 16), both issued 15 October 2026. They replace v1.0 of each. Feature behaviour is defined in SUNU Blueprint v3.1, which every work package links to; scope and commercial terms are in SUNU Proposal v2.0.
+Source: Development Roadmap v1.2 (16 October 2026; sections 7 to 9, 12 and 13) and Product Architecture v1.1 (15 October 2026; section 16). They replace earlier versions. Feature behaviour is defined in SUNU Blueprint v3.1, which every work package links to; scope and commercial terms are in SUNU Proposal v2.0.
+
+## What changed in v1.2
+
+* New epic E15 UX and visual design: screen inventory, journeys, navigation by role, wireframes, visual direction from SUNU's brand, a clickable prototype (SUNU Prototype v0.1) and the move into packages/ui. Visual direction is set by Claude Code and approved by the product owner instead of a separate designer.
+* Done so far: visual direction approved and merged into packages/ui (ADR 0020, PR #34); the ten existing screens restyled to it (PR #35).
+* A design gate before the Sprint 3 learner screens: those screens follow the approved prototype.
 
 ## What changed in v1.1
 
@@ -21,8 +27,8 @@ Each sprint's work packages are planned at the start of the sprint from the work
 | --- | --- | --- | --- |
 | Before Sprint 1 | | Decisions and setup | M0 Ready to build |
 | Sprint 1 | 1 and 2 | E1, E2, E3, E4 | M1 Walking skeleton |
-| Sprint 2 | 3 and 4 | E4, E5, E6, E7, E13 | M2 Content can flow |
-| Sprint 3 | 5 and 6 | E7, E8, E9 | M3 Learning loop |
+| Sprint 2 | 3 and 4 | E4, E5, E6, E7, E13, E15 | M2 Content can flow |
+| Sprint 3 | 5 and 6 | E7, E8, E9, E15 | M3 Learning loop |
 | Sprint 4 | 7 and 8 | E8, E9, E10, E11 | M4 Knowledge kept |
 | Sprint 5 | 9 and 10 | E11, E12, E13, E14 | M5 Feature complete |
 | Sprint 6 | 11 and 12 | E14, penetration test, acceptance | M6 Ready for production |
@@ -30,7 +36,7 @@ Each sprint's work packages are planned at the start of the sprint from the work
 
 ## Epics
 
-About 81 work packages across 14 epics (77 in v1.0). Each work package is one Claude Code session and one pull request. Counts are estimates for the technical lead to refine.
+About 88 work packages across 15 epics (81 in v1.1, 77 in v1.0). Each work package is one Claude Code session and one pull request. Counts are estimates for the technical lead to refine.
 
 | Epic | Main work packages | Count | Sprint | Main code location |
 | --- | --- | --- | --- | --- |
@@ -48,6 +54,7 @@ About 81 work packages across 14 epics (77 in v1.0). Each work package is one Cl
 | E12 Reports and evidence | Gap measurement, learner and team views, department overview, document change tracker, scheduled report emails, ITF, regulatory, data protection and individual evidence packs (key person risk moved to after go live) | 7 | 5 | packages/core, packages/documents |
 | E13 Admin console and billing | Tenant management, pack publishing, support access grants, instance health, plans and invoices | 5 | 2 and 5 | apps/console |
 | E14 Data protection and operations | Retention settings, offboarding export, monitoring, backups and restore tests, dedicated instance script, status page | 5 | 5 to 6 | packages/platform, infra |
+| E15 UX and visual design | Screen inventory, key journeys, navigation by role, wireframes, visual direction from SUNU's brand, clickable prototype tested with 3 to 5 SUNU staff, tokens and components in packages/ui with restyling of existing screens | 7 | 2 to 3 | packages/ui, apps/web, apps/console |
 
 The "Main code location" column is a mapping from the repository structure in the roadmap (section 5) and is not stated in the source documents; the technical lead may change it.
 
@@ -60,6 +67,7 @@ Each milestone ends with a demonstration on staging and a go or adjust decision 
 | M0 Ready to build | Before week 1 | Decisions recorded, accounts set up, repository and pipeline running | Start Sprint 1 |
 | M1 Walking skeleton | End of week 2 | Admin console creates a tenant; a user signs in on the tenant's domain; staff import works; isolation tests pass | Foundation patterns approved |
 | M2 Content can flow | End of week 4 | Library with learning areas and content types, publishing, bulk upload, glossary, groups, email notifications; insurance template loaded | SUNU content owners start loading materials on staging |
+| Design gate | Before Sprint 3 learner screens | Clickable prototype, visual direction and screen inventory | Product owner approves; learner screens follow the approved design (approved 16 October 2026) |
 | M3 Learning loop | End of week 6 | Four stage path drawing on both learning areas, module, test with confidence rating, certificate and My Learning page, for a sample role | First demo to SUNU sponsor |
 | M4 Knowledge kept | End of week 8 | Change alerts with confirmation; fixed automations; role profiles; handover pack triggered by a leaver | Scope check: anything at risk moves to the included support period |
 | M5 Feature complete | End of week 10 | Reports, scheduled report emails, evidence packs, retention and export | Feature freeze; only fixes after this |
