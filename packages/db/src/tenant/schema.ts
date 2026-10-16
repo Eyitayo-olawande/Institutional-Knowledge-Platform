@@ -80,6 +80,61 @@ export const verifications = pgTable(
 export const personStatus = pgEnum("person_status", ["active", "left"]);
 export const employmentEventType = pgEnum("employment_event_type", ["join", "move", "leave"]);
 
+// Organisation structure (Product Architecture v1.1, sections 4 and 7):
+// departments, units, locations and role levels as records that people link
+// to. Names are matched ignoring case and extra spaces through
+// structure_names, which also keeps old and merged names so a later staff
+// file using them still lands on the right entry.
+export const structureKind = pgEnum("structure_kind", ["department", "unit", "location", "role_level"]);
+
+export const departments = pgTable("departments", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  ...auditColumns,
+});
+
+export const units = pgTable(
+  "units",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    departmentId: uuid("department_id")
+      .notNull()
+      .references(() => departments.id),
+    name: text("name").notNull(),
+    ...auditColumns,
+  },
+  (t) => [index("units_department_idx").on(t.departmentId)],
+);
+
+export const locations = pgTable("locations", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  ...auditColumns,
+});
+
+// Rank orders levels from junior (1) upwards, so a path can say "this level
+// and above".
+export const roleLevels = pgTable("role_levels", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  rank: integer("rank").notNull(),
+  ...auditColumns,
+});
+
+// Every name an entry answers to. Units are named within their department
+// (scope is the department id); the other kinds use an empty scope.
+export const structureNames = pgTable(
+  "structure_names",
+  {
+    kind: structureKind("kind").notNull(),
+    scope: text("scope").notNull().default(""),
+    nameKey: text("name_key").notNull(),
+    entryId: uuid("entry_id").notNull(),
+    ...auditColumns,
+  },
+  (t) => [uniqueIndex("structure_names_unique").on(t.kind, t.scope, t.nameKey), index("structure_names_entry_idx").on(t.entryId)],
+);
+
 export const people = pgTable(
   "people",
   {
@@ -87,7 +142,13 @@ export const people = pgTable(
     employeeId: text("employee_id").notNull(),
     fullName: text("full_name").notNull(),
     workEmail: text("work_email").notNull(),
+    // Free text from the staff file; replaced by departmentId and removed in
+    // a later work package.
     department: text("department"),
+    departmentId: uuid("department_id").references(() => departments.id),
+    unitId: uuid("unit_id").references(() => units.id),
+    locationId: uuid("location_id").references(() => locations.id),
+    roleLevelId: uuid("role_level_id").references(() => roleLevels.id),
     managerEmployeeId: text("manager_employee_id"),
     status: personStatus("status").notNull().default("active"),
     userId: text("user_id").references(() => users.id),
@@ -111,6 +172,8 @@ export const employmentEvents = pgTable(
     // For a move: the department before and after.
     fromDepartment: text("from_department"),
     toDepartment: text("to_department"),
+    fromDepartmentId: uuid("from_department_id").references(() => departments.id),
+    toDepartmentId: uuid("to_department_id").references(() => departments.id),
     ...auditColumns,
   },
   (t) => [index("employment_events_person_idx").on(t.personId)],

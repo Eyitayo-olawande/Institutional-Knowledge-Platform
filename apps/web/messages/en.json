@@ -44,7 +44,7 @@
     },
     "import": {
       "heading": "Import staff",
-      "format": "Upload a CSV file with the columns employee_id, full_name and work_email, plus department and manager_employee_id if you have them. Each import adds joiners and records movers.",
+      "format": "Upload a CSV file with the columns employee_id, full_name and work_email, plus department, unit, location, role_level and manager_employee_id if you have them. Each import adds joiners, records movers and adds any new structure entries.",
       "mark_leavers": "Mark people who are not in this file as leavers",
       "submit": "Import file",
       "line": "Line {line}: ",
@@ -208,7 +208,8 @@
     "skip": "Skip to content",
     "search_label": "Search the library",
     "search_placeholder": "Search the library",
-    "notices_unread": "Notices, {count} new"
+    "notices_unread": "Notices, {count} new",
+    "structure": "Structure"
   },
   "home": {
     "greeting": "Welcome, {name}",
@@ -221,7 +222,40 @@
       "people": "Import staff from HR and see who has joined, moved or left.",
       "roles": "Decide who can manage content, people and settings.",
       "wording": "Change the words used for departments, units and role levels.",
-      "activity": "See the record of every change and result."
+      "activity": "See the record of every change and result.",
+      "structure": "See and tidy the structure people belong to."
+    }
+  },
+  "structure": {
+    "title": "Structure",
+    "explain": "The structure people belong to. The staff import adds anything new; rename an entry here, or merge two that mean the same thing.",
+    "tabs_label": "Kinds of structure",
+    "columns": {
+      "name": "Name",
+      "people": "People",
+      "order": "Order",
+      "actions": "Merge"
+    },
+    "rename": "Rename",
+    "rename_label": "New name for {name}",
+    "merge": "Merge",
+    "merge_label": "Merge {name} into",
+    "merge_choose": "Choose",
+    "move_up": "Up",
+    "move_down": "Down",
+    "move_up_label": "Move {name} up",
+    "move_down_label": "Move {name} down",
+    "order_note": "Order runs from the most junior level (1) upwards.",
+    "empty": "Nothing here yet. Importing a staff file adds entries.",
+    "renamed": "Renamed. People and pages now show the new name.",
+    "merged": "Merged. People and history moved to the entry you kept.",
+    "reordered": "Order changed.",
+    "errors": {
+      "name_taken": "Another entry already has that name. Merge the two instead.",
+      "missing": "That entry no longer exists.",
+      "same": "Choose a different entry to merge into.",
+      "different_department": "Entries can only be merged within the same {department}.",
+      "empty": "Enter a name."
     }
   }
 }

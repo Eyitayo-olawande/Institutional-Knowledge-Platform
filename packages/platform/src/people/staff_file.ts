@@ -4,7 +4,7 @@ import { parseCsv } from "./csv.ts";
 // the SUNU staff CSV format is agreed in weeks 1 and 2; extra columns are
 // ignored so a richer file still imports.
 export const REQUIRED_COLUMNS = ["employee_id", "full_name", "work_email"] as const;
-export const OPTIONAL_COLUMNS = ["department", "manager_employee_id"] as const;
+export const OPTIONAL_COLUMNS = ["department", "unit", "location", "role_level", "manager_employee_id"] as const;
 
 export interface StaffRow {
   readonly line: number;
@@ -12,6 +12,9 @@ export interface StaffRow {
   readonly fullName: string;
   readonly workEmail: string;
   readonly department: string | null;
+  readonly unit: string | null;
+  readonly location: string | null;
+  readonly roleLevel: string | null;
   readonly managerEmployeeId: string | null;
 }
 
@@ -59,6 +62,9 @@ export function readStaffFile(text: string): { rows: StaffRow[]; problems: Staff
       fullName,
       workEmail,
       department: at(fields, "department") || null,
+      unit: at(fields, "unit") || null,
+      location: at(fields, "location") || null,
+      roleLevel: at(fields, "role_level") || null,
       managerEmployeeId: at(fields, "manager_employee_id") || null,
     });
   });

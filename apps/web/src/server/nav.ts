@@ -5,8 +5,8 @@ import { can } from "@mantle/platform/identity";
 // The server still checks every permission on each page; this only decides
 // which links to show.
 
-export type NavKey = "home" | "library" | "notices" | "people" | "roles" | "wording" | "activity";
-export type NavIcon = "home" | "library" | "bell" | "people" | "key" | "text" | "list";
+export type NavKey = "home" | "library" | "notices" | "people" | "roles" | "wording" | "structure" | "activity";
+export type NavIcon = "home" | "library" | "bell" | "people" | "key" | "text" | "tree" | "list";
 
 export interface NavItem {
   key: NavKey;
@@ -28,6 +28,7 @@ export function buildNav({ roles, libraryOn, peopleImportOn }: NavInput): NavIte
   if (peopleImportOn && can(roles, "people.view")) items.push({ key: "people", href: "/admin/people", icon: "people", section: "admin" });
   if (can(roles, "roles.manage")) items.push({ key: "roles", href: "/admin/roles", icon: "key", section: "admin" });
   if (can(roles, "wording.edit")) items.push({ key: "wording", href: "/admin/wording", icon: "text", section: "admin" });
+  if (can(roles, "structure.manage")) items.push({ key: "structure", href: "/admin/structure", icon: "tree", section: "admin" });
   if (can(roles, "activity.view")) items.push({ key: "activity", href: "/admin/activity", icon: "list", section: "admin" });
   return items;
 }
