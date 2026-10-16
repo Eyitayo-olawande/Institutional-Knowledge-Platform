@@ -7,6 +7,7 @@ import "@fontsource/inter/400.css";
 import "@fontsource/inter/500.css";
 import "@fontsource/inter/600.css";
 import "@fontsource/inter/700.css";
+import "@mantle/ui/styles.css";
 import "./globals.css";
 import { t } from "../i18n.ts";
 
