@@ -1,4 +1,4 @@
-import { connectTenant, listLibraryItems, type TenantDb } from "@mantle/db/tenant";
+import { connectTenant, DEFAULT_CONTENT_TYPES, listAreas, listLibraryItems, type TenantDb } from "@mantle/db/tenant";
 import { migrateTenant } from "@mantle/db/tenant/migrate";
 import { createDatabase, dropDatabase } from "@mantle/db";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -11,6 +11,12 @@ describe("demo library content", () => {
     for (const item of DEMO_ITEMS) {
       expect(item.title.endsWith("(fictional)")).toBe(true);
       expect(item.body.length).toBeGreaterThan(40);
+    }
+  });
+
+  it("uses a known content type for its kind of area", () => {
+    for (const item of DEMO_ITEMS) {
+      expect(DEFAULT_CONTENT_TYPES[item.department ? "department" : "common"].map((t) => t.key)).toContain(item.type);
     }
   });
 
@@ -43,7 +49,11 @@ describe.skipIf(!serverUrl)("seedDemoLibrary", { timeout: 60_000 }, () => {
     expect(first.added).toBe(DEMO_ITEMS.length);
     const second = await seedDemoLibrary(conn.db);
     expect(second).toEqual({ added: 0, skipped: DEMO_ITEMS.length });
-    const published = await listLibraryItems(conn.db, { publishedOnly: true });
+    const published = await listLibraryItems(conn.db, { publishedOnly: true, areas: "all" });
     expect(published.length).toBe(DEMO_ITEMS.filter((i) => i.publish).length);
+    // Claims items sit in the Claims area, created for the seed.
+    const claims = (await listAreas(conn.db)).find((a) => a.departmentName === "Claims");
+    const inClaims = await listLibraryItems(conn.db, { publishedOnly: false, areas: "all", ...(claims ? { areaId: claims.id } : {}) });
+    expect(inClaims.map((i) => i.title).sort()).toEqual(DEMO_ITEMS.filter((i) => i.department === "Claims").map((i) => i.title).sort());
   });
 });

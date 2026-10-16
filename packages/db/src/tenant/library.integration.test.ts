@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createDatabase, dropDatabase } from "../setup.ts";
 import { recentActivity } from "./activity.ts";
+import { commonArea, contentTypeByKey } from "./areas.ts";
 import { connectTenant, type TenantDb } from "./client.ts";
 import { attachFileToItem, createLibraryItem, fileWithItem, getLibraryItem, itemFiles, itemsDueForReview, listLibraryItems, publishDraft, saveDraft, searchLibrary } from "./library.ts";
 import { migrateTenant } from "./migrate.ts";
@@ -13,11 +14,13 @@ describe.skipIf(!serverUrl)("knowledge library", { timeout: 60_000 }, () => {
   let db: TenantDb;
   let close: () => Promise<void>;
   let id: string;
+  let place: { areaId: string; contentTypeId: string };
 
   beforeAll(async () => {
     await createDatabase(serverUrl ?? "", name);
     await migrateTenant(serverUrl ?? "", name);
     ({ db, close } = connectTenant(serverUrl ?? "", name));
+    place = { areaId: await commonArea(db), contentTypeId: (await contentTypeByKey(db, "common", "other")) ?? "" };
   });
 
   afterAll(async () => {
@@ -26,8 +29,8 @@ describe.skipIf(!serverUrl)("knowledge library", { timeout: 60_000 }, () => {
   });
 
   it("creates an item as an unpublished draft that staff cannot see", async () => {
-    id = await createLibraryItem(db, { title: "Claims SOP", body: "Step 1", ...base }, "user:a");
-    expect(await listLibraryItems(db, { publishedOnly: true })).toEqual([]);
+    id = await createLibraryItem(db, { title: "Claims SOP", body: "Step 1", ...base, ...place }, "user:a");
+    expect(await listLibraryItems(db, { publishedOnly: true, areas: "all" })).toEqual([]);
     expect((await getLibraryItem(db, id))?.draft?.version).toBe(1);
   });
 
@@ -36,7 +39,7 @@ describe.skipIf(!serverUrl)("knowledge library", { timeout: 60_000 }, () => {
     const found = await getLibraryItem(db, id);
     expect(found?.published?.body).toBe("Step 1");
     expect(found?.draft).toBeNull();
-    expect((await listLibraryItems(db, { publishedOnly: true })).map((i) => i.title)).toEqual(["Claims SOP"]);
+    expect((await listLibraryItems(db, { publishedOnly: true, areas: "all" })).map((i) => i.title)).toEqual(["Claims SOP"]);
   });
 
   it("keeps staff on the published version while a new draft is edited", async () => {
@@ -62,16 +65,16 @@ describe.skipIf(!serverUrl)("knowledge library", { timeout: 60_000 }, () => {
   });
 
   it("searches titles and published content, never staff hidden drafts", async () => {
-    const draftId = await createLibraryItem(db, { title: "Secret draft about claims", body: "draft words", ...base }, "user:a");
-    expect((await searchLibrary(db, "claims steps", { publishedOnly: true })).map((i) => i.title)).toEqual(["Claims SOP"]);
-    expect((await searchLibrary(db, "draft words", { publishedOnly: true }))).toEqual([]);
-    expect((await searchLibrary(db, "secret", { publishedOnly: false })).map((i) => i.id)).toEqual([draftId]);
+    const draftId = await createLibraryItem(db, { title: "Secret draft about claims", body: "draft words", ...base, ...place }, "user:a");
+    expect((await searchLibrary(db, "claims steps", { publishedOnly: true, areas: "all" })).map((i) => i.title)).toEqual(["Claims SOP"]);
+    expect((await searchLibrary(db, "draft words", { publishedOnly: true, areas: "all" }))).toEqual([]);
+    expect((await searchLibrary(db, "secret", { publishedOnly: false, areas: "all" })).map((i) => i.id)).toEqual([draftId]);
   });
 
   it("lists items due for review, flagging overdue ones", async () => {
-    await createLibraryItem(db, { title: "Old item", body: "x", ownerUserId: null, reviewDate: "2026-01-01" }, "user:a");
-    await createLibraryItem(db, { title: "Far future", body: "x", ownerUserId: null, reviewDate: "2030-01-01" }, "user:a");
-    const due = await itemsDueForReview(db, "2027-03-15", 30);
+    await createLibraryItem(db, { title: "Old item", body: "x", ownerUserId: null, reviewDate: "2026-01-01", ...place }, "user:a");
+    await createLibraryItem(db, { title: "Far future", body: "x", ownerUserId: null, reviewDate: "2030-01-01", ...place }, "user:a");
+    const due = await itemsDueForReview(db, "2027-03-15", "all", 30);
     expect(due.map((d) => [d.title, d.overdue])).toEqual([
       ["Old item", true],
       ["Claims SOP", false],

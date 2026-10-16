@@ -224,3 +224,12 @@ export async function changeUserRoles(db: TenantDb, userId: string, roles: strin
     await recordActivity(tx, { actor, action: "roles.changed", entityType: "user", entityId: userId, details: { from: before.roles, to: roles } });
   });
 }
+
+// Active staff with their department, for choosing people on admin pages.
+export async function listActiveStaff(db: TenantDb) {
+  return db
+    .select({ id: people.id, fullName: people.fullName, departmentId: people.departmentId })
+    .from(people)
+    .where(eq(people.status, "active"))
+    .orderBy(people.fullName);
+}

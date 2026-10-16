@@ -1,12 +1,45 @@
 export { connectTenant, type TenantDb } from "./client.ts";
 export * as tenantSchema from "./schema.ts";
-export { addAdministrator, applyStaffImport, changeUserRoles, listPeople, listUsers, setUserRoles, type ImportOptions, type ImportSummary, type StaffRow } from "./people.ts";
+export { addAdministrator, applyStaffImport, changeUserRoles, listActiveStaff, listPeople, listUsers, setUserRoles, type ImportOptions, type ImportSummary, type StaffRow } from "./people.ts";
 export { recentActivity, recordActivity, type ActivityEntry } from "./activity.ts";
 export { isWordingKey, setWording, wording, WORDING_DEFAULTS, type Wording, type WordingKey } from "./wording.ts";
-export { attachFileToItem, createLibraryItem, fileWithItem, getLibraryItem, itemFiles, itemsDueForReview, listLibraryItems, publishDraft, saveDraft, searchLibrary, type NewItem } from "./library.ts";
+export {
+  attachFileToItem,
+  createLibraryItem,
+  fileWithItem,
+  getLibraryItem,
+  itemFiles,
+  itemsDueForReview,
+  listLibraryItems,
+  PlacementError,
+  placeItem,
+  publishDraft,
+  saveDraft,
+  searchLibrary,
+  type ListOptions,
+  type NewItem,
+} from "./library.ts";
+export {
+  canSeeArea,
+  commonArea,
+  contentTypeByKey,
+  DEFAULT_CONTENT_TYPES,
+  departmentArea,
+  grantAreaAccess,
+  listAreaGrants,
+  listAreas,
+  listContentTypes,
+  revokeAreaAccess,
+  visibleAreas,
+  type AreaGrant,
+  type AreaKind,
+  type LearningArea,
+  type VisibleAreas,
+} from "./areas.ts";
 export { addNotice, deliveriesFor, markAllRead, noticesFor, recipients, recordDelivery, unreadCount } from "./notices.ts";
 export {
   cleanName,
+  ensureDepartment,
   isStructureKind,
   listStructure,
   mergeStructure,

@@ -1,26 +1,75 @@
-import { and, asc, desc, eq, isNull, lte, max } from "drizzle-orm";
+import { and, asc, desc, eq, isNull, lte, max, type SQL } from "drizzle-orm";
 import { recordActivity } from "./activity.ts";
+import { areaIdsOrAll, checkPlacement, type VisibleAreas } from "./areas.ts";
 import type { TenantDb } from "./client.ts";
-import { files, libraryItemFiles, libraryItems, libraryItemVersions } from "./schema.ts";
+import { contentTypes, files, libraryItemFiles, libraryItems, libraryItemVersions } from "./schema.ts";
 
 export interface NewItem {
   readonly title: string;
   readonly body: string;
   readonly ownerUserId: string | null;
   readonly reviewDate: string | null;
+  // Every item sits in one learning area with a content type that suits it.
+  readonly areaId: string;
+  readonly contentTypeId: string;
+}
+
+export class PlacementError extends Error {
+  constructor() {
+    super("The content type does not belong to that learning area.");
+  }
 }
 
 // Creates an item with its first draft version.
 export async function createLibraryItem(db: TenantDb, item: NewItem, actor: string): Promise<string> {
   return db.transaction(async (tx) => {
+    if (!(await checkPlacement(tx, item.areaId, item.contentTypeId))) throw new PlacementError();
     const [row] = await tx
       .insert(libraryItems)
-      .values({ title: item.title, ownerUserId: item.ownerUserId, reviewDate: item.reviewDate, changedBy: actor })
+      .values({
+        title: item.title,
+        ownerUserId: item.ownerUserId,
+        reviewDate: item.reviewDate,
+        areaId: item.areaId,
+        contentTypeId: item.contentTypeId,
+        changedBy: actor,
+      })
       .returning({ id: libraryItems.id });
     if (!row) throw new Error("Item was not created.");
     await tx.insert(libraryItemVersions).values({ itemId: row.id, version: 1, body: item.body, changedBy: actor });
-    await recordActivity(tx, { actor, action: "library.item_created", entityType: "library_item", entityId: row.id });
+    await recordActivity(tx, {
+      actor,
+      action: "library.item_created",
+      entityType: "library_item",
+      entityId: row.id,
+      details: { area_id: item.areaId, content_type_id: item.contentTypeId },
+    });
     return row.id;
+  });
+}
+
+// Moves an item to another area or type. Saving also confirms an item the
+// migration placed in Common Staff Learning.
+export async function placeItem(db: TenantDb, itemId: string, placement: { areaId: string; contentTypeId: string }, actor: string): Promise<boolean> {
+  return db.transaction(async (tx) => {
+    const [before] = await tx.select().from(libraryItems).where(eq(libraryItems.id, itemId));
+    if (!before) return false;
+    if (!(await checkPlacement(tx, placement.areaId, placement.contentTypeId))) throw new PlacementError();
+    await tx
+      .update(libraryItems)
+      .set({ ...placement, needsAreaReview: false, updatedAt: new Date(), changedBy: actor })
+      .where(eq(libraryItems.id, itemId));
+    await recordActivity(tx, {
+      actor,
+      action: "library.item_placed",
+      entityType: "library_item",
+      entityId: itemId,
+      details: {
+        from: { area_id: before.areaId, content_type_id: before.contentTypeId },
+        to: { area_id: placement.areaId, content_type_id: placement.contentTypeId },
+      },
+    });
+    return true;
   });
 }
 
@@ -79,9 +128,27 @@ export async function publishDraft(db: TenantDb, itemId: string, actor: string):
   });
 }
 
-export async function listLibraryItems(db: TenantDb, options: { publishedOnly: boolean }) {
-  const rows = await db.select().from(libraryItems).orderBy(libraryItems.title);
-  return options.publishedOnly ? rows.filter((r) => r.publishedVersion !== null && r.status === "published") : rows;
+export interface ListOptions {
+  readonly publishedOnly: boolean;
+  // The areas the viewer may see (see visibleAreas). Required, so no list
+  // can forget the area rule.
+  readonly areas: VisibleAreas;
+  readonly areaId?: string;
+  readonly contentTypeId?: string;
+}
+
+export async function listLibraryItems(db: TenantDb, options: ListOptions) {
+  const where: (SQL | undefined)[] = [areaIdsOrAll(options.areas)];
+  if (options.areaId) where.push(eq(libraryItems.areaId, options.areaId));
+  if (options.contentTypeId) where.push(eq(libraryItems.contentTypeId, options.contentTypeId));
+  const rows = await db
+    .select({ item: libraryItems, typeLabel: contentTypes.label })
+    .from(libraryItems)
+    .innerJoin(contentTypes, eq(libraryItems.contentTypeId, contentTypes.id))
+    .where(and(...where))
+    .orderBy(libraryItems.title);
+  const items = rows.map((r) => ({ ...r.item, typeLabel: r.typeLabel }));
+  return options.publishedOnly ? items.filter((r) => r.publishedVersion !== null && r.status === "published") : items;
 }
 
 export async function getLibraryItem(db: TenantDb, itemId: string) {
@@ -98,7 +165,7 @@ export async function getLibraryItem(db: TenantDb, itemId: string) {
 
 // Searches titles and published content. Staff only ever search published
 // versions; editors also find drafts by title.
-export async function searchLibrary(db: TenantDb, query: string, options: { publishedOnly: boolean }) {
+export async function searchLibrary(db: TenantDb, query: string, options: ListOptions) {
   const words = query.trim().toLowerCase().split(/\s+/).filter(Boolean).slice(0, 8);
   if (words.length === 0) return listLibraryItems(db, options);
   const items = await listLibraryItems(db, options);
@@ -118,11 +185,15 @@ export async function searchLibrary(db: TenantDb, query: string, options: { publ
 
 // Items whose review date has passed or falls within the next `days` days,
 // soonest first. Owners use this to keep content current.
-export async function itemsDueForReview(db: TenantDb, today: string, days = 30) {
+export async function itemsDueForReview(db: TenantDb, today: string, areas: VisibleAreas, days = 30) {
   const limit = new Date(`${today}T00:00:00Z`);
   limit.setUTCDate(limit.getUTCDate() + days);
   const until = limit.toISOString().slice(0, 10);
-  const rows = await db.select().from(libraryItems).where(lte(libraryItems.reviewDate, until)).orderBy(asc(libraryItems.reviewDate));
+  const rows = await db
+    .select()
+    .from(libraryItems)
+    .where(and(lte(libraryItems.reviewDate, until), areaIdsOrAll(areas)))
+    .orderBy(asc(libraryItems.reviewDate));
   return rows.filter((r) => r.status !== "retired").map((r) => ({ ...r, overdue: (r.reviewDate ?? "") < today }));
 }
 
@@ -154,7 +225,7 @@ export async function itemFiles(db: TenantDb, itemId: string) {
 // A file with the item it belongs to, so callers can check who may open it.
 export async function fileWithItem(db: TenantDb, fileId: string) {
   const [row] = await db
-    .select({ file: files, itemId: libraryItemFiles.itemId, itemStatus: libraryItems.status })
+    .select({ file: files, itemId: libraryItemFiles.itemId, itemStatus: libraryItems.status, itemAreaId: libraryItems.areaId })
     .from(files)
     .innerJoin(libraryItemFiles, eq(libraryItemFiles.fileId, files.id))
     .innerJoin(libraryItems, eq(libraryItems.id, libraryItemFiles.itemId))
