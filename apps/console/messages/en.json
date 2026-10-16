@@ -54,7 +54,8 @@
       "email": "Administrator's work email",
       "submit": "Add administrator"
     },
-    "admin_added": "Administrator added to {domain}. They can sign in there with an emailed code."
+    "admin_added": "Administrator added to {domain}. They can sign in there with an emailed code.",
+    "sub": "{count} organisations on this platform."
   },
   "features": {
     "heading": "Feature switches",
@@ -64,6 +65,8 @@
     "names": {
       "people_import": "Staff import",
       "knowledge_library": "Knowledge library"
-    }
+    },
+    "turn_on": "Turn on",
+    "turn_off": "Turn off"
   }
 }
