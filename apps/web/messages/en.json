@@ -22,7 +22,8 @@
     "errors": {
       "wrong_details": "That email and password do not match.",
       "wrong_code": "That code is wrong or has expired."
-    }
+    },
+    "sign_in_hint": "Use your work email to continue."
   },
   "people": {
     "back": "Back to home",
@@ -64,8 +65,17 @@
         "bad_email": "The work email is not valid, so this row was skipped.",
         "duplicate_id": "This employee ID appears earlier in the file, so this row was skipped.",
         "duplicate_email": "This work email appears earlier in the file, so this row was skipped."
+      },
+      "file": "Staff CSV file",
+      "labels": {
+        "joined": "Joined",
+        "moved": "Moved",
+        "updated": "Updated",
+        "unchanged": "Unchanged",
+        "left": "Left"
       }
-    }
+    },
+    "title": "People"
   },
   "wording": {
     "heading": "Wording at {name}",
@@ -81,7 +91,8 @@
       "unit": "Unit",
       "location": "Location",
       "role_level": "Role level"
-    }
+    },
+    "title": "Wording"
   },
   "roles": {
     "manage": "Roles",
@@ -102,7 +113,8 @@
       "group_viewer": "Group viewer",
       "external_learner": "External learner"
     },
-    "none": "no roles"
+    "none": "no roles",
+    "title": "Roles"
   },
   "activity": {
     "manage": "Activity log",
@@ -113,7 +125,8 @@
       "action": "What",
       "actor": "Who",
       "entity": "Record"
-    }
+    },
+    "title": "Activity"
   },
   "library": {
     "manage": "Knowledge library",
@@ -123,9 +136,9 @@
     "empty": "Nothing has been published yet.",
     "create": "Create draft",
     "statuses": {
-      "draft": "(draft)",
-      "published": "(published)",
-      "retired": "(retired)"
+      "draft": "Draft",
+      "published": "Published",
+      "retired": "Retired"
     },
     "fields": {
       "title": "Title",
@@ -155,7 +168,9 @@
     "no_results": "Nothing matches that search.",
     "due_heading": "Due for review",
     "due": "review by {date}",
-    "overdue": "review overdue since {date}"
+    "overdue": "review overdue since {date}",
+    "title": "Library",
+    "new_sub": "Write the content now; it stays a draft until you publish it."
   },
   "notices": {
     "link": "Notices ({count} new)",
@@ -164,5 +179,34 @@
     "empty": "No notices yet.",
     "mark_read": "Mark all as read",
     "new": "New"
+  },
+  "nav": {
+    "home": "Home",
+    "library": "Library",
+    "notices": "Notices",
+    "people": "People",
+    "roles": "Roles",
+    "wording": "Wording",
+    "activity": "Activity",
+    "admin_section": "Administration",
+    "menu": "Main menu",
+    "skip": "Skip to content",
+    "search_label": "Search the library",
+    "search_placeholder": "Search the library",
+    "notices_unread": "Notices, {count} new"
+  },
+  "home": {
+    "greeting": "Welcome, {name}",
+    "sub": "Your learning, library and notices at {name}.",
+    "unread": "You have {count} new notices.",
+    "read_notices": "Read notices",
+    "cards": {
+      "library": "Read and search learning materials for your department and the whole company.",
+      "notices": "Messages and reminders sent to you.",
+      "people": "Import staff from HR and see who has joined, moved or left.",
+      "roles": "Decide who can manage content, people and settings.",
+      "wording": "Change the words used for departments, units and role levels.",
+      "activity": "See the record of every change and result."
+    }
   }
 }

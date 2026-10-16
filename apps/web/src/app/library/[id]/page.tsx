@@ -1,12 +1,12 @@
 import { getLibraryItem } from "@mantle/db/tenant";
 import { can } from "@mantle/platform/identity";
-import { Button, color, space } from "@mantle/ui";
+import { Badge, Button, Card } from "@mantle/ui";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { t } from "../../../i18n.ts";
 import { requireFeature, requirePermission } from "../../../server/session.ts";
+import { AppShell } from "../../_components/AppShell.tsx";
 import { publishItem, saveItemDraft } from "../actions.ts";
-import { field, input } from "../form_styles.ts";
 
 export default async function Item({
   params,
@@ -15,7 +15,8 @@ export default async function Item({
   params: Promise<{ id: string }>;
   searchParams: Promise<{ saved?: string; published?: string; error?: string }>;
 }) {
-  const { tenant, db, roles } = await requirePermission("library.view");
+  const ctx = await requirePermission("library.view");
+  const { tenant, db, roles } = ctx;
   await requireFeature(tenant, "knowledge_library");
   const { id } = await params;
   const { saved, published, error } = await searchParams;
@@ -26,64 +27,84 @@ export default async function Item({
   const current = draft ?? found.published;
 
   return (
-    <main style={{ padding: space.md, maxWidth: 800 }}>
-      <p>
-        <Link href="/library">{t("library.back")}</Link>
-      </p>
-      <h1>{item.title}</h1>
-      {saved && <p role="status" style={{ color: color.success }}>{t("library.saved")}</p>}
-      {published && <p role="status" style={{ color: color.success }}>{t("library.published_now")}</p>}
-      {error && <p role="alert" style={{ color: color.danger }}>{t(`library.errors.${error === "no_draft" ? "no_draft" : "missing"}`)}</p>}
+    <AppShell ctx={ctx} active="library">
+      <p className="crumb"><Link href="/library">{t("library.back")}</Link></p>
+      <div className="page-head">
+        <div>
+          <h1>{item.title}</h1>
+          <div className="row">
+            {found.published ? (
+              <Badge tone="success">{t("library.published_version", { version: found.published.version })}</Badge>
+            ) : (
+              <Badge tone="neutral">{t("library.statuses.draft")}</Badge>
+            )}
+            {item.reviewDate ? <span className="muted">{t("library.review_by", { date: item.reviewDate })}</span> : null}
+          </div>
+        </div>
+      </div>
 
-      {found.published ? (
-        <section>
-          <p>{t("library.published_version", { version: found.published.version })}</p>
-          <div style={{ whiteSpace: "pre-wrap" }}>{found.published.body}</div>
-        </section>
-      ) : (
-        <p>{t("library.not_published")}</p>
-      )}
-      {item.reviewDate && <p>{t("library.review_by", { date: item.reviewDate })}</p>}
+      {saved ? <div className="alert alert-success" role="status"><p>{t("library.saved")}</p></div> : null}
+      {published ? <div className="alert alert-success" role="status"><p>{t("library.published_now")}</p></div> : null}
+      {error ? (
+        <div className="alert alert-danger" role="alert"><p>{t(`library.errors.${error === "no_draft" ? "no_draft" : "missing"}`)}</p></div>
+      ) : null}
 
-      {editor && current && (
-        <section style={{ marginTop: space.lg }}>
-          <h2>{draft ? t("library.draft_heading", { version: draft.version }) : t("library.edit_heading")}</h2>
-          <form action={saveItemDraft}>
-            <input type="hidden" name="id" value={item.id} />
-            <label style={field}>
-              {t("library.fields.title")}
-              <input name="title" defaultValue={item.title} required style={input} />
-            </label>
-            <label style={field}>
-              {t("library.fields.body")}
-              <textarea name="body" defaultValue={current.body} required rows={12} style={{ ...input, minHeight: 200 }} />
-            </label>
-            <label style={field}>
-              {t("library.fields.change_note")}
-              <input name="changeNote" defaultValue={draft?.changeNote ?? ""} style={input} />
-            </label>
-            <label style={field}>
-              {t("library.fields.review_date")}
-              <input name="reviewDate" type="date" defaultValue={item.reviewDate ?? ""} style={input} />
-            </label>
-            <Button type="submit" variant="secondary">{t("library.save_draft")}</Button>
-          </form>
-          {draft && (
-            <form action={publishItem} style={{ marginTop: space.md }}>
-              <input type="hidden" name="id" value={item.id} />
-              <Button type="submit">{t("library.publish", { version: draft.version })}</Button>
-            </form>
+      <div className={editor && current ? "grid grid-2" : "stack"} style={{ alignItems: "start" }}>
+        <Card>
+          {found.published ? (
+            <div className="prose">{found.published.body}</div>
+          ) : (
+            <p className="sub">{t("library.not_published")}</p>
           )}
-          <h2>{t("library.history")}</h2>
-          <ul>
-            {versions.map((v) => (
-              <li key={v.id}>
-                {t(v.publishedAt ? "library.history_published" : "library.history_draft", { version: v.version, note: v.changeNote ?? "" })}
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-    </main>
+        </Card>
+
+        {editor && current ? (
+          <div className="stack">
+            <Card>
+              <h2>{draft ? t("library.draft_heading", { version: draft.version }) : t("library.edit_heading")}</h2>
+              <form action={saveItemDraft}>
+                <input type="hidden" name="id" value={item.id} />
+                <label className="field">
+                  {t("library.fields.title")}
+                  <input className="input" name="title" defaultValue={item.title} required />
+                </label>
+                <label className="field">
+                  {t("library.fields.body")}
+                  <textarea className="input" name="body" defaultValue={current.body} required rows={12} />
+                </label>
+                <label className="field">
+                  {t("library.fields.change_note")}
+                  <input className="input" name="changeNote" defaultValue={draft?.changeNote ?? ""} />
+                </label>
+                <label className="field">
+                  {t("library.fields.review_date")}
+                  <input className="input" name="reviewDate" type="date" defaultValue={item.reviewDate ?? ""} />
+                </label>
+                <Button type="submit" variant="secondary">{t("library.save_draft")}</Button>
+              </form>
+              {draft ? (
+                <form action={publishItem} style={{ marginTop: 12 }}>
+                  <input type="hidden" name="id" value={item.id} />
+                  <Button type="submit">{t("library.publish", { version: draft.version })}</Button>
+                </form>
+              ) : null}
+            </Card>
+            <Card>
+              <h2>{t("library.history")}</h2>
+              <ul className="list">
+                {versions.map((v) => (
+                  <li key={v.id}>
+                    <div className="grow">
+                      {t(v.publishedAt ? "library.history_published" : "library.history_draft", { version: v.version, note: v.changeNote ?? "" })}
+                    </div>
+                    <Badge tone={v.publishedAt ? "success" : "neutral"}>{t(v.publishedAt ? "library.statuses.published" : "library.statuses.draft")}</Badge>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          </div>
+        ) : null}
+      </div>
+    </AppShell>
   );
 }

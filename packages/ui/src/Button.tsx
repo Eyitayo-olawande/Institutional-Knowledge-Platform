@@ -37,6 +37,11 @@ const sizes: Record<ButtonSize, CSSProperties> = {
   sm: { fontSize: font.sizeSm, padding: `0 ${space.md}` },
 };
 
+// The same look for a link that navigates (a link must not wrap a button).
+export function buttonStyle(variant: ButtonVariant = "primary", size: ButtonSize = "md"): CSSProperties {
+  return { ...base, ...variants[variant], ...sizes[size], textDecoration: "none" };
+}
+
 // Labels always come from the caller, so screen text stays in translation files.
 export function Button({ variant = "primary", size = "md", type = "button", style, ...rest }: ButtonProps) {
   return <button type={type} style={{ ...base, ...variants[variant], ...sizes[size], ...style }} {...rest} />;
