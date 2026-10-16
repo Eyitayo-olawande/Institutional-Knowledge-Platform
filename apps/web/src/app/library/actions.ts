@@ -1,6 +1,8 @@
 "use server";
 
-import { createLibraryItem, getLibraryItem, publishDraft, saveDraft } from "@mantle/db/tenant";
+import { attachFileToItem, createLibraryItem, getLibraryItem, publishDraft, saveDraft } from "@mantle/db/tenant";
+import { checkUpload, MAX_FILES_PER_UPLOAD } from "@mantle/platform/files";
+import { fileStore, scanner } from "../../server/files.ts";
 import { redirect } from "next/navigation";
 import { requireFeature, requirePermission } from "../../server/session.ts";
 
@@ -44,4 +46,28 @@ export async function publishItem(form: FormData): Promise<void> {
   const id = String(form.get("id") ?? "");
   const version = await publishDraft(db, id, `user:${user.id}`);
   redirect(`/library/${id}?${version ? "published=1" : "error=no_draft"}`);
+}
+
+// Attaches one or more files in one go. Every file is checked and scanned
+// before any is stored, so a batch is either attached whole or refused.
+export async function uploadItemFile(form: FormData): Promise<void> {
+  const { db, user, tenant } = await editor();
+  const id = String(form.get("id") ?? "");
+  if (!(await getLibraryItem(db, id))) redirect("/library");
+  const chosen = form.getAll("file").filter((f): f is File => f instanceof File && f.size > 0);
+  if (chosen.length === 0) redirect(`/library/${id}?file_error=empty`);
+  if (chosen.length > MAX_FILES_PER_UPLOAD) redirect(`/library/${id}?file_error=too_many`);
+  const ready = [];
+  for (const file of chosen) {
+    const data = new Uint8Array(await file.arrayBuffer());
+    const checked = checkUpload(file.name, data);
+    if (!checked.ok) redirect(`/library/${id}?file_error=${checked.reason}`);
+    if ((await scanner.scan(data)) !== "clean") redirect(`/library/${id}?file_error=infected`);
+    ready.push({ data, checked });
+  }
+  for (const { data, checked } of ready) {
+    const stored = await fileStore.put(tenant.id, data);
+    await attachFileToItem(db, id, { storageKey: stored.key, name: checked.name, contentType: checked.contentType, size: stored.size, sha256: stored.sha256 }, `user:${user.id}`);
+  }
+  redirect(`/library/${id}?file_added=${ready.length}`);
 }

@@ -7,7 +7,8 @@
     "./tenancy": "./src/tenancy/index.ts",
     "./identity": "./src/identity/index.ts",
     "./people": "./src/people/index.ts",
-    "./notifications": "./src/notifications/index.ts"
+    "./notifications": "./src/notifications/index.ts",
+    "./files": "./src/files/index.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",

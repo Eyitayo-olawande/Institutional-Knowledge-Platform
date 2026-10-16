@@ -216,3 +216,29 @@ export const deliveryRecords = pgTable(
   },
   (t) => [index("delivery_records_user_idx").on(t.userId), index("delivery_records_event_idx").on(t.event)],
 );
+
+// Files (Product Architecture v1, section 5): stored in the tenant's own
+// storage area; this table holds what is needed to find and check them.
+export const files = pgTable("files", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  storageKey: text("storage_key").notNull().unique(),
+  name: text("name").notNull(),
+  contentType: text("content_type").notNull(),
+  size: integer("size").notNull(),
+  sha256: text("sha256").notNull(),
+  ...auditColumns,
+});
+
+export const libraryItemFiles = pgTable(
+  "library_item_files",
+  {
+    itemId: uuid("item_id")
+      .notNull()
+      .references(() => libraryItems.id),
+    fileId: uuid("file_id")
+      .notNull()
+      .references(() => files.id),
+    ...auditColumns,
+  },
+  (t) => [uniqueIndex("library_item_files_unique").on(t.itemId, t.fileId)],
+);
