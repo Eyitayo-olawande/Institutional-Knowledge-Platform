@@ -12,7 +12,8 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "seed:people": "tsx src/identity/seed_cli.ts"
+    "seed:people": "tsx src/identity/seed_cli.ts",
+    "seed:library": "tsx src/demo/library_cli.ts"
   },
   "dependencies": {
     "better-auth": "^1.7.9",
