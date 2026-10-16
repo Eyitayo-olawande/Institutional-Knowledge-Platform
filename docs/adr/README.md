@@ -27,6 +27,7 @@ The roadmap asks for one decision record per line of the proposed stack. All 16 
 | [0017 Translation lookup](0017_translation_lookup.md) | Small built in lookup over JSON message files (answers the open question in 0011) | Accepted |
 | [0018 Drizzle](0018_drizzle.md) | Drizzle ORM and Drizzle Kit over the pg driver (answers the open question in 0005) | Accepted |
 | [0019 Better Auth](0019_better_auth.md) | Better Auth, one sign in instance per tenant database (answers the open question in 0009) | Accepted |
+| [0020 Visual direction](0020_visual_direction.md) | SUNU brand red for the brand and main action, separate risk colour, AA contrast, Inter, phone first components (roadmap v1.2, E15) | Accepted |
 
 ## Statuses
 
