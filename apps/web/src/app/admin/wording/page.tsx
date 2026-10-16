@@ -1,40 +1,40 @@
 import { wording, type WordingKey } from "@mantle/db/tenant";
-import { Button, color, space } from "@mantle/ui";
-import Link from "next/link";
+import { Button, Card } from "@mantle/ui";
 import { t } from "../../../i18n.ts";
 import { requirePermission } from "../../../server/session.ts";
+import { AppShell, PageHead } from "../../_components/AppShell.tsx";
 import { saveWording } from "./actions.ts";
 
-const input = { minHeight: 44, padding: space.sm, fontSize: 16 } as const;
-
 export default async function Wording({ searchParams }: { searchParams: Promise<{ saved?: string; error?: string }> }) {
-  const { tenant, db } = await requirePermission("wording.edit");
-  const labels = await wording(db);
+  const ctx = await requirePermission("wording.edit");
+  const labels = await wording(ctx.db);
   const { saved, error } = await searchParams;
 
   return (
-    <main style={{ padding: space.md, maxWidth: 720 }}>
-      <p>
-        <Link href="/">{t("people.back")}</Link>
-      </p>
-      <h1>{t("wording.heading", { name: tenant.name })}</h1>
-      <p>{t("wording.explain")}</p>
-      {saved && <p role="status" style={{ color: color.success }}>{t("wording.saved")}</p>}
-      {error && <p role="alert" style={{ color: color.danger }}>{t("wording.error")}</p>}
-      {(Object.keys(labels) as WordingKey[]).map((key) => (
-        <form key={key} action={saveWording} style={{ display: "flex", flexWrap: "wrap", gap: space.sm, alignItems: "end", marginBottom: space.md }}>
-          <input type="hidden" name="key" value={key} />
-          <label style={{ display: "grid", gap: space.xs }}>
-            {t("wording.singular", { term: t(`wording.terms.${key}`) })}
-            <input name="singular" defaultValue={labels[key].singular} required style={input} />
-          </label>
-          <label style={{ display: "grid", gap: space.xs }}>
-            {t("wording.plural")}
-            <input name="plural" defaultValue={labels[key].plural} required style={input} />
-          </label>
-          <Button type="submit" variant="secondary">{t("wording.save")}</Button>
-        </form>
-      ))}
-    </main>
+    <AppShell ctx={ctx} active="wording">
+      <PageHead title={t("wording.title")} sub={t("wording.explain")} />
+      {saved ? <div className="alert alert-success" role="status"><p>{t("wording.saved")}</p></div> : null}
+      {error ? <div className="alert alert-danger" role="alert"><p>{t("wording.error")}</p></div> : null}
+      <Card style={{ maxWidth: 820 }}>
+        <ul className="list">
+          {(Object.keys(labels) as WordingKey[]).map((key) => (
+            <li key={key}>
+              <form action={saveWording} className="row grow" style={{ alignItems: "flex-end" }}>
+                <input type="hidden" name="key" value={key} />
+                <label className="field" style={{ flex: 1, minWidth: 160, marginBottom: 0 }}>
+                  {t("wording.singular", { term: t(`wording.terms.${key}`) })}
+                  <input className="input" name="singular" defaultValue={labels[key].singular} required />
+                </label>
+                <label className="field" style={{ flex: 1, minWidth: 160, marginBottom: 0 }}>
+                  {t("wording.plural")}
+                  <input className="input" name="plural" defaultValue={labels[key].plural} required />
+                </label>
+                <Button type="submit" variant="secondary">{t("wording.save")}</Button>
+              </form>
+            </li>
+          ))}
+        </ul>
+      </Card>
+    </AppShell>
   );
 }

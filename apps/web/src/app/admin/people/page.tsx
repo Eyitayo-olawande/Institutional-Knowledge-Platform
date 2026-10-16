@@ -1,16 +1,17 @@
 import { listPeople, wording } from "@mantle/db/tenant";
-import { Button, color, space } from "@mantle/ui";
+import { Badge, Button, Card, StatTile } from "@mantle/ui";
 import { cookies } from "next/headers";
-import Link from "next/link";
 import { t } from "../../../i18n.ts";
 import { requireFeature, requirePermission } from "../../../server/session.ts";
+import { AppShell, PageHead } from "../../_components/AppShell.tsx";
 import { importStaff } from "./actions.ts";
 import { RESULT_COOKIE, type ImportResult } from "./import_result.ts";
 
 const COUNTS = ["joined", "moved", "updated", "unchanged", "left"] as const;
 
 export default async function People() {
-  const { tenant, db } = await requirePermission("people.view");
+  const ctx = await requirePermission("people.view");
+  const { tenant, db } = ctx;
   await requireFeature(tenant, "people_import");
   const people = await listPeople(db);
   const labels = await wording(db);
@@ -18,75 +19,83 @@ export default async function People() {
   const result = raw ? (JSON.parse(raw) as ImportResult) : undefined;
 
   return (
-    <main style={{ padding: space.md, maxWidth: 900 }}>
-      <p>
-        <Link href="/">{t("people.back")}</Link>
-      </p>
-      <h1>{t("people.heading", { name: tenant.name })}</h1>
+    <AppShell ctx={ctx} active="people">
+      <PageHead title={t("people.title")} sub={t("people.heading", { name: tenant.name })} />
 
-      {result && (
-        <section role="status" style={{ marginBottom: space.lg }}>
-          {result.joined !== undefined && (
-            <ul>
+      {result ? (
+        <section role="status" style={{ marginBottom: 16 }}>
+          {result.joined !== undefined ? (
+            <div className="grid grid-4" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", marginBottom: 12 }}>
               {COUNTS.map((k) => (
-                <li key={k}>{t(`people.import.counts.${k}`, { count: result[k] ?? 0 })}</li>
+                <StatTile key={k} label={t(`people.import.labels.${k}`)} value={result[k] ?? 0} />
               ))}
-            </ul>
-          )}
-          {result.problems.length > 0 && (
-            <ul style={{ color: color.danger }}>
-              {result.problems.map((p) => (
-                <li key={`${p.line}-${p.key}`}>
-                  {p.line > 0 ? t("people.import.line", { line: p.line }) : null}
-                  {t(p.key, { columns: p.columns ?? "" })}
-                </li>
-              ))}
-            </ul>
-          )}
+            </div>
+          ) : null}
+          {result.problems.length > 0 ? (
+            <div className="alert alert-danger" role="alert">
+              <ul style={{ margin: 0, paddingLeft: 18 }}>
+                {result.problems.map((p) => (
+                  <li key={`${p.line}-${p.key}`}>
+                    {p.line > 0 ? t("people.import.line", { line: p.line }) : null}
+                    {t(p.key, { columns: p.columns ?? "" })}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
         </section>
-      )}
+      ) : null}
 
-      <h2>{t("people.import.heading")}</h2>
-      <p>{t("people.import.format")}</p>
-      <form action={importStaff}>
-        <p>
-          <input type="file" name="file" accept=".csv,text/csv" required />
-        </p>
-        <p>
-          <label>
-            <input type="checkbox" name="mark_leavers" /> {t("people.import.mark_leavers")}
-          </label>
-        </p>
-        <Button type="submit">{t("people.import.submit")}</Button>
-      </form>
+      <div className="grid" style={{ gridTemplateColumns: "minmax(0, 1fr)", gap: 16 }}>
+        <Card>
+          <h2>{t("people.import.heading")}</h2>
+          <p className="muted" style={{ marginTop: 0 }}>{t("people.import.format")}</p>
+          <form action={importStaff}>
+            <label className="field">
+              {t("people.import.file")}
+              <input className="input" type="file" name="file" accept=".csv,text/csv" required />
+            </label>
+            <label className="check" style={{ marginBottom: 12 }}>
+              <input type="checkbox" name="mark_leavers" /> {t("people.import.mark_leavers")}
+            </label>
+            <div>
+              <Button type="submit">{t("people.import.submit")}</Button>
+            </div>
+          </form>
+        </Card>
 
-      <h2>{t("people.list_heading", { count: people.length })}</h2>
-      {people.length === 0 ? (
-        <p>{t("people.empty")}</p>
-      ) : (
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead>
-            <tr>
-              <th align="left">{t("people.columns.employee_id")}</th>
-              <th align="left">{t("people.columns.name")}</th>
-              <th align="left">{t("people.columns.email")}</th>
-              <th align="left">{labels.department.singular}</th>
-              <th align="left">{t("people.columns.status")}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {people.map((p) => (
-              <tr key={p.id}>
-                <td>{p.employeeId}</td>
-                <td>{p.fullName}</td>
-                <td>{p.workEmail}</td>
-                <td>{p.department}</td>
-                <td>{t(`people.statuses.${p.status}`)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-    </main>
+        <Card>
+          <h2>{t("people.list_heading", { count: people.length })}</h2>
+          {people.length === 0 ? (
+            <p className="sub">{t("people.empty")}</p>
+          ) : (
+            <div className="table-wrap">
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>{t("people.columns.employee_id")}</th>
+                    <th>{t("people.columns.name")}</th>
+                    <th>{t("people.columns.email")}</th>
+                    <th>{labels.department.singular}</th>
+                    <th>{t("people.columns.status")}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {people.map((p) => (
+                    <tr key={p.id}>
+                      <td>{p.employeeId}</td>
+                      <td><strong>{p.fullName}</strong></td>
+                      <td>{p.workEmail}</td>
+                      <td>{p.department}</td>
+                      <td><Badge tone={p.status === "active" ? "success" : "neutral"}>{t(`people.statuses.${p.status}`)}</Badge></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </Card>
+      </div>
+    </AppShell>
   );
 }

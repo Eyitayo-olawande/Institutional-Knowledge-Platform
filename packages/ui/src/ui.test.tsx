@@ -4,6 +4,7 @@ import {
   Badge,
   badgeColors,
   Button,
+  buttonStyle,
   Card,
   color,
   contrastRatio,
@@ -29,6 +30,14 @@ describe("Button", () => {
 
   it("uses the brand colour for the primary action", () => {
     expect(renderToStaticMarkup(<Button>Go</Button>)).toContain(`background:${color.primary}`);
+  });
+});
+
+describe("buttonStyle", () => {
+  it("gives a link the button look and touch target", () => {
+    expect(buttonStyle().minHeight).toBe(touchTarget);
+    expect(buttonStyle("secondary").background).toBe(color.surface);
+    expect(buttonStyle().textDecoration).toBe("none");
   });
 });
 
