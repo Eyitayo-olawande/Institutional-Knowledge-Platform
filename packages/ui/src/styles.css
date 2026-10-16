@@ -81,3 +81,9 @@ textarea.input { min-height: 220px; resize: vertical; }
 .tabs a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; color: var(--mantle-color-text_muted); font-weight: var(--mantle-font-weight_semibold); text-decoration: none; white-space: nowrap; border-bottom: 2px solid transparent; margin-bottom: -1px; }
 .tabs a:hover { color: var(--mantle-color-text); }
 .tabs a[aria-current="page"] { color: var(--mantle-color-primary); border-bottom-color: var(--mantle-color-primary); }
+
+/* Filter chips: links, the chosen one marked with aria-current. */
+.chips { display: flex; flex-wrap: wrap; gap: var(--mantle-space-xs); margin-bottom: var(--mantle-space-sm); }
+.chips a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--mantle-color-border); background: var(--mantle-color-surface); color: var(--mantle-color-text); font-size: var(--mantle-font-size_sm); font-weight: var(--mantle-font-weight_semibold); text-decoration: none; }
+.chips a:hover { border-color: var(--mantle-color-primary); }
+.chips a[aria-current="true"] { background: var(--mantle-color-primary); border-color: var(--mantle-color-primary); color: var(--mantle-color-primary_text); }

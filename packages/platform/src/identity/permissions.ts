@@ -24,6 +24,8 @@ export const ACTIONS = [
   "activity.view",
   "library.view",
   "library.edit",
+  "library.all_areas",
+  "areas.manage",
 ] as const;
 
 export type Action = (typeof ACTIONS)[number];
@@ -39,6 +41,10 @@ const GRANTS: Record<Action, readonly Role[]> = {
   // External learners only see what is assigned to them (later work).
   "library.view": ["learner", "line_manager", "content_owner", "compliance_reviewer", "learning_administrator"],
   "library.edit": ["content_owner", "learning_administrator"],
+  // Everyone else sees Common Staff Learning, their own department's area
+  // and areas granted to them (checked on every library read).
+  "library.all_areas": ["learning_administrator"],
+  "areas.manage": ["learning_administrator"],
 };
 
 export function isRole(value: string): value is Role {

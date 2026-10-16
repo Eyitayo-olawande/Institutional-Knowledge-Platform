@@ -1,6 +1,6 @@
 # E5: Learning areas and content types
 
-* **Status:** Proposed, for the product owner to approve
+* **Status:** Approved 16 October 2026; built (area grants to groups follow with the groups package)
 * **Blueprint:** v3.1 section 3 (the library and the two learning areas); Proposal v2.0 section 4
 * **Architecture:** v1.1 section 4 (learning areas and path structure)
 * **Prototype:** Library screen (area and type filter chips), Department library screen

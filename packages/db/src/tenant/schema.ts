@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import { boolean, date, index, integer, jsonb, pgEnum, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
 import { auditColumns } from "../columns.ts";
 
@@ -210,6 +211,58 @@ export const wordingLabels = pgTable("wording_labels", {
   ...auditColumns,
 });
 
+// Learning areas (Blueprint v3.1, section 3): Common Staff Learning, seen
+// by all staff, and one Department Learning area per department, seen by
+// that department's staff and anyone granted access. Every library item
+// sits in exactly one area, so nothing is copied between departments.
+export const learningAreaKind = pgEnum("learning_area_kind", ["common", "department"]);
+
+export const learningAreas = pgTable(
+  "learning_areas",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    kind: learningAreaKind("kind").notNull(),
+    departmentId: uuid("department_id").references(() => departments.id),
+    ...auditColumns,
+  },
+  (t) => [
+    uniqueIndex("learning_areas_department_unique").on(t.departmentId),
+    uniqueIndex("learning_areas_one_common").on(t.kind).where(sql`kind = 'common'`),
+  ],
+);
+
+// Content types per kind of area. Set by the industry template (E7); the
+// defaults are loaded by the migration.
+export const contentTypes = pgTable(
+  "content_types",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    areaKind: learningAreaKind("area_kind").notNull(),
+    key: text("key").notNull(),
+    label: text("label").notNull(),
+    rank: integer("rank").notNull(),
+    ...auditColumns,
+  },
+  (t) => [uniqueIndex("content_types_kind_key_unique").on(t.areaKind, t.key)],
+);
+
+// Access to a department's area for someone outside it. Group grants
+// arrive with groups (E4 groups).
+export const areaAccessGrants = pgTable(
+  "area_access_grants",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    areaId: uuid("area_id")
+      .notNull()
+      .references(() => learningAreas.id),
+    personId: uuid("person_id")
+      .notNull()
+      .references(() => people.id),
+    ...auditColumns,
+  },
+  (t) => [uniqueIndex("area_access_grants_unique").on(t.areaId, t.personId)],
+);
+
 // Knowledge library (Product Architecture v1, section 5): items with
 // versions, owners, review dates and a publishing workflow. Staff see the
 // published version; editors work on a draft until it is published.
@@ -222,6 +275,15 @@ export const libraryItems = pgTable("library_items", {
   reviewDate: date("review_date"),
   status: libraryItemStatus("status").notNull().default("draft"),
   publishedVersion: integer("published_version"),
+  areaId: uuid("area_id")
+    .notNull()
+    .references(() => learningAreas.id),
+  contentTypeId: uuid("content_type_id")
+    .notNull()
+    .references(() => contentTypes.id),
+  // Set on items the migration placed in Common Staff Learning, until a
+  // content owner confirms or moves them.
+  needsAreaReview: boolean("needs_area_review").notNull().default(false),
   ...auditColumns,
 });
 

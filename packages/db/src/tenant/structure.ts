@@ -1,5 +1,6 @@
 import { and, asc, count, eq, max, sql } from "drizzle-orm";
 import { recordActivity } from "./activity.ts";
+import { ensureDepartmentArea, mergeDepartmentAreas } from "./areas.ts";
 import type { TenantDb } from "./client.ts";
 import { departments, employmentEvents, locations, people, roleLevels, structureNames, units } from "./schema.ts";
 
@@ -64,6 +65,7 @@ export function structureResolver(tx: Tx, changedBy: string) {
       id = await create(kind, name, scope);
       await addName(tx, kind, name, id, changedBy, scope);
       await recordActivity(tx, { actor: changedBy, action: "structure.created", entityType: kind, entityId: id, details: { name } });
+      if (kind === "department") await ensureDepartmentArea(tx, id, changedBy);
     }
     cache.set(cacheKey, id);
     return id;
@@ -210,6 +212,7 @@ async function moveEntry(tx: Tx, kind: StructureKind, fromId: string, toId: stri
     .returning({ id: people.id });
 
   if (kind === "department") {
+    await mergeDepartmentAreas(tx, fromId, toId, actor);
     await tx.update(employmentEvents).set({ fromDepartmentId: toId }).where(eq(employmentEvents.fromDepartmentId, fromId));
     await tx.update(employmentEvents).set({ toDepartmentId: toId }).where(eq(employmentEvents.toDepartmentId, fromId));
     // Units come along; a unit whose name the kept department already uses
@@ -262,5 +265,14 @@ export async function moveRoleLevel(db: TenantDb, id: string, direction: "up" | 
     await tx.update(roleLevels).set({ rank: a.rank, updatedAt: now, changedBy: actor }).where(eq(roleLevels.id, b.id));
     await recordActivity(tx, { actor, action: "structure.reordered", entityType: "role_level", entityId: id, details: { name: a.name, from: a.rank, to: b.rank } });
     return true;
+  });
+}
+
+// Finds or creates a department by name (development seeding).
+export async function ensureDepartment(db: TenantDb, name: string, actor: string): Promise<string> {
+  return db.transaction(async (tx) => {
+    const { departmentId } = await structureResolver(tx, actor).forRow({ department: name });
+    if (!departmentId) throw new Error("A department needs a name.");
+    return departmentId;
   });
 }

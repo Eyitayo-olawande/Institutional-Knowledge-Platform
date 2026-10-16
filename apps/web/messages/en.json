@@ -144,7 +144,10 @@
       "title": "Title",
       "body": "Content",
       "review_date": "Review by",
-      "change_note": "What changed"
+      "change_note": "What changed",
+      "area": "Learning area",
+      "content_type": "Content type",
+      "choose": "Choose"
     },
     "saved": "Draft saved.",
     "published_now": "Published. Staff now see this version.",
@@ -160,7 +163,8 @@
     "history_draft": "Version {version}, draft. {note}",
     "errors": {
       "missing": "Enter a title and content.",
-      "no_draft": "There is no draft to publish."
+      "no_draft": "There is no draft to publish.",
+      "placement": "That content type does not suit the learning area. Choose a type listed for that kind of area."
     },
     "search": "Search",
     "search_label": "Search the library",
@@ -185,6 +189,23 @@
         "content_mismatch": "A file's contents do not match its type. Nothing was saved.",
         "infected": "A file failed the malware scan. Nothing was saved."
       }
+    },
+    "areas": {
+      "common": "Common Staff Learning",
+      "all": "All",
+      "all_types": "All types",
+      "filter_label": "Learning area",
+      "type_filter_label": "Content type",
+      "types_for": {
+        "common": "Common Staff Learning types",
+        "department": "Department Learning types"
+      },
+      "needs_review": "Check area",
+      "review_prompt": "This item was placed in Common Staff Learning when learning areas were added. Check its area and type below, then confirm.",
+      "place_heading": "Learning area and type",
+      "move": "Save area and type",
+      "confirm": "Confirm area and type",
+      "placed": "Area and type saved."
     }
   },
   "notices": {
@@ -209,7 +230,8 @@
     "search_label": "Search the library",
     "search_placeholder": "Search the library",
     "notices_unread": "Notices, {count} new",
-    "structure": "Structure"
+    "structure": "Structure",
+    "areas": "Area access"
   },
   "home": {
     "greeting": "Welcome, {name}",
@@ -223,7 +245,8 @@
       "roles": "Decide who can manage content, people and settings.",
       "wording": "Change the words used for departments, units and role levels.",
       "activity": "See the record of every change and result.",
-      "structure": "See and tidy the structure people belong to."
+      "structure": "See and tidy the structure people belong to.",
+      "areas": "Let people outside a team see its learning area."
     }
   },
   "structure": {
@@ -257,5 +280,20 @@
       "different_department": "Entries can only be merged within the same {department}.",
       "empty": "Enter a name."
     }
+  },
+  "areas": {
+    "title": "Area access",
+    "explain": "Everyone sees Common Staff Learning, and each {department}'s staff see its own learning area. Give access here to someone from outside who needs it.",
+    "members": "{count} staff see this area as members",
+    "no_grants": "No one from outside has access.",
+    "choose_person": "Choose a person",
+    "person_label": "Person to give access to {name}",
+    "grant": "Add",
+    "remove": "Remove",
+    "remove_label": "Remove access for {name}",
+    "granted": "Access given.",
+    "revoked": "Access removed.",
+    "error": "That change could not be made.",
+    "empty": "No {departments} yet. They are added by the staff import."
   }
 }

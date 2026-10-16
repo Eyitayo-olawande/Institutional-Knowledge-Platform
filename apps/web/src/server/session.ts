@@ -1,6 +1,6 @@
 import "server-only";
 import { loadConfig } from "@mantle/db";
-import { connectTenant, type TenantDb } from "@mantle/db/tenant";
+import { connectTenant, visibleAreas, type TenantDb, type VisibleAreas } from "@mantle/db/tenant";
 import { isFeatureOn, type Feature } from "@mantle/db/control";
 import { can, type Action } from "@mantle/platform/identity";
 import type { TenantRecord } from "@mantle/platform/tenancy";
@@ -53,4 +53,9 @@ export async function featureOn(tenant: TenantRecord, feature: Feature): Promise
 
 export async function requireFeature(tenant: TenantRecord, feature: Feature): Promise<void> {
   if (!(await featureOn(tenant, feature))) redirect("/");
+}
+
+// The learning areas the signed in person may see, for every library read.
+export async function viewerAreas(ctx: { db: TenantDb; roles: string; user: { id: string } }): Promise<VisibleAreas> {
+  return visibleAreas(ctx.db, { userId: ctx.user.id, allAreas: can(ctx.roles, "library.all_areas") });
 }

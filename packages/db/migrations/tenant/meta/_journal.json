@@ -57,6 +57,13 @@
       "when": 1792174446391,
       "tag": "0007_structure_records",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1792191761087,
+      "tag": "0008_learning_areas",
+      "breakpoints": true
     }
   ]
 }
