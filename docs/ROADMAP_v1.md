@@ -1,6 +1,6 @@
 # Version 1 Roadmap
 
-Source: Development Roadmap v1.1 (sections 7 to 9, 12 and 13) and Product Architecture v1.1 (section 16), both issued 15 October 2026. They replace v1.0 of each; SUNU Proposal v2.0 describes the feature behaviour for SUNU.
+Source: Development Roadmap v1.1 (sections 7 to 9, 12 and 13) and Product Architecture v1.1 (section 16), both issued 15 October 2026. They replace v1.0 of each. Feature behaviour is defined in SUNU Blueprint v3.1, which every work package links to; scope and commercial terms are in SUNU Proposal v2.0.
 
 ## What changed in v1.1
 
