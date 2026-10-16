@@ -17,7 +17,7 @@ npm run db:setup
 npm run check
 ```
 
-`npm run db:setup` creates the control database and two fictional tenant databases (`mantle_control`, `mantle_tenant_alpha`, `mantle_tenant_beta`), applies the control database migrations, and adds the two fictional tenants on `alpha.localhost` and `beta.localhost`. It is safe to run again. `npm run db:migrate` applies new control database migrations only. Defaults are in `.env.example`.
+`npm run db:setup` creates the control database and two fictional tenant databases (`mantle_control`, `mantle_tenant_alpha`, `mantle_tenant_beta`), applies the control database migrations, and adds the two fictional tenants on `alpha.localhost` and `beta.localhost`. It is safe to run again. It also adds eight fictional library items (Common Staff Learning topics and Claims procedures, one overdue for review and one unpublished draft) so screens can be reviewed with realistic content; run `npm run seed:library -w @mantle/platform` to add them on their own. `npm run db:migrate` applies new control database migrations only. Defaults are in `.env.example`.
 
 Database integration tests run when `MANTLE_PG_SERVER_URL` is set, for example:
 
