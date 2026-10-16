@@ -3,6 +3,7 @@ import type { TenantDb } from "./client.ts";
 import * as tenantSchema from "./schema.ts";
 import { recordActivity } from "./activity.ts";
 import { randomUUID } from "node:crypto";
+import { structureResolver } from "./structure.ts";
 
 // A checked staff file row (see @mantle/platform/people for the file rules).
 export interface StaffRow {
@@ -11,9 +12,12 @@ export interface StaffRow {
   readonly workEmail: string;
   readonly department: string | null;
   readonly managerEmployeeId: string | null;
+  readonly unit?: string | null;
+  readonly location?: string | null;
+  readonly roleLevel?: string | null;
 }
 
-const { people, employmentEvents, users } = tenantSchema;
+const { people, employmentEvents, users, departments } = tenantSchema;
 
 export interface ImportOptions {
   // People in the organisation but missing from the file become leavers.
@@ -41,9 +45,11 @@ export async function applyStaffImport(db: TenantDb, rows: readonly StaffRow[], 
     const counts = { joined: 0, moved: 0, updated: 0, unchanged: 0, left: 0 };
     const now = new Date();
     const changedBy = options.changedBy;
+    const structure = structureResolver(tx, changedBy);
 
     for (const row of rows) {
       const current = byId.get(row.employeeId);
+      const links = await structure.forRow(row);
       if (!current || current.status === "left") {
         const userId = await ensureUser(tx, row, now);
         const values = {
@@ -51,6 +57,7 @@ export async function applyStaffImport(db: TenantDb, rows: readonly StaffRow[], 
           fullName: row.fullName,
           workEmail: row.workEmail,
           department: row.department,
+          ...links,
           managerEmployeeId: row.managerEmployeeId,
           status: "active" as const,
           userId,
@@ -63,28 +70,34 @@ export async function applyStaffImport(db: TenantDb, rows: readonly StaffRow[], 
           ? await tx.update(people).set(values).where(eqId(current.id)).returning({ id: people.id })
           : await tx.insert(people).values(values).returning({ id: people.id });
         if (person) {
-          await tx.insert(employmentEvents).values({ personId: person.id, type: "join", toDepartment: row.department, changedBy });
+          await tx.insert(employmentEvents).values({ personId: person.id, type: "join", toDepartment: row.department, toDepartmentId: links.departmentId, changedBy });
           await recordActivity(tx, { actor: changedBy, action: "people.joined", entityType: "person", entityId: person.id, details: { department: row.department } });
         }
         counts.joined++;
         continue;
       }
-      const moved = (current.department ?? null) !== row.department;
-      const changed =
-        moved ||
-        current.fullName !== row.fullName ||
-        current.workEmail !== row.workEmail ||
-        (current.managerEmployeeId ?? null) !== row.managerEmployeeId;
-      if (!changed) {
+      // A move is a change of department record, so "Claims" and "claims "
+      // are the same department.
+      const moved = (current.departmentId ?? null) !== links.departmentId;
+      const fields = changedFields(current, row, links);
+      if (fields.length === 0) {
         counts.unchanged++;
         continue;
       }
       await tx
         .update(people)
-        .set({ fullName: row.fullName, workEmail: row.workEmail, department: row.department, managerEmployeeId: row.managerEmployeeId, updatedAt: now, changedBy })
+        .set({ fullName: row.fullName, workEmail: row.workEmail, department: row.department, ...links, managerEmployeeId: row.managerEmployeeId, updatedAt: now, changedBy })
         .where(eqId(current.id));
       if (moved) {
-        await tx.insert(employmentEvents).values({ personId: current.id, type: "move", fromDepartment: current.department, toDepartment: row.department, changedBy });
+        await tx.insert(employmentEvents).values({
+          personId: current.id,
+          type: "move",
+          fromDepartment: current.department,
+          toDepartment: row.department,
+          fromDepartmentId: current.departmentId,
+          toDepartmentId: links.departmentId,
+          changedBy,
+        });
         counts.moved++;
       } else {
         counts.updated++;
@@ -94,7 +107,7 @@ export async function applyStaffImport(db: TenantDb, rows: readonly StaffRow[], 
         action: moved ? "people.moved" : "people.updated",
         entityType: "person",
         entityId: current.id,
-        details: { fields: changedFields(current, row), ...(moved ? { from: current.department, to: row.department } : {}) },
+        details: { fields, ...(moved ? { from: current.department, to: row.department } : {}) },
       });
     }
 
@@ -102,7 +115,7 @@ export async function applyStaffImport(db: TenantDb, rows: readonly StaffRow[], 
       for (const person of existing) {
         if (person.status !== "active" || inFile.has(person.employeeId)) continue;
         await tx.update(people).set({ status: "left", leftAt: now, updatedAt: now, changedBy }).where(eqId(person.id));
-        await tx.insert(employmentEvents).values({ personId: person.id, type: "leave", fromDepartment: person.department, changedBy });
+        await tx.insert(employmentEvents).values({ personId: person.id, type: "leave", fromDepartment: person.department, fromDepartmentId: person.departmentId, changedBy });
         await recordActivity(tx, { actor: changedBy, action: "people.left", entityType: "person", entityId: person.id });
         if (person.userId) await tx.delete(tenantSchema.sessions).where(eqSessionUser(person.userId));
         counts.left++;
@@ -112,14 +125,20 @@ export async function applyStaffImport(db: TenantDb, rows: readonly StaffRow[], 
   });
 }
 
+type Links = { departmentId: string | null; unitId: string | null; locationId: string | null; roleLevelId: string | null };
+
 function changedFields(
-  current: { fullName: string; workEmail: string; department: string | null; managerEmployeeId: string | null },
+  current: { fullName: string; workEmail: string; managerEmployeeId: string | null } & Links,
   row: StaffRow,
+  links: Links,
 ): string[] {
   const fields: string[] = [];
   if (current.fullName !== row.fullName) fields.push("full_name");
   if (current.workEmail !== row.workEmail) fields.push("work_email");
-  if ((current.department ?? null) !== row.department) fields.push("department");
+  if ((current.departmentId ?? null) !== links.departmentId) fields.push("department");
+  if ((current.unitId ?? null) !== links.unitId) fields.push("unit");
+  if ((current.locationId ?? null) !== links.locationId) fields.push("location");
+  if ((current.roleLevelId ?? null) !== links.roleLevelId) fields.push("role_level");
   if ((current.managerEmployeeId ?? null) !== row.managerEmployeeId) fields.push("manager_employee_id");
   return fields;
 }
@@ -145,10 +164,11 @@ export async function listPeople(db: TenantDb) {
       employeeId: people.employeeId,
       fullName: people.fullName,
       workEmail: people.workEmail,
-      department: people.department,
+      department: departments.name,
       status: people.status,
     })
     .from(people)
+    .leftJoin(departments, eq(people.departmentId, departments.id))
     .orderBy(people.fullName);
 }
 

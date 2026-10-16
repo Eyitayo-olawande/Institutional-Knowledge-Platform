@@ -20,6 +20,7 @@ export const ACTIONS = [
   "people.import",
   "roles.manage",
   "wording.edit",
+  "structure.manage",
   "activity.view",
   "library.view",
   "library.edit",
@@ -33,6 +34,7 @@ const GRANTS: Record<Action, readonly Role[]> = {
   "people.import": ["learning_administrator"],
   "roles.manage": ["learning_administrator"],
   "wording.edit": ["learning_administrator"],
+  "structure.manage": ["learning_administrator"],
   "activity.view": ["learning_administrator"],
   // External learners only see what is assigned to them (later work).
   "library.view": ["learner", "line_manager", "content_owner", "compliance_reviewer", "learning_administrator"],

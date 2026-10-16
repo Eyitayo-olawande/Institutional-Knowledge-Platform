@@ -18,7 +18,7 @@ describe("buildNav", () => {
   it("shows administration links only to roles that hold the permission", () => {
     expect(keys("learner")).not.toContain("roles");
     const admin = keys("learning_administrator");
-    expect(admin).toEqual(expect.arrayContaining(["people", "roles", "wording", "activity"]));
+    expect(admin).toEqual(expect.arrayContaining(["people", "roles", "wording", "structure", "activity"]));
   });
 
   it("hides people when the import feature is off", () => {

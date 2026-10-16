@@ -18,8 +18,13 @@ describe("readStaffFile", () => {
     const { rows, problems } = readStaffFile(`${HEADER},grade\nE1,Ada Obi,ADA@Alpha.test,Claims,,G7\n`);
     expect(problems).toEqual([]);
     expect(rows).toEqual([
-      { line: 2, employeeId: "E1", fullName: "Ada Obi", workEmail: "ada@alpha.test", department: "Claims", managerEmployeeId: null },
+      { line: 2, employeeId: "E1", fullName: "Ada Obi", workEmail: "ada@alpha.test", department: "Claims", unit: null, location: null, roleLevel: null, managerEmployeeId: null },
     ]);
+  });
+
+  it("reads the optional unit, location and role level columns", () => {
+    const { rows } = readStaffFile("employee_id,full_name,work_email,department,unit,location,role_level\nE1,Ada,ada@a.test,Claims,Motor,Lagos,Officer\n");
+    expect(rows[0]).toMatchObject({ department: "Claims", unit: "Motor", location: "Lagos", roleLevel: "Officer" });
   });
 
   it("reports missing required columns", () => {

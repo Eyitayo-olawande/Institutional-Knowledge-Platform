@@ -43,7 +43,7 @@ The customer app works out which organisation you are visiting from the address,
 
 ## Importing staff
 
-Ada on each development tenant is a learning administrator, so after signing in the menu shows People under Administration (http://alpha.localhost:3000/admin/people). Upload `docs/samples/staff_import_example.csv` to add four fictional people. Imported people sign in with an emailed code. The file columns are provisional until the SUNU staff file format is agreed.
+Ada on each development tenant is a learning administrator, so after signing in the menu shows People under Administration (http://alpha.localhost:3000/admin/people). Upload `docs/samples/staff_import_example.csv` to add four fictional people; their departments, units, locations and role levels then appear under Administration, Structure. Imported people sign in with an emailed code. The file columns are provisional until the SUNU staff file format is agreed.
 
 ## Before opening a pull request
 

@@ -1,6 +1,6 @@
 # E4: Departments, units and role levels as records
 
-* **Status:** Proposed, for the product owner to approve
+* **Status:** Approved 16 October 2026; built
 * **Blueprint:** v3.1 sections 3 (Department Learning, one per department), 5 (paths by department and role level)
 * **Architecture:** v1.1 sections 4 and 7 (Organisation area: departments, units, locations, role levels)
 * **Depends on:** staff CSV import (done). Blocks: learning areas, groups, paths.

@@ -24,13 +24,13 @@ describe.skipIf(!serverUrl)("activity log", { timeout: 60_000 }, () => {
     await dropDatabase(serverUrl ?? "", name);
   });
 
-  it("records joins, moves and leaves from a staff import", async () => {
+  it("records joins, moves, leaves and new departments from a staff import", async () => {
     const row = (id: string, dept: string) => ({ employeeId: id, fullName: id, workEmail: `${id}@a.test`, department: dept, managerEmployeeId: null });
     const opts = { markMissingAsLeavers: true, changedBy: "user:admin" };
     await applyStaffImport(db, [row("e1", "Claims"), row("e2", "Sales")], opts);
     await applyStaffImport(db, [row("e1", "Underwriting")], opts);
     const actions = (await recentActivity(db)).map((a) => a.action).sort();
-    expect(actions).toEqual(["people.joined", "people.joined", "people.left", "people.moved"]);
+    expect(actions).toEqual(["people.joined", "people.joined", "people.left", "people.moved", "structure.created", "structure.created", "structure.created"]);
   });
 
   it("records granting the administrator role", async () => {
