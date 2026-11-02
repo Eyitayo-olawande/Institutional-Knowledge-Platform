@@ -4,7 +4,7 @@ Specs for each work package. Version 1 has 15 epics and about 88 work packages (
 
 Each spec is written or approved by the product owner and holds: the goal, acceptance criteria, screens or rules, and a link to the blueprint. Each work package is small enough to finish and review in a day or two, and becomes one branch and one pull request.
 
-## Proposed specs (16 October 2026)
+## Proposed specs (16 October 2026, updated 2 November 2026)
 
 Drafted by Claude Code from Blueprint v3.1, Proposal v2.0, Architecture v1.1 and SUNU Prototype v0.1, for the product owner to approve. Suggested order:
 
@@ -12,8 +12,11 @@ Drafted by Claude Code from Blueprint v3.1, Proposal v2.0, Architecture v1.1 and
 2. [Learning areas and content types](E5_learning_areas.md)
 3. [Glossary](E5_glossary.md)
 4. [Groups, group enrolment and bulk actions](E4_groups_bulk.md)
-5. [Paths, modules and the four stage template](E8_paths_four_stages.md)
-6. [My Learning page](E8_my_learning.md)
-7. [Fixed automations and scheduled report emails](E8_fixed_automations.md)
+5. [Document viewer, no raw downloads](E5_document_viewer.md)
+6. [Paths, modules and the four stage template](E8_paths_four_stages.md)
+7. [My Learning page](E8_my_learning.md)
+8. [Fixed automations and scheduled report emails](E8_fixed_automations.md)
+
+Item 5 was added on 2 November 2026, from a product owner review of the alpha build: library files downloaded instead of rendering in place. It now sits ahead of item 6 because E8's own spec assumes a module is completed by opening each of its items, which needs a viewer to exist first. See [ADR 0021](../adr/0021_document_viewer.md).
 
 Each adds tenant tables, so each takes the next free migration number at the time it is built.

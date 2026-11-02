@@ -1,0 +1,14 @@
+{
+  "name": "@mantle/documents",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./convert": "./src/convert/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "tsx": "^4.23.15"
+  }
+}

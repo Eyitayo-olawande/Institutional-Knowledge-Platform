@@ -28,6 +28,7 @@ The roadmap asks for one decision record per line of the proposed stack. All 16 
 | [0018 Drizzle](0018_drizzle.md) | Drizzle ORM and Drizzle Kit over the pg driver (answers the open question in 0005) | Accepted |
 | [0019 Better Auth](0019_better_auth.md) | Better Auth, one sign in instance per tenant database (answers the open question in 0009) | Accepted |
 | [0020 Visual direction](0020_visual_direction.md) | SUNU brand red for the brand and main action, separate risk colour, AA contrast, Inter, phone first components (roadmap v1.2, E15) | Accepted |
+| [0021 Document viewer](0021_document_viewer.md) | PDF.js in the browser; headless LibreOffice converts DOCX/PPTX/XLSX to PDF in the worker; originals kept but not served to learners (product owner review, 2 November 2026) | Proposed |
 
 ## Statuses
 

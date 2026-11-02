@@ -2,7 +2,8 @@
 
 import { attachFileToItem, canSeeArea, createLibraryItem, getLibraryItem, PlacementError, placeItem, publishDraft, saveDraft } from "@mantle/db/tenant";
 import { checkUpload, MAX_FILES_PER_UPLOAD } from "@mantle/platform/files";
-import { fileStore, scanner } from "../../server/files.ts";
+import { needsConversion } from "@mantle/documents/convert";
+import { converter, fileStore, scanner } from "../../server/files.ts";
 import { redirect } from "next/navigation";
 import { requireFeature, requirePermission, viewerAreas } from "../../server/session.ts";
 
@@ -111,7 +112,27 @@ export async function uploadItemFile(form: FormData): Promise<void> {
   }
   for (const { data, checked } of ready) {
     const stored = await fileStore.put(tenant.id, data);
-    await attachFileToItem(db, id, { storageKey: stored.key, name: checked.name, contentType: checked.contentType, size: stored.size, sha256: stored.sha256 }, `user:${user.id}`);
+    // A DOCX, PPTX or XLSX is converted to a viewable PDF now, before the
+    // file record is written, so staff never see the raw original
+    // (ADR 0021). A conversion failure still attaches the file, marked
+    // failed, so the rest of the item stays usable; an editor can retry by
+    // re-uploading.
+    let rendition: { conversionStatus: "ready" | "failed"; renditionKey?: string } | undefined;
+    if (needsConversion(checked.contentType)) {
+      try {
+        const pdf = await converter.convert(data, checked.contentType);
+        const storedPdf = await fileStore.put(tenant.id, pdf);
+        rendition = { conversionStatus: "ready", renditionKey: storedPdf.key };
+      } catch {
+        rendition = { conversionStatus: "failed" };
+      }
+    }
+    await attachFileToItem(
+      db,
+      id,
+      { storageKey: stored.key, name: checked.name, contentType: checked.contentType, size: stored.size, sha256: stored.sha256, ...rendition },
+      `user:${user.id}`,
+    );
   }
   redirect(`/library/${id}?file_added=${ready.length}`);
 }

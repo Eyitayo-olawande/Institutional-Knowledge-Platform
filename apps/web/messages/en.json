@@ -181,6 +181,8 @@
       "upload": "Upload files",
       "added": "Files attached: {count}.",
       "size": "{kb} KB",
+      "failed": "This file could not be prepared for viewing. Remove it and upload it again.",
+      "original": "Download original",
       "errors": {
         "empty": "Choose at least one file to upload.",
         "too_many": "Upload up to 10 files at a time.",

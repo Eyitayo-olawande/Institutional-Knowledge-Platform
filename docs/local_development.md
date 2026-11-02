@@ -8,6 +8,7 @@ How to run Mantle on a developer machine. Development uses the fictional test in
 * Git with access to the GitHub repository.
 * PostgreSQL 18 through [Postgres.app](https://postgresapp.com), chosen on 15 October 2026. Open it and keep it running (green "Running" light, port 5432).
 * File storage: a local folder (`.data/files`, ignored by git) stands in for S3 compatible storage in development.
+* [LibreOffice](https://www.libreoffice.org) (the `soffice` command on your PATH), to convert an uploaded DOCX, PPTX or XLSX to a viewable PDF (ADR 0021). Without it, those three file types attach but show "could not be prepared for viewing"; PDF, PNG, JPG and MP4 are unaffected.
 
 ## First run
 
