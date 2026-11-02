@@ -94,7 +94,7 @@ describe.skipIf(!serverUrl)("control database", { timeout: 60_000 }, () => {
 
   it("uses feature defaults until a tenant switch is set, per tenant only", async () => {
     const [alpha, beta] = await listTenants(db);
-    expect(await featureStates(db, alpha!.id)).toEqual({ people_import: true, knowledge_library: false });
+    expect(await featureStates(db, alpha!.id)).toEqual({ people_import: true, knowledge_library: false, learning_paths: false });
     await setFeature(db, alpha!.id, "knowledge_library", true, "test");
     await setFeature(db, alpha!.id, "knowledge_library", true, "test");
     expect(await isFeatureOn(db, alpha!.id, "knowledge_library")).toBe(true);

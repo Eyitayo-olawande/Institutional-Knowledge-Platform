@@ -4,6 +4,7 @@ import * as tenantSchema from "./schema.ts";
 import { recordActivity } from "./activity.ts";
 import { randomUUID } from "node:crypto";
 import { structureResolver } from "./structure.ts";
+import { assignOnJoin } from "./paths.ts";
 
 // A checked staff file row (see @mantle/platform/people for the file rules).
 export interface StaffRow {
@@ -72,6 +73,13 @@ export async function applyStaffImport(db: TenantDb, rows: readonly StaffRow[], 
         if (person) {
           await tx.insert(employmentEvents).values({ personId: person.id, type: "join", toDepartment: row.department, toDepartmentId: links.departmentId, changedBy });
           await recordActivity(tx, { actor: changedBy, action: "people.joined", entityType: "person", entityId: person.id, details: { department: row.department } });
+          // A joiner matching an assignment rule gets that path, with due
+          // dates from their start date (E8 paths, acceptance criterion 3).
+          await assignOnJoin(
+            tx,
+            { personId: person.id, departmentId: links.departmentId, roleLevelId: links.roleLevelId, unitId: links.unitId, startDate: now.toISOString().slice(0, 10) },
+            changedBy,
+          );
         }
         counts.joined++;
         continue;
@@ -99,6 +107,11 @@ export async function applyStaffImport(db: TenantDb, rows: readonly StaffRow[], 
           changedBy,
         });
         counts.moved++;
+        // A mover picks up their new department's path too, starting today;
+        // shared Common modules they already completed stay completed, since
+        // progress is recorded against the module, not the path (E8 paths,
+        // acceptance criterion 4).
+        await assignOnJoin(tx, { personId: current.id, departmentId: links.departmentId, roleLevelId: links.roleLevelId, unitId: links.unitId, startDate: now.toISOString().slice(0, 10) }, changedBy);
       } else {
         counts.updated++;
       }
@@ -223,6 +236,13 @@ export async function changeUserRoles(db: TenantDb, userId: string, roles: strin
     await tx.update(users).set({ roles, updatedAt: new Date() }).where(eq(users.id, userId));
     await recordActivity(tx, { actor, action: "roles.changed", entityType: "user", entityId: userId, details: { from: before.roles, to: roles } });
   });
+}
+
+// Finds the staff record for a signed in user, if they have one (not every
+// account, such as a console administrator, is also staff).
+export async function personByUserId(db: TenantDb, userId: string): Promise<{ id: string } | null> {
+  const [found] = await db.select({ id: people.id }).from(people).where(eq(people.userId, userId));
+  return found ?? null;
 }
 
 // Active staff with their department, for choosing people on admin pages.

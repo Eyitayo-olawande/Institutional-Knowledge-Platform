@@ -5,13 +5,14 @@ import { t } from "../i18n.ts";
 import { authFor, requestHost } from "../server/auth.ts";
 import { buildNav } from "../server/nav.ts";
 import { featureOn, tenantDb } from "../server/session.ts";
-import { listActiveStaff, listLibraryItems, listStructure, recentActivity, unreadCount } from "@mantle/db/tenant";
+import { listActiveStaff, listLibraryItems, listModuleItems, listStructure, myLearning, personByUserId, recentActivity, unreadCount } from "@mantle/db/tenant";
 import { can } from "@mantle/platform/identity";
 import { resolveRequestTenant } from "../server/tenant.ts";
 import { tenantView } from "../server/tenant_view.ts";
 import { signOut } from "./actions.ts";
 import { AppShell, PageHead } from "./_components/AppShell.tsx";
 import { Icon } from "./_components/Icon.tsx";
+import { MyLearningSection, type PathCardData } from "./_components/MyLearning.tsx";
 
 export default async function Home() {
   const resolution = await resolveRequestTenant();
@@ -44,15 +45,39 @@ export default async function Home() {
   const db = tenantDb(resolution.tenant);
   const roles = (session.user as { roles?: string }).roles ?? "";
   const isAdmin = can(roles, "activity.view");
-  const [unread, libraryOn, peopleImportOn] = await Promise.all([
+  const [unread, libraryOn, peopleImportOn, pathsOn] = await Promise.all([
     unreadCount(db, session.user.id),
     featureOn(resolution.tenant, "knowledge_library"),
     featureOn(resolution.tenant, "people_import"),
+    featureOn(resolution.tenant, "learning_paths"),
   ]);
-  const destinations = buildNav({ roles, libraryOn, peopleImportOn }).filter((i) => i.key !== "home");
+  const destinations = buildNav({ roles, libraryOn, peopleImportOn, pathsOn }).filter((i) => i.key !== "home");
   const mainDestinations = destinations.filter((d) => d.section === "main");
   const adminDestinations = destinations.filter((d) => d.section === "admin");
   const firstName = session.user.name.split(" ")[0] ?? session.user.name;
+
+  // My Learning replaces the staff home cards once a person has at least
+  // one path assigned; with no path they still see the library and glossary
+  // cards (E8 My Learning, acceptance criterion 4).
+  let learningCards: PathCardData[] | null = null;
+  let learningSummary: Awaited<ReturnType<typeof myLearning>> | null = null;
+  if (pathsOn) {
+    const person = await personByUserId(db, session.user.id);
+    if (person) {
+      learningSummary = await myLearning(db, person.id);
+      if (learningSummary.pathsEnrolled > 0) {
+        learningCards = await Promise.all(
+          learningSummary.assignments.map(async (view) => {
+            const currentModules = view.stages.find((s) => !s.complete)?.modules.slice(0, 3) ?? [];
+            const modules = await Promise.all(
+              currentModules.map(async (m) => ({ ...m, items: m.completed ? await listModuleItems(db, m.id) : [] })),
+            );
+            return { view, modules };
+          }),
+        );
+      }
+    }
+  }
 
   // An administrator's portal overview: real counts and the most recent
   // changes, not placeholders for features that don't exist yet (no
@@ -132,19 +157,30 @@ export default async function Home() {
         </>
       ) : null}
 
-      <div className="grid grid-3">
-        {mainDestinations.map((d) => (
-          <Card key={d.key}>
-            <Link className="dest" href={d.href}>
-              <span className="icon"><Icon name={d.icon} size={22} /></span>
-              <div>
-                <h3>{t(`nav.${d.key}`)}</h3>
-                <span className="muted">{t(`home.cards.${d.key}`)}</span>
-              </div>
-            </Link>
-          </Card>
-        ))}
-      </div>
+      {learningCards && learningSummary ? (
+        <MyLearningSection
+          pathsEnrolled={learningSummary.pathsEnrolled}
+          modulesCompleted={learningSummary.modulesCompleted}
+          modulesTotal={learningSummary.modulesTotal}
+          completionRate={learningSummary.completionRate}
+          nextUp={learningSummary.nextUp}
+          cards={learningCards}
+        />
+      ) : (
+        <div className="grid grid-3">
+          {mainDestinations.map((d) => (
+            <Card key={d.key}>
+              <Link className="dest" href={d.href}>
+                <span className="icon"><Icon name={d.icon} size={22} /></span>
+                <div>
+                  <h3>{t(`nav.${d.key}`)}</h3>
+                  <span className="muted">{t(`home.cards.${d.key}`)}</span>
+                </div>
+              </Link>
+            </Card>
+          ))}
+        </div>
+      )}
       <Card flat style={{ marginTop: 16 }}>
         <div className="row" style={{ justifyContent: "space-between" }}>
           <p className="muted" style={{ margin: 0 }}>{t("auth.signed_in_as", { name: session.user.name })}</p>

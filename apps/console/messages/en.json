@@ -64,7 +64,8 @@
     "off": "Off",
     "names": {
       "people_import": "Staff import",
-      "knowledge_library": "Knowledge library"
+      "knowledge_library": "Knowledge library",
+      "learning_paths": "Learning paths"
     },
     "turn_on": "Turn on",
     "turn_off": "Turn off"
