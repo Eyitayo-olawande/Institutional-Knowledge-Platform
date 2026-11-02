@@ -1,6 +1,6 @@
 # E8: My Learning page
 
-* **Status:** Proposed, for the product owner to approve
+* **Status:** Approved 2 November 2026; built.
 * **Blueprint:** v3.1 section 11 (My Learning page)
 * **Prototype:** My Learning screen
 * **Depends on:** paths, modules and the four stage template.
@@ -40,4 +40,4 @@ Unit tests for status rules (due soon, overdue); render tests for the tiles; an 
 
 ## Out of scope
 
-Weekly refresher (E9), certificates list contents (E9).
+Weekly refresher (E9), certificates list contents (E9). A module shows Start or Review only; Continue is not shown, since progress is only recorded once a module is confirmed read, with nothing in between to track yet.

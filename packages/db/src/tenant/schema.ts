@@ -378,3 +378,116 @@ export const libraryItemFiles = pgTable(
   },
   (t) => [uniqueIndex("library_item_files_unique").on(t.itemId, t.fileId)],
 );
+
+// Learning paths (work package E8). A path has four fixed stages; each
+// stage holds modules; a module points at one or more library items and
+// never copies them, so editing an item changes every path that uses it.
+export const pathStageKind = pgEnum("path_stage_kind", ["common", "department", "role", "certificate"]);
+
+export const paths = pgTable("paths", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  // The department that owns and built this path; null for a company wide path.
+  departmentId: uuid("department_id").references(() => departments.id),
+  ...auditColumns,
+});
+
+export const pathStages = pgTable(
+  "path_stages",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    pathId: uuid("path_id")
+      .notNull()
+      .references(() => paths.id),
+    kind: pathStageKind("kind").notNull(),
+    // Days from the person's assignment start date; defaults 14/42/70/90.
+    dueDays: integer("due_days").notNull(),
+    ...auditColumns,
+  },
+  (t) => [uniqueIndex("path_stages_path_kind_unique").on(t.pathId, t.kind)],
+);
+
+// A module is a reusable building block: the same module can sit in more
+// than one path's stage, and a person completes it once for all of them.
+export const modules = pgTable("modules", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  title: text("title").notNull(),
+  ...auditColumns,
+});
+
+export const moduleItems = pgTable(
+  "module_items",
+  {
+    moduleId: uuid("module_id")
+      .notNull()
+      .references(() => modules.id),
+    itemId: uuid("item_id")
+      .notNull()
+      .references(() => libraryItems.id),
+    rank: integer("rank").notNull(),
+    ...auditColumns,
+  },
+  (t) => [uniqueIndex("module_items_unique").on(t.moduleId, t.itemId)],
+);
+
+export const stageModules = pgTable(
+  "stage_modules",
+  {
+    stageId: uuid("stage_id")
+      .notNull()
+      .references(() => pathStages.id),
+    moduleId: uuid("module_id")
+      .notNull()
+      .references(() => modules.id),
+    rank: integer("rank").notNull(),
+    ...auditColumns,
+  },
+  (t) => [uniqueIndex("stage_modules_unique").on(t.stageId, t.moduleId)],
+);
+
+// Who gets a path automatically on joining (E4 groups adds manual
+// enrolment later). unitId is optional, narrowing department and role.
+export const assignmentRules = pgTable("assignment_rules", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  pathId: uuid("path_id")
+    .notNull()
+    .references(() => paths.id),
+  departmentId: uuid("department_id").references(() => departments.id),
+  roleLevelId: uuid("role_level_id").references(() => roleLevels.id),
+  unitId: uuid("unit_id").references(() => units.id),
+  ...auditColumns,
+});
+
+export const assignments = pgTable(
+  "assignments",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    pathId: uuid("path_id")
+      .notNull()
+      .references(() => paths.id),
+    personId: uuid("person_id")
+      .notNull()
+      .references(() => people.id),
+    // Due dates are startDate + each stage's dueDays, not stored directly.
+    startDate: date("start_date").notNull(),
+    ...auditColumns,
+  },
+  (t) => [uniqueIndex("assignments_path_person_unique").on(t.pathId, t.personId)],
+);
+
+// One row per person per module, so completing a module shared by several
+// paths counts in all of them (Behaviour, E8 paths spec).
+export const moduleProgress = pgTable(
+  "module_progress",
+  {
+    personId: uuid("person_id")
+      .notNull()
+      .references(() => people.id),
+    moduleId: uuid("module_id")
+      .notNull()
+      .references(() => modules.id),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+    ...auditColumns,
+  },
+  (t) => [uniqueIndex("module_progress_unique").on(t.personId, t.moduleId)],
+);

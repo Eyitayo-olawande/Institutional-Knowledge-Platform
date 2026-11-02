@@ -1,8 +1,10 @@
 "use server";
 
+import { completeModule, personByUserId } from "@mantle/db/tenant";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { authFor, requestHost } from "../server/auth.ts";
+import { requireSignedIn } from "../server/session.ts";
 import { resolveRequestTenant } from "../server/tenant.ts";
 
 async function currentAuth() {
@@ -57,5 +59,15 @@ export async function signInWithCode(form: FormData): Promise<void> {
 export async function signOut(): Promise<void> {
   const auth = await currentAuth();
   await auth.api.signOut({ headers: await headers() });
+  redirect("/");
+}
+
+// "I have read this" (My Learning). Refused quietly if the module's stage
+// is not yet unlocked for this person, rather than trusting the button.
+export async function completeModuleAction(form: FormData): Promise<void> {
+  const { db, user } = await requireSignedIn();
+  const moduleId = String(form.get("moduleId") ?? "");
+  const person = await personByUserId(db, user.id);
+  if (person) await completeModule(db, person.id, moduleId, `user:${user.id}`);
   redirect("/");
 }
