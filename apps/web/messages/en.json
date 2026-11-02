@@ -247,6 +247,20 @@
       "activity": "See the record of every change and result.",
       "structure": "See and tidy the structure people belong to.",
       "areas": "Let people outside a team see its learning area."
+    },
+    "admin": {
+      "overview_heading": "Portal overview",
+      "stats": {
+        "staff": "Active staff",
+        "departments": "Departments",
+        "published": "Published library items",
+        "sign_ins": "Sign-ins this week"
+      },
+      "quick_actions_heading": "Quick actions",
+      "timeline_heading": "Recent activity",
+      "timeline_view_all": "View all",
+      "timeline_empty": "Nothing recorded yet.",
+      "destinations_heading": "Go to"
     }
   },
   "structure": {
