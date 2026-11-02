@@ -26,6 +26,7 @@ export const ACTIONS = [
   "library.edit",
   "library.all_areas",
   "areas.manage",
+  "paths.edit",
 ] as const;
 
 export type Action = (typeof ACTIONS)[number];
@@ -45,6 +46,7 @@ const GRANTS: Record<Action, readonly Role[]> = {
   // and areas granted to them (checked on every library read).
   "library.all_areas": ["learning_administrator"],
   "areas.manage": ["learning_administrator"],
+  "paths.edit": ["content_owner", "learning_administrator"],
 };
 
 export function isRole(value: string): value is Role {

@@ -1,6 +1,6 @@
 export { connectTenant, type TenantDb } from "./client.ts";
 export * as tenantSchema from "./schema.ts";
-export { addAdministrator, applyStaffImport, changeUserRoles, listActiveStaff, listPeople, listUsers, setUserRoles, type ImportOptions, type ImportSummary, type StaffRow } from "./people.ts";
+export { addAdministrator, applyStaffImport, changeUserRoles, listActiveStaff, listPeople, listUsers, personByUserId, setUserRoles, type ImportOptions, type ImportSummary, type StaffRow } from "./people.ts";
 export { recentActivity, recordActivity, type ActivityEntry } from "./activity.ts";
 export { isWordingKey, setWording, wording, WORDING_DEFAULTS, type Wording, type WordingKey } from "./wording.ts";
 export {
@@ -52,3 +52,37 @@ export {
   type StructureEntry,
   type StructureKind,
 } from "./structure.ts";
+export {
+  addDays,
+  addItemToModule,
+  addModuleToStage,
+  assignOnJoin,
+  canCompleteModule,
+  completeModule,
+  computePathStatus,
+  createModule,
+  createPath,
+  DEFAULT_DUE_DAYS,
+  getPathBuilder,
+  isStageUnlocked,
+  listAssignmentRules,
+  listModuleItems,
+  listModules,
+  listPaths,
+  moveStageModule,
+  myLearning,
+  personAssignments,
+  removeAssignmentRule,
+  removeItemFromModule,
+  removeModuleFromStage,
+  setAssignmentRule,
+  setStageDueDays,
+  STAGE_ORDER,
+  type AssignmentRule,
+  type AssignmentStageView,
+  type AssignmentView,
+  type BuilderStage,
+  type MyLearningSummary,
+  type PathStatus,
+  type StageKind,
+} from "./paths.ts";

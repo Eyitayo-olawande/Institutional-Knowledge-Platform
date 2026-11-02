@@ -231,7 +231,8 @@
     "search_placeholder": "Search the library",
     "notices_unread": "Notices, {count} new",
     "structure": "Structure",
-    "areas": "Area access"
+    "areas": "Area access",
+    "paths": "Learning paths"
   },
   "home": {
     "greeting": "Welcome, {name}",
@@ -246,7 +247,8 @@
       "wording": "Change the words used for departments, units and role levels.",
       "activity": "See the record of every change and result.",
       "structure": "See and tidy the structure people belong to.",
-      "areas": "Let people outside a team see its learning area."
+      "areas": "Let people outside a team see its learning area.",
+      "paths": "Build the stages, modules and due dates staff work through."
     },
     "admin": {
       "overview_heading": "Portal overview",
@@ -261,6 +263,78 @@
       "timeline_view_all": "View all",
       "timeline_empty": "Nothing recorded yet.",
       "destinations_heading": "Go to"
+    },
+    "my_learning": {
+      "heading": "My learning",
+      "tiles": {
+        "paths": "Paths enrolled",
+        "modules": "Modules completed",
+        "modules_value": "{done} of {total}",
+        "completion": "Completion rate"
+      },
+      "next_up_heading": "Next up",
+      "next_up": "{module}, in {path}.",
+      "due": "Due {date}",
+      "start": "Start",
+      "review": "Review",
+      "status": {
+        "not_started": "Not started",
+        "in_progress": "In progress",
+        "due_soon": "Due soon",
+        "overdue": "Overdue",
+        "completed": "Completed"
+      }
+    }
+  },
+  "paths": {
+    "stages": {
+      "common": "Common",
+      "department": "Department",
+      "role": "Role",
+      "certificate": "Certificate"
+    },
+    "admin": {
+      "title": "Learning paths",
+      "explain": "Four stages, in order: Common, Department, Role, then Certificate. A module can sit in more than one path and is completed once for all of them.",
+      "empty": "No paths yet.",
+      "columns": { "name": "Name", "department": "Department" },
+      "open": "Open",
+      "create_heading": "New path",
+      "fields": { "name": "Name", "department": "Department" },
+      "all_departments": "All departments (company wide)",
+      "create": "Create path"
+    },
+    "builder": {
+      "back": "Back to learning paths",
+      "due_days_heading": "Due, days from start",
+      "save": "Save",
+      "add_module_heading": "Add a module",
+      "new_module_name": "New module title",
+      "add_new": "Add new",
+      "existing_module": "Existing module",
+      "choose_module": "Choose a module",
+      "add_existing": "Add",
+      "remove_module": "Remove",
+      "move_up": "Move up",
+      "move_down": "Move down",
+      "items_heading": "Library items",
+      "choose_item": "Choose an item",
+      "add_item": "Add",
+      "remove_item": "Remove",
+      "no_items": "No items linked yet.",
+      "rules_heading": "Who gets this path",
+      "rules_explain": "A joiner or mover matching a rule is assigned this path with due dates from their start date. Leave a field as Any to match everyone in that column.",
+      "rule_department": "Department",
+      "rule_role_level": "Role level",
+      "rule_unit": "Unit",
+      "any": "Any",
+      "any_department": "Department: Any",
+      "any_role_level": "Role level: Any",
+      "any_unit": "Unit: Any",
+      "rule_summary": "Department: {department}, Role level: {role}, Unit: {unit}",
+      "add_rule": "Add rule",
+      "remove_rule": "Remove",
+      "no_rules": "No assignment rules yet, so nobody will be assigned this path automatically."
     }
   },
   "structure": {

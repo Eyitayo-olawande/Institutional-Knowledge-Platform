@@ -6,7 +6,7 @@ import { ACTIONS, can, formatRoles, parseRoles, ROLES } from "./permissions.ts";
 const ALLOWED: Record<string, readonly string[]> = {
   learner: ["library.view"],
   line_manager: ["library.view"],
-  content_owner: ["library.view", "library.edit"],
+  content_owner: ["library.view", "library.edit", "paths.edit"],
   compliance_reviewer: ["library.view"],
   learning_administrator: ACTIONS,
 };

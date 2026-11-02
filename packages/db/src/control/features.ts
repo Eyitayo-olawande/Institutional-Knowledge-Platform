@@ -7,6 +7,7 @@ import { featureSwitches } from "./schema.ts";
 export const FEATURES = {
   people_import: { defaultOn: true },
   knowledge_library: { defaultOn: false },
+  learning_paths: { defaultOn: false },
 } as const;
 
 export type Feature = keyof typeof FEATURES;

@@ -5,7 +5,7 @@ import { can } from "@mantle/platform/identity";
 // The server still checks every permission on each page; this only decides
 // which links to show.
 
-export type NavKey = "home" | "library" | "notices" | "people" | "roles" | "wording" | "structure" | "areas" | "activity";
+export type NavKey = "home" | "library" | "notices" | "people" | "roles" | "wording" | "structure" | "areas" | "activity" | "paths";
 export type NavIcon = "home" | "library" | "bell" | "people" | "key" | "text" | "tree" | "list";
 
 export interface NavItem {
@@ -19,9 +19,10 @@ export interface NavInput {
   roles: string | undefined;
   libraryOn: boolean;
   peopleImportOn: boolean;
+  pathsOn: boolean;
 }
 
-export function buildNav({ roles, libraryOn, peopleImportOn }: NavInput): NavItem[] {
+export function buildNav({ roles, libraryOn, peopleImportOn, pathsOn }: NavInput): NavItem[] {
   const items: NavItem[] = [{ key: "home", href: "/", icon: "home", section: "main" }];
   if (libraryOn && can(roles, "library.view")) items.push({ key: "library", href: "/library", icon: "library", section: "main" });
   items.push({ key: "notices", href: "/notices", icon: "bell", section: "main" });
@@ -30,6 +31,7 @@ export function buildNav({ roles, libraryOn, peopleImportOn }: NavInput): NavIte
   if (can(roles, "wording.edit")) items.push({ key: "wording", href: "/admin/wording", icon: "text", section: "admin" });
   if (can(roles, "structure.manage")) items.push({ key: "structure", href: "/admin/structure", icon: "tree", section: "admin" });
   if (libraryOn && can(roles, "areas.manage")) items.push({ key: "areas", href: "/admin/areas", icon: "library", section: "admin" });
+  if (pathsOn && can(roles, "paths.edit")) items.push({ key: "paths", href: "/admin/paths", icon: "tree", section: "admin" });
   if (can(roles, "activity.view")) items.push({ key: "activity", href: "/admin/activity", icon: "list", section: "admin" });
   return items;
 }
