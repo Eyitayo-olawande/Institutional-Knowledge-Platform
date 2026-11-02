@@ -1,4 +1,5 @@
 import { canSeeArea, getLibraryItem, itemFiles } from "@mantle/db/tenant";
+import { needsConversion } from "@mantle/documents/convert";
 import { can } from "@mantle/platform/identity";
 import { Badge, Button, Card } from "@mantle/ui";
 import Link from "next/link";
@@ -77,14 +78,26 @@ export default async function Item({
           {attachments.length > 0 ? (
             <>
               <h2 style={{ marginTop: 24 }}>{t("library.files.heading")}</h2>
-              <ul className="list">
+              <div className="stack">
                 {attachments.map((f) => (
-                  <li key={f.id}>
-                    <a className="grow" href={`/files/${f.id}`}>{f.name}</a>
-                    <span className="muted">{t("library.files.size", { kb: Math.max(1, Math.round(f.size / 1024)) })}</span>
-                  </li>
+                  <div key={f.id}>
+                    <div className="row">
+                      <span className="grow">{f.name}</span>
+                      <span className="muted">{t("library.files.size", { kb: Math.max(1, Math.round(f.size / 1024)) })}</span>
+                      {editor ? <a href={`/files/${f.id}/original`}>{t("library.files.original")}</a> : null}
+                    </div>
+                    {needsConversion(f.contentType) && f.conversionStatus !== "ready" ? (
+                      <p className="sub">{t("library.files.failed")}</p>
+                    ) : f.contentType.startsWith("image/") ? (
+                      <img src={`/files/${f.id}`} alt={f.name} style={{ maxWidth: "100%" }} />
+                    ) : f.contentType === "video/mp4" ? (
+                      <video src={`/files/${f.id}`} controls style={{ maxWidth: "100%" }} />
+                    ) : (
+                      <iframe src={`/files/${f.id}`} title={f.name} style={{ width: "100%", height: 600, border: 0 }} />
+                    )}
+                  </div>
                 ))}
-              </ul>
+              </div>
             </>
           ) : null}
         </Card>

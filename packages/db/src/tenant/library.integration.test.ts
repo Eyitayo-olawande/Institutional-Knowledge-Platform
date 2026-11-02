@@ -88,4 +88,30 @@ describe.skipIf(!serverUrl)("knowledge library", { timeout: 60_000 }, () => {
     expect(await fileWithItem(db, fileId)).toMatchObject({ itemId: id, itemStatus: "published" });
     expect((await recentActivity(db, 1))[0]?.action).toBe("library.file_attached");
   });
+
+  it("records a converted file's rendition, viewed instead of the original (ADR 0021)", async () => {
+    const docxType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+    const readyId = await attachFileToItem(
+      db,
+      id,
+      { storageKey: "k2", name: "handbook.docx", contentType: docxType, size: 20, sha256: "y", conversionStatus: "ready", renditionKey: "k2.pdf" },
+      "user:a",
+    );
+    const ready = (await itemFiles(db, id)).find((f) => f.id === readyId);
+    expect(ready).toMatchObject({ conversionStatus: "ready" });
+    const readyFile = await fileWithItem(db, readyId);
+    expect(readyFile?.file.renditionKey).toBe("k2.pdf");
+    expect(readyFile?.file.renditionConvertedAt).toBeInstanceOf(Date);
+
+    const failedId = await attachFileToItem(
+      db,
+      id,
+      { storageKey: "k3", name: "broken.pptx", contentType: "application/vnd.openxmlformats-officedocument.presentationml.presentation", size: 5, sha256: "z", conversionStatus: "failed" },
+      "user:a",
+    );
+    const failed = (await itemFiles(db, id)).find((f) => f.id === failedId);
+    expect(failed).toMatchObject({ conversionStatus: "failed" });
+    const failedFile = await fileWithItem(db, failedId);
+    expect(failedFile?.file.renditionKey).toBeNull();
+  });
 });

@@ -201,11 +201,23 @@ export async function itemsDueForReview(db: TenantDb, today: string, areas: Visi
 export async function attachFileToItem(
   db: TenantDb,
   itemId: string,
-  file: { storageKey: string; name: string; contentType: string; size: number; sha256: string },
+  file: {
+    storageKey: string;
+    name: string;
+    contentType: string;
+    size: number;
+    sha256: string;
+    // Set by the caller once conversion to a viewable PDF has been tried
+    // (ADR 0021); left undefined for a type that is viewed from the
+    // original and needs no conversion.
+    conversionStatus?: "ready" | "failed";
+    renditionKey?: string;
+  },
   actor: string,
 ): Promise<string> {
   return db.transaction(async (tx) => {
-    const [row] = await tx.insert(files).values({ ...file, changedBy: actor }).returning({ id: files.id });
+    const renditionConvertedAt = file.conversionStatus === "ready" ? new Date() : undefined;
+    const [row] = await tx.insert(files).values({ ...file, renditionConvertedAt, changedBy: actor }).returning({ id: files.id });
     if (!row) throw new Error("File was not recorded.");
     await tx.insert(libraryItemFiles).values({ itemId, fileId: row.id, changedBy: actor });
     await recordActivity(tx, { actor, action: "library.file_attached", entityType: "library_item", entityId: itemId, details: { file_id: row.id, size: file.size } });
@@ -215,7 +227,13 @@ export async function attachFileToItem(
 
 export async function itemFiles(db: TenantDb, itemId: string) {
   return db
-    .select({ id: files.id, name: files.name, size: files.size, contentType: files.contentType })
+    .select({
+      id: files.id,
+      name: files.name,
+      size: files.size,
+      contentType: files.contentType,
+      conversionStatus: files.conversionStatus,
+    })
     .from(libraryItemFiles)
     .innerJoin(files, eq(libraryItemFiles.fileId, files.id))
     .where(eq(libraryItemFiles.itemId, itemId))

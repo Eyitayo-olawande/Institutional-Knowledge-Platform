@@ -344,6 +344,14 @@ export const deliveryRecords = pgTable(
 
 // Files (Product Architecture v1, section 5): stored in the tenant's own
 // storage area; this table holds what is needed to find and check them.
+//
+// Staff view a file in Mantle rather than downloading it (ADR 0021). A PDF,
+// PNG, JPG or MP4 needs no conversion and is viewed from the original, so
+// conversionStatus stays null. A DOCX, PPTX or XLSX is converted to PDF on
+// upload; conversionStatus and renditionKey track that converted copy. The
+// original is always kept, for a content owner to re-edit it.
+export const conversionStatus = pgEnum("conversion_status", ["pending", "ready", "failed"]);
+
 export const files = pgTable("files", {
   id: uuid("id").primaryKey().defaultRandom(),
   storageKey: text("storage_key").notNull().unique(),
@@ -351,6 +359,9 @@ export const files = pgTable("files", {
   contentType: text("content_type").notNull(),
   size: integer("size").notNull(),
   sha256: text("sha256").notNull(),
+  conversionStatus: conversionStatus("conversion_status"),
+  renditionKey: text("rendition_key"),
+  renditionConvertedAt: timestamp("rendition_converted_at", { withTimezone: true }),
   ...auditColumns,
 });
 

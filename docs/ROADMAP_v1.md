@@ -2,6 +2,15 @@
 
 Source: Development Roadmap v1.2 (16 October 2026; sections 7 to 9, 12 and 13) and Product Architecture v1.1 (15 October 2026; section 16). They replace earlier versions. Feature behaviour is defined in SUNU Blueprint v3.1, which every work package links to; scope and commercial terms are in SUNU Proposal v2.0.
 
+## What changed on 2 November 2026
+
+Not a new numbered source document; a decision made directly with the product owner, reviewing the alpha build.
+
+* New work package, E5 document viewer: library files were downloading instead of rendering in Mantle, against the product owner's standing rule that company-owned content is viewed, not downloaded, except a genuinely external link. See [ADR 0021](adr/0021_document_viewer.md) and [the work package spec](work_packages/E5_document_viewer.md).
+* It is sequenced ahead of the E8 path and My Learning packages, since those assume a module is completed by opening each of its items, which needs a viewer to exist first.
+* Confirmed unchanged: the four stage path template (Common, Department, Role, Certificate) stays the structural backbone for learning paths; only how an item's content is opened was in question.
+* Confirmed: the original uploaded file is always kept in storage, for content owners to re-edit, even once a viewable rendition exists alongside it.
+
 ## What changed in v1.2
 
 * New epic E15 UX and visual design: screen inventory, journeys, navigation by role, wireframes, visual direction from SUNU's brand, a clickable prototype (SUNU Prototype v0.1) and the move into packages/ui. Visual direction is set by Claude Code and approved by the product owner instead of a separate designer.
