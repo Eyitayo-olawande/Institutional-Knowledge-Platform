@@ -260,7 +260,6 @@
         "published": "Published library items",
         "sign_ins": "Sign-ins this week"
       },
-      "quick_actions_heading": "Quick actions",
       "timeline_heading": "Recent activity",
       "timeline_view_all": "View all",
       "timeline_empty": "Nothing recorded yet.",
@@ -277,8 +276,7 @@
       "next_up_heading": "Next up",
       "next_up": "{module}, in {path}.",
       "due": "Due {date}",
-      "start": "Start",
-      "review": "Review",
+      "confirm_read": "I have read this",
       "status": {
         "not_started": "Not started",
         "in_progress": "In progress",

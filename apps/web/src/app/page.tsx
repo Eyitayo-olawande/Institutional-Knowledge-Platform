@@ -53,7 +53,6 @@ export default async function Home() {
   ]);
   const destinations = buildNav({ roles, libraryOn, peopleImportOn, pathsOn }).filter((i) => i.key !== "home");
   const mainDestinations = destinations.filter((d) => d.section === "main");
-  const adminDestinations = destinations.filter((d) => d.section === "admin");
   const firstName = session.user.name.split(" ")[0] ?? session.user.name;
 
   // My Learning replaces the staff home cards once a person has at least
@@ -70,7 +69,7 @@ export default async function Home() {
           learningSummary.assignments.map(async (view) => {
             const currentModules = view.stages.find((s) => !s.complete)?.modules.slice(0, 3) ?? [];
             const modules = await Promise.all(
-              currentModules.map(async (m) => ({ ...m, items: m.completed ? await listModuleItems(db, m.id) : [] })),
+              currentModules.map(async (m) => ({ ...m, items: await listModuleItems(db, m.id) })),
             );
             return { view, modules };
           }),
@@ -116,42 +115,24 @@ export default async function Home() {
             <StatTile label={t("home.admin.stats.sign_ins")} value={overview.signIns} />
           </div>
 
-          <div className="grid grid-2" style={{ alignItems: "start", marginTop: 16 }}>
-            {adminDestinations.length > 0 ? (
-              <Card>
-                <h3>{t("home.admin.quick_actions_heading")}</h3>
-                <ul className="list">
-                  {adminDestinations.map((d) => (
-                    <li key={d.key}>
-                      <Link className="grow" href={d.href}>
-                        <Icon name={d.icon} size={18} />
-                        <span style={{ marginLeft: 8 }}>{t(`nav.${d.key}`)}</span>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </Card>
-            ) : null}
-
-            <Card>
-              <div className="row" style={{ justifyContent: "space-between" }}>
-                <h3 style={{ margin: 0 }}>{t("home.admin.timeline_heading")}</h3>
-                <Link href="/admin/activity" className="muted">{t("home.admin.timeline_view_all")}</Link>
-              </div>
-              {overview.timeline.length === 0 ? (
-                <p className="sub">{t("home.admin.timeline_empty")}</p>
-              ) : (
-                <ul className="list">
-                  {overview.timeline.map((e) => (
-                    <li key={e.id}>
-                      <span className="grow">{e.action}</span>
-                      <span className="muted">{e.at.toISOString().replace("T", " ").slice(0, 16)}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </Card>
-          </div>
+          <Card style={{ marginTop: 16 }}>
+            <div className="row" style={{ justifyContent: "space-between" }}>
+              <h3 style={{ margin: 0 }}>{t("home.admin.timeline_heading")}</h3>
+              <Link href="/admin/activity" className="muted">{t("home.admin.timeline_view_all")}</Link>
+            </div>
+            {overview.timeline.length === 0 ? (
+              <p className="sub">{t("home.admin.timeline_empty")}</p>
+            ) : (
+              <ul className="list">
+                {overview.timeline.map((e) => (
+                  <li key={e.id}>
+                    <span className="grow">{e.action}</span>
+                    <span className="muted">{e.at.toISOString().replace("T", " ").slice(0, 16)}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Card>
 
           <h2 style={{ marginTop: 24 }}>{t("home.admin.destinations_heading")}</h2>
         </>

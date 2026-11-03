@@ -74,14 +74,23 @@ function PathCard({ view, modules }: { view: AssignmentView; modules: readonly P
       {modules.length > 0 ? (
         <ul className="list" style={{ marginTop: 8 }}>
           {modules.map((m) => (
-            <li key={m.id}>
-              <span className="grow">{m.title}</span>
+            <li key={m.id} style={{ flexDirection: "column", alignItems: "stretch", gap: 6 }}>
+              <span style={{ fontWeight: 600 }}>{m.title}</span>
+              {m.items.length > 0 ? (
+                <ul className="list">
+                  {m.items.map((it) => (
+                    <li key={it.id}>
+                      <Link href={`/library/${it.id}`} className="title grow">{it.title}</Link>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
               {m.completed ? (
-                <Link href={m.items[0] ? `/library/${m.items[0].id}` : "/library"} className="muted">{t("home.my_learning.review")}</Link>
+                <Badge tone="success">{t("home.my_learning.status.completed")}</Badge>
               ) : (
                 <form action={completeModuleAction}>
                   <input type="hidden" name="moduleId" value={m.id} />
-                  <Button type="submit" size="sm">{t("home.my_learning.start")}</Button>
+                  <Button type="submit" size="sm">{t("home.my_learning.confirm_read")}</Button>
                 </form>
               )}
             </li>
