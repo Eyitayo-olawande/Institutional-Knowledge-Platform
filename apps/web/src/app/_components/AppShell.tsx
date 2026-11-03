@@ -1,4 +1,4 @@
-import { unreadCount, type TenantDb } from "@mantle/db/tenant";
+import { personDepartmentByUserId, unreadCount, type TenantDb } from "@mantle/db/tenant";
 import type { TenantRecord } from "@mantle/platform/tenancy";
 import { Button } from "@mantle/ui";
 import Link from "next/link";
@@ -19,11 +19,12 @@ export interface ShellContext {
 // The frame around every signed in page: side menu on laptops, bottom menu
 // on phones, a top bar with library search and notices (ADR 0020).
 export async function AppShell({ ctx, active, children }: { ctx: ShellContext; active: NavKey; children: ReactNode }) {
-  const [libraryOn, peopleImportOn, pathsOn, unread] = await Promise.all([
+  const [libraryOn, peopleImportOn, pathsOn, unread, department] = await Promise.all([
     featureOn(ctx.tenant, "knowledge_library"),
     featureOn(ctx.tenant, "people_import"),
     featureOn(ctx.tenant, "learning_paths"),
     unreadCount(ctx.db, ctx.user.id),
+    personDepartmentByUserId(ctx.db, ctx.user.id),
   ]);
   const items = buildNav({ roles: ctx.roles, libraryOn, peopleImportOn, pathsOn });
   const main = items.filter((i) => i.section === "main");
@@ -42,23 +43,34 @@ export async function AppShell({ ctx, active, children }: { ctx: ShellContext; a
       <a className="skip" href="#content">{t("nav.skip")}</a>
       <aside className="side">
         <Link className="brand" href="/">
-          <span className="brand-chip" aria-hidden="true">{ctx.tenant.name.charAt(0)}</span>
+          <Icon name="library" />
           <span className="brand-name">{ctx.tenant.name}</span>
+        </Link>
+        <Link className="brand product" href="/">
+          <Icon name="library" />
+          <span>
+            <span className="brand-name">{t("nav.product_name")}</span>
+            <span className="brand-tagline">{t("nav.product_tagline")}</span>
+          </span>
         </Link>
         <nav className="nav" aria-label={t("nav.menu")}>
           {main.map(link)}
           {admin.length > 0 ? <div className="nav-section">{t("nav.admin_section")}</div> : null}
           {admin.map(link)}
         </nav>
-        <div className="me">
-          <div className="avatar" aria-hidden="true">{initials(ctx.user.name)}</div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div className="me-name">{ctx.user.name}</div>
-            <form action={signOut}>
-              <Button type="submit" variant="ghost" size="sm" style={{ padding: 0, color: "#fff" }}>{t("auth.sign_out")}</Button>
-            </form>
-          </div>
-        </div>
+        <details className="me">
+          <summary>
+            <div className="avatar" aria-hidden="true">{initials(ctx.user.name)}</div>
+            <div className="me-info">
+              <div className="me-name">{ctx.user.name}</div>
+              {department ? <div className="me-dept">{department}</div> : null}
+            </div>
+            <Icon name="chevron_down" size={16} />
+          </summary>
+          <form action={signOut}>
+            <Button type="submit" variant="ghost" size="sm" style={{ color: "#fff" }}>{t("auth.sign_out")}</Button>
+          </form>
+        </details>
       </aside>
       <div>
         <header className="topbar">

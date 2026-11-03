@@ -219,6 +219,8 @@
     "new": "New"
   },
   "nav": {
+    "product_name": "eLibrary",
+    "product_tagline": "Knowledge & Learning Hub",
     "home": "Home",
     "library": "Library",
     "notices": "Notices",
