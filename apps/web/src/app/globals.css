@@ -34,6 +34,15 @@
 
 .main { padding: 24px; max-width: 1180px; width: 100%; min-width: 0; }
 
+/* Staff home page hero, in brand colour with a supporting photo. The admin
+   overview keeps the plain page-head heading instead (WP6). */
+.hero { display: flex; align-items: center; gap: 28px; background: linear-gradient(135deg, var(--mantle-color-primary) 0%, #7a0a24 100%); border-radius: var(--mantle-radius-lg); padding: 32px; margin-bottom: 20px; overflow: hidden; }
+.hero-text { flex: 1 1 320px; min-width: 0; }
+.hero-text h1 { color: #fff; }
+.hero-text .sub { color: rgba(255, 255, 255, 0.85); }
+.hero-photo { flex: 0 0 240px; width: 240px; height: 170px; border-radius: var(--mantle-radius-lg); overflow: hidden; }
+.hero-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
 /* Phone: one column, bottom menu */
 .bottom-nav { display: none; }
 @media (max-width: 860px) {
@@ -43,6 +52,8 @@
   .topbar .brand-sm { display: block; }
   .search { display: none; }
   .main { padding: 16px 14px 96px; }
+  .hero { padding: 20px; }
+  .hero-photo { display: none; }
   .bottom-nav { display: flex; position: fixed; bottom: 0; left: 0; right: 0; z-index: 9; background: var(--mantle-color-surface); border-top: 1px solid var(--mantle-color-border); justify-content: space-around; padding: 6px 4px calc(6px + env(safe-area-inset-bottom)); }
   .bottom-nav a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-width: 64px; min-height: 44px; font-size: 11px; color: var(--mantle-color-text_muted); text-decoration: none; }
   .bottom-nav a[aria-current="page"] { color: var(--mantle-color-primary); }

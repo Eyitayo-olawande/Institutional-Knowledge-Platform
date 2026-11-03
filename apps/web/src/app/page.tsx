@@ -97,7 +97,19 @@ export default async function Home() {
 
   return (
     <AppShell ctx={{ tenant: resolution.tenant, db, roles, user: session.user }} active="home">
-      <PageHead title={t("home.greeting", { name: firstName })} sub={t("home.sub", { name: resolution.tenant.name })} />
+      {isAdmin ? (
+        <PageHead title={t("home.greeting", { name: firstName })} sub={t("home.sub", { name: resolution.tenant.name })} />
+      ) : (
+        <div className="hero">
+          <div className="hero-text">
+            <h1>{t("home.greeting", { name: firstName })}</h1>
+            <p className="sub">{t("home.sub", { name: resolution.tenant.name })}</p>
+          </div>
+          <div className="hero-photo">
+            <img src="/images/people/dashboard-hero.webp" alt="" />
+          </div>
+        </div>
+      )}
       {unread > 0 ? (
         <div className="alert alert-brand" role="status">
           <Icon name="bell" />
@@ -152,8 +164,6 @@ export default async function Home() {
               )}
             </Card>
           </div>
-
-          <h2 style={{ marginTop: 24 }}>{t("home.admin.destinations_heading")}</h2>
         </>
       ) : null}
 
@@ -166,21 +176,26 @@ export default async function Home() {
           nextUp={learningSummary.nextUp}
           cards={learningCards}
         />
-      ) : (
-        <div className="grid grid-3">
-          {mainDestinations.map((d) => (
-            <Card key={d.key}>
-              <Link className="dest" href={d.href}>
-                <span className="icon"><Icon name={d.icon} size={22} /></span>
-                <div>
-                  <h3>{t(`nav.${d.key}`)}</h3>
-                  <span className="muted">{t(`home.cards.${d.key}`)}</span>
-                </div>
-              </Link>
-            </Card>
-          ))}
-        </div>
-      )}
+      ) : null}
+
+      {mainDestinations.length > 0 ? (
+        <>
+          <h2 style={{ marginTop: learningCards ? 24 : 0 }}>{t("home.quick_access_heading")}</h2>
+          <div className="grid grid-3">
+            {mainDestinations.map((d) => (
+              <Card key={d.key}>
+                <Link className="dest" href={d.href}>
+                  <span className="icon"><Icon name={d.icon} size={22} /></span>
+                  <div>
+                    <h3>{t(`nav.${d.key}`)}</h3>
+                    <span className="muted">{t(`home.cards.${d.key}`)}</span>
+                  </div>
+                </Link>
+              </Card>
+            ))}
+          </div>
+        </>
+      ) : null}
       <Card flat style={{ marginTop: 16 }}>
         <div className="row" style={{ justifyContent: "space-between" }}>
           <p className="muted" style={{ margin: 0 }}>{t("auth.signed_in_as", { name: session.user.name })}</p>

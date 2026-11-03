@@ -243,6 +243,7 @@
     "sub": "Your learning, library and notices at {name}.",
     "unread": "You have {count} new notices.",
     "read_notices": "Read notices",
+    "quick_access_heading": "Quick access",
     "cards": {
       "library": "Read and search learning materials for your department and the whole company.",
       "notices": "Messages and reminders sent to you.",
@@ -265,8 +266,7 @@
       "quick_actions_heading": "Quick actions",
       "timeline_heading": "Recent activity",
       "timeline_view_all": "View all",
-      "timeline_empty": "Nothing recorded yet.",
-      "destinations_heading": "Go to"
+      "timeline_empty": "Nothing recorded yet."
     },
     "my_learning": {
       "heading": "My learning",
