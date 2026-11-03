@@ -244,6 +244,9 @@
     "unread": "You have {count} new notices.",
     "read_notices": "Read notices",
     "quick_access_heading": "Quick access",
+    "featured_heading": "Featured resources",
+    "featured_view_all": "View all",
+    "notices_heading": "Recent notices",
     "cards": {
       "library": "Read and search learning materials for your department and the whole company.",
       "notices": "Messages and reminders sent to you.",

@@ -43,6 +43,10 @@
 .hero-photo { flex: 0 0 240px; width: 240px; height: 170px; border-radius: var(--mantle-radius-lg); overflow: hidden; }
 .hero-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
+.quick-tile { display: flex; flex-direction: column; gap: 10px; text-decoration: none; color: inherit; }
+.quick-tile .icon { width: 40px; height: 40px; border-radius: var(--mantle-radius-md); background: var(--mantle-color-primary_tint); color: var(--mantle-color-primary); display: flex; align-items: center; justify-content: center; }
+.quick-tile:hover h3 { color: var(--mantle-color-primary); }
+
 /* Phone: one column, bottom menu */
 .bottom-nav { display: none; }
 @media (max-width: 860px) {

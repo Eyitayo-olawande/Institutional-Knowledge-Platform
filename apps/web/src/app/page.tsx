@@ -1,11 +1,11 @@
-import { Button, buttonStyle, Card, StatTile } from "@mantle/ui";
+import { Badge, Button, buttonStyle, Card, StatTile, type BadgeTone } from "@mantle/ui";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { t } from "../i18n.ts";
 import { authFor, requestHost } from "../server/auth.ts";
 import { buildNav } from "../server/nav.ts";
 import { featureOn, tenantDb } from "../server/session.ts";
-import { listActiveStaff, listLibraryItems, listModuleItems, listStructure, myLearning, personByUserId, recentActivity, unreadCount } from "@mantle/db/tenant";
+import { listActiveStaff, listLibraryItems, listModuleItems, listStructure, myLearning, noticesFor, personByUserId, recentActivity, unreadCount } from "@mantle/db/tenant";
 import { can } from "@mantle/platform/identity";
 import { resolveRequestTenant } from "../server/tenant.ts";
 import { tenantView } from "../server/tenant_view.ts";
@@ -13,6 +13,14 @@ import { signOut } from "./actions.ts";
 import { AppShell, PageHead } from "./_components/AppShell.tsx";
 import { Icon } from "./_components/Icon.tsx";
 import { MyLearningSection, type PathCardData } from "./_components/MyLearning.tsx";
+
+function typeTone(label: string): BadgeTone {
+  if (label === "Policy") return "brand";
+  if (label === "Guideline") return "info";
+  if (label === "Training") return "warning";
+  if (label === "Template") return "strong";
+  return "neutral";
+}
 
 export default async function Home() {
   const resolution = await resolveRequestTenant();
@@ -93,6 +101,19 @@ export default async function Home() {
     const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
     const signIns = activity.filter((a) => a.action === "auth.signed_in" && a.at.getTime() >= weekAgo).length;
     overview = { staff: staff.length, departments: departments.length, published: items.length, signIns, timeline: activity.slice(0, 6) };
+  }
+
+  // Featured resources and recent notices for the staff home page only; the
+  // admin overview above already has its own activity feed (WP6).
+  let featuredResources: Awaited<ReturnType<typeof listLibraryItems>> | null = null;
+  let recentNotices: Awaited<ReturnType<typeof noticesFor>> | null = null;
+  if (!isAdmin) {
+    const [items, notices] = await Promise.all([
+      libraryOn ? listLibraryItems(db, { publishedOnly: true, areas: "all" }) : Promise.resolve([]),
+      noticesFor(db, session.user.id, 4),
+    ]);
+    featuredResources = items.slice(0, 4);
+    recentNotices = notices;
   }
 
   return (
@@ -184,17 +205,52 @@ export default async function Home() {
           <div className="grid grid-3">
             {mainDestinations.map((d) => (
               <Card key={d.key}>
-                <Link className="dest" href={d.href}>
+                <Link className="quick-tile" href={d.href}>
                   <span className="icon"><Icon name={d.icon} size={22} /></span>
-                  <div>
-                    <h3>{t(`nav.${d.key}`)}</h3>
-                    <span className="muted">{t(`home.cards.${d.key}`)}</span>
-                  </div>
+                  <h3>{t(`nav.${d.key}`)}</h3>
+                  <span className="muted">{t(`home.cards.${d.key}`)}</span>
                 </Link>
               </Card>
             ))}
           </div>
         </>
+      ) : null}
+
+      {(featuredResources && featuredResources.length > 0) || (recentNotices && recentNotices.length > 0) ? (
+        <div className="grid grid-2" style={{ gridTemplateColumns: "2fr 1fr", alignItems: "start", marginTop: 24 }}>
+          {featuredResources && featuredResources.length > 0 ? (
+            <div>
+              <div className="row" style={{ justifyContent: "space-between" }}>
+                <h2 style={{ margin: 0 }}>{t("home.featured_heading")}</h2>
+                <Link href="/library" className="muted">{t("home.featured_view_all")}</Link>
+              </div>
+              <div className="grid grid-2" style={{ marginTop: 12 }}>
+                {featuredResources.map((item) => (
+                  <Card key={item.id} flat>
+                    <Badge tone={typeTone(item.typeLabel)}>{item.typeLabel}</Badge>
+                    <h3 style={{ marginTop: 8 }}><Link href={`/library/${item.id}`}>{item.title}</Link></h3>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          ) : null}
+          {recentNotices && recentNotices.length > 0 ? (
+            <Card>
+              <div className="row" style={{ justifyContent: "space-between" }}>
+                <h3 style={{ margin: 0 }}>{t("home.notices_heading")}</h3>
+                <Link href="/notices" className="muted">{t("home.featured_view_all")}</Link>
+              </div>
+              <ul className="list">
+                {recentNotices.map((n) => (
+                  <li key={n.id}>
+                    <span className="grow">{n.subject}</span>
+                    <span className="muted">{n.createdAt.toISOString().slice(0, 10)}</span>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          ) : null}
+        </div>
       ) : null}
       <Card flat style={{ marginTop: 16 }}>
         <div className="row" style={{ justifyContent: "space-between" }}>
