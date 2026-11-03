@@ -1,5 +1,5 @@
 import type { CSSProperties, HTMLAttributes } from "react";
-import { color, font, radius, space } from "./tokens.ts";
+import { color, colorVar, font, radius, space } from "./tokens.ts";
 
 // Status is always a word plus a colour, never colour alone (ADR 0020).
 // success: Completed, Certified. info: In progress. neutral: Not started.
@@ -11,6 +11,9 @@ export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
   tone?: BadgeTone;
 }
 
+// The actual hex each tone resolves to, for WCAG contrast checks (tests only) —
+// rendering itself goes through the CSS variables in badgeVars below, so a
+// tenant theme can repaint badges without a code change.
 export const badgeColors: Record<BadgeTone, { foreground: string; background: string }> = {
   success: { foreground: color.success, background: color.successTint },
   info: { foreground: color.info, background: color.infoTint },
@@ -19,6 +22,16 @@ export const badgeColors: Record<BadgeTone, { foreground: string; background: st
   danger: { foreground: color.danger, background: color.dangerTint },
   brand: { foreground: color.primary, background: color.primaryTint },
   strong: { foreground: color.strong, background: color.strongTint },
+};
+
+const badgeVars: Record<BadgeTone, { foreground: string; background: string }> = {
+  success: { foreground: colorVar("success"), background: colorVar("successTint") },
+  info: { foreground: colorVar("info"), background: colorVar("infoTint") },
+  neutral: { foreground: colorVar("neutral"), background: colorVar("neutralTint") },
+  warning: { foreground: colorVar("warning"), background: colorVar("warningTint") },
+  danger: { foreground: colorVar("danger"), background: colorVar("dangerTint") },
+  brand: { foreground: colorVar("primary"), background: colorVar("primaryTint") },
+  strong: { foreground: colorVar("strong"), background: colorVar("strongTint") },
 };
 
 const base: CSSProperties = {
@@ -36,7 +49,7 @@ const base: CSSProperties = {
 const dot: CSSProperties = { width: "7px", height: "7px", borderRadius: "50%", background: "currentColor" };
 
 export function Badge({ tone = "neutral", style, children, ...rest }: BadgeProps) {
-  const colors = badgeColors[tone];
+  const colors = badgeVars[tone];
   return (
     <span style={{ ...base, color: colors.foreground, background: colors.background, ...style }} {...rest}>
       <span aria-hidden="true" style={dot} />

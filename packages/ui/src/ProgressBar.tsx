@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { color, radius } from "./tokens.ts";
+import { colorVar, radius } from "./tokens.ts";
 
 export interface ProgressBarProps {
   // Percentage complete, 0 to 100. Values outside the range are clamped.
@@ -11,7 +11,7 @@ export interface ProgressBarProps {
 
 const track: CSSProperties = {
   height: "8px",
-  background: color.borderSubtle,
+  background: colorVar("borderSubtle"),
   borderRadius: radius.pill,
   overflow: "hidden",
 };
@@ -21,7 +21,7 @@ export function ProgressBar({ value, label, tone = "success" }: ProgressBarProps
   const fill: CSSProperties = {
     width: `${percent}%`,
     height: "100%",
-    background: tone === "primary" ? color.primary : color.success,
+    background: tone === "primary" ? colorVar("primary") : colorVar("success"),
     borderRadius: radius.pill,
   };
   return (

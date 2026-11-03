@@ -4,18 +4,26 @@
 
 /* App frame */
 .shell { display: grid; grid-template-columns: 248px minmax(0, 1fr); min-height: 100vh; }
-.side { background: var(--mantle-color-surface); border-right: 1px solid var(--mantle-color-border); display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; }
-.brand { padding: 18px 20px; border-bottom: 1px solid var(--mantle-color-border_subtle); font-weight: var(--mantle-font-weight_bold); font-size: var(--mantle-font-size_lg); color: var(--mantle-color-primary); text-decoration: none; display: block; }
+.side { background: linear-gradient(180deg, #a4052b 0%, #6c0528 100%); display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; }
+.brand { padding: 14px 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.18); display: flex; align-items: flex-start; gap: 10px; text-decoration: none; }
+.brand svg { color: #fff; flex: 0 0 auto; margin-top: 2px; }
+.brand-name { display: block; font-weight: var(--mantle-font-weight_bold); font-size: var(--mantle-font-size_md); color: #fff; line-height: 1.25; }
+.brand-tagline { display: block; font-size: 12px; color: rgba(255, 255, 255, 0.75); margin-top: 1px; }
 .nav { padding: 10px; display: flex; flex-direction: column; gap: 2px; flex: 1; overflow-y: auto; }
-.nav-section { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mantle-color-text_muted); margin: 14px 12px 4px; }
-.nav a { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 12px; border-radius: var(--mantle-radius-sm); color: var(--mantle-color-neutral); font-weight: var(--mantle-font-weight_medium); text-decoration: none; }
-.nav a:hover { background: var(--mantle-color-surface_raised); }
-.nav a[aria-current="page"] { background: var(--mantle-color-primary_tint); color: var(--mantle-color-primary); }
+.nav-section { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255, 255, 255, 0.6); margin: 14px 12px 4px; }
+.nav a { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 12px; border-radius: var(--mantle-radius-sm); color: rgba(255, 255, 255, 0.82); font-weight: var(--mantle-font-weight_medium); text-decoration: none; }
+.nav a:hover { background: rgba(255, 255, 255, 0.1); }
+.nav a[aria-current="page"] { background: var(--mantle-color-primary_tint); color: var(--mantle-color-primary); font-weight: var(--mantle-font-weight_bold); }
 .nav .count { margin-left: auto; background: var(--mantle-color-accent); color: #fff; border-radius: 999px; font-size: 12px; font-weight: 700; padding: 0 8px; line-height: 20px; }
-.me { border-top: 1px solid var(--mantle-color-border_subtle); padding: 12px 16px; display: flex; gap: 10px; align-items: center; }
-.avatar { width: 36px; height: 36px; flex: 0 0 36px; border-radius: 50%; background: var(--mantle-color-primary); color: var(--mantle-color-primary_text); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
-.me-name { font-size: var(--mantle-font-size_sm); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.me form { margin: 0; }
+.me { border-top: 1px solid rgba(255, 255, 255, 0.18); padding: 12px 16px; }
+.me summary { display: flex; gap: 10px; align-items: center; cursor: pointer; list-style: none; }
+.me summary::-webkit-details-marker { display: none; }
+.me summary svg { margin-left: auto; color: rgba(255, 255, 255, 0.7); flex: 0 0 auto; }
+.avatar { width: 36px; height: 36px; flex: 0 0 36px; border-radius: 50%; background: rgba(255, 255, 255, 0.22); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
+.me-info { flex: 1; min-width: 0; }
+.me-name { font-size: var(--mantle-font-size_sm); font-weight: 600; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.me-dept { font-size: 12px; color: rgba(255, 255, 255, 0.7); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.me form { margin: 10px 0 0 46px; }
 
 .topbar { height: 60px; background: var(--mantle-color-surface); border-bottom: 1px solid var(--mantle-color-border); display: flex; align-items: center; gap: 12px; padding: 0 24px; position: sticky; top: 0; z-index: 5; }
 .topbar .brand-sm { display: none; font-weight: 700; color: var(--mantle-color-primary); text-decoration: none; }

@@ -1,8 +1,9 @@
+import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createDatabase, dropDatabase } from "../setup.ts";
 import { connectTenant, type TenantDb } from "./client.ts";
 import { migrateTenant } from "./migrate.ts";
-import { addAdministrator, applyStaffImport, listPeople } from "./people.ts";
+import { addAdministrator, applyStaffImport, listPeople, personDepartmentByUserId } from "./people.ts";
 import * as schema from "./schema.ts";
 
 const serverUrl = process.env.MANTLE_PG_SERVER_URL;
@@ -59,6 +60,15 @@ describe.skipIf(!serverUrl)("staff import", { timeout: 60_000 }, () => {
     const summary = await applyStaffImport(db, [row("E1", "Ada", "Underwriting"), row("E2", "Bola", "Sales")], opts);
     expect(summary).toMatchObject({ joined: 1, unchanged: 1 });
     expect((await listPeople(db)).find((p) => p.employeeId === "E2")?.status).toBe("active");
+  });
+
+  it("looks up a person's department from their sign in account, for the app shell", async () => {
+    const [user] = await db.select().from(schema.users).where(eq(schema.users.email, "e1@a.test"));
+    expect(await personDepartmentByUserId(db, user!.id)).toBe("Underwriting");
+  });
+
+  it("gives no department for a sign in account with no staff record", async () => {
+    expect(await personDepartmentByUserId(db, "00000000-0000-0000-0000-000000000000")).toBeNull();
   });
 });
 
