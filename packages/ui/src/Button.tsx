@@ -1,5 +1,5 @@
 import type { ButtonHTMLAttributes, CSSProperties } from "react";
-import { color, font, radius, space, touchTarget } from "./tokens.ts";
+import { colorVar, font, radius, space, touchTarget } from "./tokens.ts";
 
 // primary: the one main action on a screen (SUNU red).
 // secondary: other actions. ghost: a text link styled action.
@@ -26,9 +26,9 @@ const base: CSSProperties = {
 };
 
 const variants: Record<ButtonVariant, CSSProperties> = {
-  primary: { background: color.primary, color: color.primaryText, border: "1px solid transparent" },
-  secondary: { background: color.surface, color: color.text, border: `1px solid ${color.border}` },
-  ghost: { background: "transparent", color: color.primary, border: "1px solid transparent", padding: `0 ${space.sm}` },
+  primary: { background: colorVar("primary"), color: colorVar("primaryText"), border: "1px solid transparent" },
+  secondary: { background: colorVar("surface"), color: colorVar("text"), border: `1px solid ${colorVar("border")}` },
+  ghost: { background: "transparent", color: colorVar("primary"), border: "1px solid transparent", padding: `0 ${space.sm}` },
 };
 
 // The small size is for dense tables only; it stays at the phone touch target height.

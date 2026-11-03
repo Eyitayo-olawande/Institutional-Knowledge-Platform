@@ -41,7 +41,10 @@ export async function AppShell({ ctx, active, children }: { ctx: ShellContext; a
     <div className="shell">
       <a className="skip" href="#content">{t("nav.skip")}</a>
       <aside className="side">
-        <Link className="brand" href="/">{ctx.tenant.name}</Link>
+        <Link className="brand" href="/">
+          <span className="brand-chip" aria-hidden="true">{ctx.tenant.name.charAt(0)}</span>
+          <span className="brand-name">{ctx.tenant.name}</span>
+        </Link>
         <nav className="nav" aria-label={t("nav.menu")}>
           {main.map(link)}
           {admin.length > 0 ? <div className="nav-section">{t("nav.admin_section")}</div> : null}
@@ -52,7 +55,7 @@ export async function AppShell({ ctx, active, children }: { ctx: ShellContext; a
           <div style={{ flex: 1, minWidth: 0 }}>
             <div className="me-name">{ctx.user.name}</div>
             <form action={signOut}>
-              <Button type="submit" variant="ghost" size="sm" style={{ padding: 0 }}>{t("auth.sign_out")}</Button>
+              <Button type="submit" variant="ghost" size="sm" style={{ padding: 0, color: "#fff" }}>{t("auth.sign_out")}</Button>
             </form>
           </div>
         </div>
