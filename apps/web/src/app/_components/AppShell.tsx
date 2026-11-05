@@ -43,11 +43,13 @@ export async function AppShell({ ctx, active, children }: { ctx: ShellContext; a
       <a className="skip" href="#content">{t("nav.skip")}</a>
       <aside className="side">
         <Link className="brand" href="/">
-          <Icon name="library" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/images/sunu-logo.webp" alt="" className="brand-logo" aria-hidden="true" />
           <span className="brand-name">{ctx.tenant.name}</span>
         </Link>
         <Link className="brand product" href="/">
-          <Icon name="library" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/images/sunu-logo.webp" alt="" className="brand-logo" aria-hidden="true" />
           <span>
             <span className="brand-name">{t("nav.product_name")}</span>
             <span className="brand-tagline">{t("nav.product_tagline")}</span>

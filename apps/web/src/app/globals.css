@@ -7,6 +7,7 @@
 .side { background: linear-gradient(180deg, #a4052b 0%, #6c0528 100%); display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; }
 .brand { padding: 14px 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.18); display: flex; align-items: flex-start; gap: 10px; text-decoration: none; }
 .brand svg { color: #fff; flex: 0 0 auto; margin-top: 2px; }
+.brand-logo { height: 36px; width: auto; flex-shrink: 0; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.45)); }
 .brand-name { display: block; font-weight: var(--mantle-font-weight_bold); font-size: var(--mantle-font-size_md); color: #fff; line-height: 1.25; }
 .brand-tagline { display: block; font-size: 12px; color: rgba(255, 255, 255, 0.75); margin-top: 1px; }
 .nav { padding: 10px; display: flex; flex-direction: column; gap: 2px; flex: 1; overflow-y: auto; }
