@@ -255,6 +255,7 @@
     "search_label": "Search the library",
     "search_placeholder": "Search the library",
     "notices_unread": "Notices, {count} new",
+    "my_learning": "My Learning",
     "structure": "Structure",
     "areas": "Area access",
     "paths": "Learning paths"
@@ -329,6 +330,31 @@
         "completed": "Completed"
       }
     }
+  },
+  "learning": {
+    "title": "My Learning",
+    "banner_sub": "Build your knowledge and meet your role requirements.",
+    "journey_heading": "My Learning Path",
+    "journey_sub": "A structured journey to build your knowledge and meet role requirements.",
+    "tabs_all": "My Enrolled Courses",
+    "tabs_in_progress": "In Progress",
+    "tabs_completed": "Completed",
+    "no_assignments": "No modules match this filter.",
+    "empty_heading": "No learning paths assigned",
+    "empty_body": "You have not been assigned any learning paths yet.",
+    "progress_heading": "My Progress",
+    "progress_sub": "Overall learning-path completion",
+    "progress_completed": "Completed",
+    "progress_in_progress": "In progress",
+    "progress_not_started": "Not started",
+    "certs_heading": "My Certificates",
+    "certs_coming_soon": "Coming soon",
+    "certs_none": "No certificates have been issued.",
+    "action_start": "Start",
+    "action_review": "Review",
+    "stage_cert": "Certificate",
+    "stage_cert_soon": "Coming soon",
+    "module_detail": "Module {n} of {total} · {stage}"
   },
   "paths": {
     "stages": {
