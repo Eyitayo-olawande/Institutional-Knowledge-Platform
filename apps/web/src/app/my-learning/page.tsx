@@ -38,6 +38,8 @@ export default async function MyLearning({
         <div className="my-banner">
           <div className="my-banner-bg" />
           <div className="my-banner-shade" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/images/learning-professional.png" alt="" className="my-learning-person" aria-hidden="true" />
           <div className="my-banner-copy">
             <p className="eyebrow">{t("learning.title").toUpperCase()}</p>
             <h1>
@@ -61,6 +63,8 @@ export default async function MyLearning({
         <div className="my-banner">
           <div className="my-banner-bg" />
           <div className="my-banner-shade" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/images/learning-professional.png" alt="" className="my-learning-person" aria-hidden="true" />
           <div className="my-banner-copy">
             <p className="eyebrow">{t("learning.title").toUpperCase()}</p>
             <h1>
@@ -153,6 +157,8 @@ export default async function MyLearning({
       <div className="my-banner">
         <div className="my-banner-bg" />
         <div className="my-banner-shade" />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/images/learning-professional.png" alt="" className="my-learning-person" aria-hidden="true" />
         <div className="my-banner-copy">
           <p className="eyebrow">{t("learning.title").toUpperCase()}</p>
           <h1>
