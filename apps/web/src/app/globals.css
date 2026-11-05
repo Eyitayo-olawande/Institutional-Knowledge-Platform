@@ -63,6 +63,16 @@
   .bottom-nav a[aria-current="page"] { color: var(--mantle-color-primary); }
 }
 
+/* Admin: narrow sticky aside + wider main content */
+.admin-2col { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 20px; align-items: start; }
+.admin-2col-aside { position: sticky; top: 84px; }
+/* Admin: roles checkbox grid — fits more roles per row */
+.role-checks { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 2px; margin: 8px 0; }
+@media (max-width: 860px) {
+  .admin-2col { grid-template-columns: 1fr; }
+  .admin-2col-aside { position: static; }
+}
+
 /* Library card grid */
 .lib-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
 .lib-card {

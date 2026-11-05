@@ -22,50 +22,53 @@ export default async function People() {
     <AppShell ctx={ctx} active="people">
       <PageHead title={t("people.title")} sub={t("people.heading", { name: tenant.name })} />
 
-      {result ? (
-        <section role="status" style={{ marginBottom: 16 }}>
-          {result.joined !== undefined ? (
-            <div className="grid grid-4" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", marginBottom: 12 }}>
-              {COUNTS.map((k) => (
-                <StatTile key={k} label={t(`people.import.labels.${k}`)} value={result[k] ?? 0} />
-              ))}
-            </div>
+      <div className="admin-2col">
+        {/* Import sidebar */}
+        <div className="admin-2col-aside">
+          {result ? (
+            <section role="status" style={{ marginBottom: 16 }}>
+              {result.joined !== undefined ? (
+                <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(100px, 1fr))", gap: 10, marginBottom: 12 }}>
+                  {COUNTS.map((k) => (
+                    <StatTile key={k} label={t(`people.import.labels.${k}`)} value={result[k] ?? 0} />
+                  ))}
+                </div>
+              ) : null}
+              {result.problems.length > 0 ? (
+                <div className="alert alert-danger" role="alert">
+                  <ul style={{ margin: 0, paddingLeft: 18 }}>
+                    {result.problems.map((p) => (
+                      <li key={`${p.line}-${p.key}`}>
+                        {p.line > 0 ? t("people.import.line", { line: p.line }) : null}
+                        {t(p.key, { columns: p.columns ?? "" })}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+            </section>
           ) : null}
-          {result.problems.length > 0 ? (
-            <div className="alert alert-danger" role="alert">
-              <ul style={{ margin: 0, paddingLeft: 18 }}>
-                {result.problems.map((p) => (
-                  <li key={`${p.line}-${p.key}`}>
-                    {p.line > 0 ? t("people.import.line", { line: p.line }) : null}
-                    {t(p.key, { columns: p.columns ?? "" })}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
-        </section>
-      ) : null}
+          <Card>
+            <h2 style={{ marginTop: 0 }}>{t("people.import.heading")}</h2>
+            <p className="muted" style={{ marginTop: 0 }}>{t("people.import.format")}</p>
+            <form action={importStaff}>
+              <label className="field">
+                {t("people.import.file")}
+                <input className="input" type="file" name="file" accept=".csv,text/csv" required />
+              </label>
+              <label className="check" style={{ marginBottom: 12 }}>
+                <input type="checkbox" name="mark_leavers" /> {t("people.import.mark_leavers")}
+              </label>
+              <div>
+                <Button type="submit">{t("people.import.submit")}</Button>
+              </div>
+            </form>
+          </Card>
+        </div>
 
-      <div className="grid" style={{ gridTemplateColumns: "minmax(0, 1fr)", gap: 16 }}>
+        {/* Staff table */}
         <Card>
-          <h2>{t("people.import.heading")}</h2>
-          <p className="muted" style={{ marginTop: 0 }}>{t("people.import.format")}</p>
-          <form action={importStaff}>
-            <label className="field">
-              {t("people.import.file")}
-              <input className="input" type="file" name="file" accept=".csv,text/csv" required />
-            </label>
-            <label className="check" style={{ marginBottom: 12 }}>
-              <input type="checkbox" name="mark_leavers" /> {t("people.import.mark_leavers")}
-            </label>
-            <div>
-              <Button type="submit">{t("people.import.submit")}</Button>
-            </div>
-          </form>
-        </Card>
-
-        <Card>
-          <h2>{t("people.list_heading", { count: people.length })}</h2>
+          <h2 style={{ marginTop: 0 }}>{t("people.list_heading", { count: people.length })}</h2>
           {people.length === 0 ? (
             <p className="sub">{t("people.empty")}</p>
           ) : (
