@@ -255,6 +255,13 @@
 .welcome-banner-content p { color: rgba(255,255,255,0.80); font-size: 15px; line-height: 1.6; margin: 0; }
 .welcome-banner-rule { height: 4px; width: 48px; border-radius: 999px; background: var(--mantle-color-primary); margin-top: 14px; }
 
+/* Admin hero wrapper: z-index above sticky topbar (5) so person overflows visibly */
+.admin-hero-wrap {
+  position: relative;
+  z-index: 6;
+  margin-bottom: 24px;
+  pointer-events: none; /* topbar elements underneath remain clickable */
+}
 /* Admin hero banner — layered composition: light office bg + colleagues cutout + dark text */
 .admin-banner {
   position: relative;
@@ -262,8 +269,7 @@
   min-height: 200px;
   display: flex;
   align-items: center;
-  margin-bottom: 24px;
-  /* no overflow:hidden — person image overflows above the banner boundary */
+  pointer-events: auto; /* restore interactivity for banner content */
 }
 .admin-banner-bg {
   position: absolute; inset: 0;
@@ -278,18 +284,18 @@
   background: linear-gradient(to right, rgba(255,255,255,0.72) 0%, rgba(255,255,255,0.40) 50%, rgba(255,255,255,0) 100%);
   z-index: -1;
 }
+/* Person: mobile — contained within banner (no overflow), desktop — taller than banner so heads overflow above */
 .admin-banner-person {
   position: absolute; right: 0; bottom: 0;
-  height: 130%; width: auto;
-  max-width: 52%;
-  z-index: 2;
+  height: 165px; width: auto;
+  max-width: 100%;
   pointer-events: none;
   object-fit: contain; object-position: bottom right;
 }
 .admin-banner-rule { height: 4px; width: 56px; border-radius: 999px; background: var(--mantle-color-primary); margin-top: 14px; }
 
-/* Admin banner copy — dark text on the light office background */
-.admin-banner-copy { position: relative; z-index: 3; padding: 28px 36px 36px; }
+/* Admin banner copy — dark text, restore pointer-events inside banner */
+.admin-banner-copy { position: relative; z-index: 3; padding: 28px 36px 36px; pointer-events: auto; }
 .admin-banner-copy h1 { font-size: 28px; font-weight: 800; line-height: 1.25; margin: 0 0 8px; color: var(--mantle-color-text); }
 .admin-banner-copy h1 span { color: var(--mantle-color-primary); }
 .admin-banner-copy p { color: var(--mantle-color-text_muted); font-size: 15px; line-height: 1.6; margin: 0; max-width: 400px; }
@@ -365,10 +371,15 @@
   .admin-kpis { grid-template-columns: repeat(4, 1fr); }
   .admin-subgrid { grid-template-columns: 1fr 1fr; }
 }
+/* Desktop: banner fixed height so person (235px) overflows above */
+@media (min-width: 860px) {
+  .admin-banner { height: 200px; }
+  .admin-banner-person { height: 235px; max-width: 50%; }
+}
 @media (min-width: 1024px) {
   .admin-panels { grid-template-columns: 2fr 3fr; }
   .admin-banner-copy h1 { font-size: 32px; color: var(--mantle-color-text); }
-  .admin-banner-person { max-width: 46%; }
+  .admin-banner-person { height: 245px; max-width: 54%; }
 }
 
 /* Learning progress gradient card */
