@@ -99,122 +99,166 @@
 @media (max-width: 860px) { .lib-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 540px) { .lib-grid { grid-template-columns: 1fr; } }
 
-/* Sign-in screen: brand panel left, form right */
-.sign-in { display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh; }
+/* Sign-in screen: office-photo brand panel (55%) left, floating form card (45%) right */
+.sign-in { display: grid; grid-template-columns: 55fr 45fr; min-height: 100vh; }
+
 .sign-in-brand {
-  background: linear-gradient(160deg, var(--mantle-color-primary) 0%, #5c0320 100%);
-  color: #fff;
+  position: relative; overflow: hidden;
+  display: flex; flex-direction: column; justify-content: space-between;
+  padding: 40px; color: #fff; min-height: 100vh;
+}
+.sign-in-photo {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%; object-fit: cover; z-index: 0;
+}
+.sign-in-photo-shade {
+  position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(to bottom, rgba(72,7,22,0.80) 0%, rgba(55,5,17,0.56) 42%, rgba(32,3,12,0.94) 100%);
+}
+.sign-in-branding, .sign-in-copy, .sign-in-benefits-grid { position: relative; z-index: 2; }
+
+.sign-in-branding { display: flex; align-items: center; gap: 14px; }
+.sign-in-brand-mark {
+  font-size: 18px; font-weight: 800; letter-spacing: -0.01em; line-height: 1;
+  background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.22);
+  border-radius: 8px; padding: 7px 13px; white-space: nowrap;
+}
+.sign-in-brand-divider { width: 1px; height: 32px; background: rgba(255,255,255,0.28); flex-shrink: 0; }
+.sign-in-brand-name strong { display: block; font-size: var(--mantle-font-size_lg); font-weight: var(--mantle-font-weight_bold); line-height: 1.25; }
+.sign-in-brand-name span { display: block; font-size: 13px; color: rgba(255,255,255,0.70); margin-top: 2px; }
+
+.sign-in-copy h1 {
+  font-size: clamp(38px, 3.4vw, 54px);
+  font-weight: 800; line-height: 1.1; margin: 0 0 18px; color: #fff;
+}
+.sign-in-rule { height: 6px; width: 80px; border-radius: 999px; background: var(--mantle-color-primary); margin-bottom: 20px; }
+.sign-in-copy p { color: rgba(255,255,255,0.84); font-size: 15px; line-height: 1.65; margin: 0; max-width: 380px; }
+
+.sign-in-benefits-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
+  border-top: 1px solid rgba(255,255,255,0.14); padding-top: 24px; color: #fff;
+}
+.sign-in-benefit { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+.sign-in-benefit svg { width: 32px; height: 32px; flex-shrink: 0; }
+.sign-in-benefit span { font-size: 12px; line-height: 1.4; }
+
+.sign-in-form {
+  background: var(--mantle-color-background);
+  display: flex; align-items: center; justify-content: center;
+  padding: 40px; min-height: 100vh;
+}
+.sign-in-panel { width: 100%; max-width: 440px; }
+.sign-in-card {
+  background: var(--mantle-color-surface);
+  border-radius: 20px; padding: 40px;
+  box-shadow: 0 1px 2px rgba(16,24,40,0.06), 0 4px 16px -6px rgba(16,24,40,0.10);
+}
+.sign-in-card h2 { font-size: 26px; font-weight: 800; line-height: 1.2; margin: 0 0 10px; }
+.sign-in-card-sub { color: var(--mantle-color-text_muted); font-size: 15px; line-height: 1.6; margin: 0 0 28px; }
+.sign-in-label { display: block; font-size: 14px; font-weight: var(--mantle-font-weight_semibold); margin-bottom: 6px; }
+.sign-in-field {
+  display: flex; align-items: center; gap: 10px;
+  border: 1px solid var(--mantle-color-border);
+  border-radius: var(--mantle-radius-md);
+  background: var(--mantle-color-background);
+  padding: 0 14px; height: 48px; margin-bottom: 14px;
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+.sign-in-field:focus-within { box-shadow: 0 0 0 3px rgba(186,12,47,0.14); border-color: var(--mantle-color-primary); }
+.sign-in-field svg { width: 20px; height: 20px; flex-shrink: 0; color: var(--mantle-color-text_muted); }
+.sign-in-field input {
+  flex: 1; border: 0; background: transparent; outline: none;
+  font: inherit; font-size: 15px; color: var(--mantle-color-text); min-width: 0;
+}
+.sign-in-field input::placeholder { color: var(--mantle-color-text_muted); }
+
+@media (max-width: 860px) {
+  .sign-in { grid-template-columns: 1fr; }
+  .sign-in-brand { min-height: auto; padding: 16px 20px; flex-direction: row; align-items: center; gap: 10px; justify-content: flex-start; }
+  .sign-in-copy, .sign-in-benefits-grid { display: none; }
+  .sign-in-branding { flex: 1; }
+  .sign-in-form { min-height: auto; padding: 24px 16px; align-items: flex-start; }
+  .sign-in-card { padding: 24px 20px; border-radius: 14px; box-shadow: none; }
+}
+
+/* Welcome banner — employee home hero with office photo background */
+.welcome-banner {
+  position: relative;
+  border-radius: var(--mantle-radius-lg);
+  overflow: hidden;
+  min-height: 200px;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 48px 52px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.welcome-banner-bg {
+  position: absolute; inset: 0;
+  background: url('/images/sunu-office.jpg') 60% center / cover no-repeat;
+}
+.welcome-banner-shade {
+  position: absolute; inset: 0;
+  background: linear-gradient(to right, rgba(72,7,22,0.92) 0%, rgba(55,5,17,0.74) 48%, rgba(32,3,12,0.22) 100%);
+}
+.welcome-banner-content { position: relative; z-index: 1; padding: 32px 36px; color: #fff; max-width: 60%; }
+.welcome-banner-content h1 { font-size: 24px; font-weight: 800; line-height: 1.25; margin: 0 0 8px; color: #fff; }
+.welcome-banner-content p { color: rgba(255,255,255,0.80); font-size: 15px; line-height: 1.6; margin: 0; }
+.welcome-banner-rule { height: 4px; width: 48px; border-radius: 999px; background: var(--mantle-color-primary); margin-top: 14px; }
+
+/* Admin hero banner with office photo */
+.admin-banner {
+  position: relative;
+  border-radius: var(--mantle-radius-lg);
+  overflow: hidden;
+  min-height: 180px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.admin-banner-bg {
+  position: absolute; inset: 0;
+  background: url('/images/sunu-office.jpg') center / cover no-repeat;
+}
+.admin-banner-shade {
+  position: absolute; inset: 0;
+  background: linear-gradient(to right, rgba(50,5,18,0.94) 0%, rgba(50,5,18,0.74) 55%, rgba(50,5,18,0.16) 100%);
+}
+.admin-banner-content { position: relative; z-index: 1; padding: 28px 36px; color: #fff; }
+.admin-banner-content h1 { font-size: 28px; font-weight: 800; line-height: 1.2; margin: 0 0 6px; color: #fff; }
+.admin-banner-content p { color: rgba(255,255,255,0.80); font-size: 15px; line-height: 1.6; margin: 0; max-width: 480px; }
+.admin-banner-rule { height: 4px; width: 56px; border-radius: 999px; background: var(--mantle-color-primary); margin-top: 14px; }
+
+/* Learning progress gradient card */
+.learning-progress-card {
+  background: linear-gradient(135deg, var(--mantle-color-primary) 0%, #7a0a24 100%);
+  border-radius: var(--mantle-radius-lg);
+  padding: 20px 24px;
+  color: #fff;
+  margin-bottom: 20px;
   position: relative;
   overflow: hidden;
 }
-.sign-in-brand::before {
+.learning-progress-card::before {
   content: '';
   position: absolute;
-  width: 500px; height: 500px;
+  width: 220px; height: 220px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.04);
-  top: -120px; right: -160px;
+  background: rgba(255,255,255,0.06);
+  top: -70px; right: -50px;
   pointer-events: none;
 }
-.sign-in-brand::after {
-  content: '';
-  position: absolute;
-  width: 320px; height: 320px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.04);
-  bottom: -80px; left: -60px;
-  pointer-events: none;
-}
-.sign-in-brand-top {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 52px;
-}
-.sign-in-brand-mark {
-  width: 40px; height: 40px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: var(--mantle-radius-md);
-  display: flex; align-items: center; justify-content: center;
+.learning-progress-pct { font-size: 44px; font-weight: 800; line-height: 1; }
+.learning-progress-bar { height: 8px; border-radius: 999px; background: rgba(255,255,255,0.22); margin: 12px 0 6px; }
+.learning-progress-fill { height: 100%; border-radius: 999px; background: rgba(255,255,255,0.88); }
+.learning-status-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,0.15); border-radius: 999px;
+  padding: 3px 10px; font-size: 12px; font-weight: 600; color: #fff;
   flex-shrink: 0;
 }
-.sign-in-brand-name {
-  font-size: var(--mantle-font-size_lg);
-  font-weight: var(--mantle-font-weight_bold);
-}
-.sign-in-brand-org {
-  font-size: 36px;
-  font-weight: var(--mantle-font-weight_bold);
-  line-height: 1.15;
-  margin: 0 0 10px;
-}
-.sign-in-brand-tag {
-  color: rgba(255, 255, 255, 0.78);
-  margin: 0 0 36px;
-}
-.sign-in-benefits {
-  list-style: none;
-  padding: 0; margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-.sign-in-benefits li {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: var(--mantle-font-size_sm);
-  color: rgba(255, 255, 255, 0.9);
-}
-.sign-in-check {
-  width: 22px; height: 22px;
-  min-width: 22px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-  position: relative;
-  display: block;
-}
-.sign-in-check::after {
-  content: '';
-  position: absolute;
-  left: 5px; top: 6px;
-  width: 10px; height: 6px;
-  border-left: 2px solid #fff;
-  border-bottom: 2px solid #fff;
-  transform: rotate(-45deg);
-}
-.sign-in-form {
-  background: var(--mantle-color-background);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 40px 32px;
-}
-.sign-in-panel { width: 100%; max-width: 400px; }
-.sign-in-panel-org {
-  font-size: var(--mantle-font-size_sm);
-  font-weight: var(--mantle-font-weight_semibold);
-  color: var(--mantle-color-primary);
-  margin: 0 0 14px;
-}
+.learning-status-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.88); }
+
 @media (max-width: 860px) {
-  .sign-in { grid-template-columns: 1fr; }
-  .sign-in-brand {
-    padding: 14px 20px;
-    flex-direction: row;
-    align-items: center;
-    gap: 10px;
-    min-height: auto;
-  }
-  .sign-in-brand::before,
-  .sign-in-brand::after { display: none; }
-  .sign-in-brand-top { margin: 0; }
-  .sign-in-brand-org,
-  .sign-in-brand-tag,
-  .sign-in-benefits { display: none; }
-  .sign-in-form { padding: 24px 16px; align-items: flex-start; }
+  .welcome-banner-content { max-width: 100%; padding: 24px 20px; }
+  .admin-banner-content { padding: 20px 24px; }
+  .admin-banner-content h1 { font-size: 22px; }
 }

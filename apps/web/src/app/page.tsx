@@ -10,7 +10,7 @@ import { can } from "@mantle/platform/identity";
 import { resolveRequestTenant } from "../server/tenant.ts";
 import { tenantView } from "../server/tenant_view.ts";
 import { signOut } from "./actions.ts";
-import { AppShell, PageHead } from "./_components/AppShell.tsx";
+import { AppShell } from "./_components/AppShell.tsx";
 import { Icon } from "./_components/Icon.tsx";
 import { MyLearningSection, type PathCardData } from "./_components/MyLearning.tsx";
 
@@ -119,15 +119,27 @@ export default async function Home() {
   return (
     <AppShell ctx={{ tenant: resolution.tenant, db, roles, user: session.user }} active="home">
       {isAdmin ? (
-        <PageHead title={t("home.greeting", { name: firstName })} sub={t("home.sub", { name: resolution.tenant.name })} />
-      ) : (
-        <div className="hero">
-          <div className="hero-text">
-            <h1>{t("home.greeting", { name: firstName })}</h1>
-            <p className="sub">{t("home.sub", { name: resolution.tenant.name })}</p>
+        <div className="admin-banner">
+          <div className="admin-banner-bg" />
+          <div className="admin-banner-shade" />
+          <div className="admin-banner-content">
+            <p style={{ margin: "0 0 6px", fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.60)", textTransform: "uppercase", letterSpacing: "0.09em" }}>
+              {t("home.admin.banner_heading")} &middot; {t("home.admin.banner_product")}
+            </p>
+            <h1 style={{ margin: "0 0 6px", fontSize: 30, fontWeight: 800, color: "#fff", lineHeight: 1.2 }}>{t("home.greeting", { name: firstName })}</h1>
+            <p style={{ margin: 0, color: "rgba(255,255,255,0.78)", fontSize: 15 }}>{t("home.admin.banner_sub")}</p>
+            <div className="admin-banner-rule" />
           </div>
-          <div className="hero-photo">
-            <img src="/images/people/dashboard-hero.webp" alt="" />
+        </div>
+      ) : (
+        <div className="welcome-banner">
+          <div className="welcome-banner-bg" />
+          <div className="welcome-banner-shade" />
+          <div className="welcome-banner-content">
+            <p style={{ margin: "0 0 4px", fontSize: 14, fontWeight: 600, color: "rgba(255,255,255,0.68)" }}>{t("home.greeting_prefix")}</p>
+            <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800, color: "#fff", lineHeight: 1.2 }}>{firstName}</h1>
+            <p style={{ margin: 0, color: "rgba(255,255,255,0.78)", fontSize: 15 }}>{t("home.sub", { name: resolution.tenant.name })}</p>
+            <div className="welcome-banner-rule" />
           </div>
         </div>
       )}
@@ -186,6 +198,27 @@ export default async function Home() {
             </Card>
           </div>
         </>
+      ) : null}
+
+      {learningSummary && learningSummary.pathsEnrolled > 0 && !isAdmin ? (
+        <div className="learning-progress-card">
+          <div className="row" style={{ alignItems: "flex-start", justifyContent: "space-between", gap: 16 }}>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.68)", marginBottom: 4 }}>{t("home.my_learning.in_progress")}</div>
+              <div className="learning-progress-pct">{learningSummary.completionRate}%</div>
+              <div style={{ fontSize: 14, color: "rgba(255,255,255,0.72)", marginTop: 4 }}>
+                {t("home.my_learning.modules_summary", { done: learningSummary.modulesCompleted, total: learningSummary.modulesTotal })}
+              </div>
+            </div>
+            <div className="learning-status-pill">
+              <span className="learning-status-dot" />
+              {t("home.my_learning.tiles.paths")}: {learningSummary.pathsEnrolled}
+            </div>
+          </div>
+          <div className="learning-progress-bar">
+            <div className="learning-progress-fill" style={{ width: `${learningSummary.completionRate}%` }} />
+          </div>
+        </div>
       ) : null}
 
       {learningCards && learningSummary ? (
