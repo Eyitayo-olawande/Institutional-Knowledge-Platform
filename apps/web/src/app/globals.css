@@ -63,6 +63,32 @@
   .bottom-nav a[aria-current="page"] { color: var(--mantle-color-primary); }
 }
 
+/* Library card grid */
+.lib-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.lib-card {
+  background: var(--mantle-color-surface);
+  border: 1px solid var(--mantle-color-border);
+  border-radius: var(--mantle-radius-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+.lib-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); border-color: var(--mantle-color-primary); }
+.lib-card-band { height: 6px; background: var(--mantle-color-border_subtle); }
+.lib-card-band.published { background: var(--mantle-color-success); }
+.lib-card-band.draft { background: var(--mantle-color-border); }
+.lib-card-band.retired { background: var(--mantle-color-border); }
+.lib-card-body { padding: 16px; flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.lib-card-icon { width: 34px; height: 34px; border-radius: var(--mantle-radius-sm); background: var(--mantle-color-primary_tint); color: var(--mantle-color-primary); display: flex; align-items: center; justify-content: center; margin-bottom: 2px; }
+.lib-card-title { font-size: var(--mantle-font-size_md); font-weight: var(--mantle-font-weight_semibold); color: var(--mantle-color-text); line-height: 1.35; }
+.lib-card-type { font-size: 13px; color: var(--mantle-color-text_muted); }
+.lib-card-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-top: auto; padding-top: 10px; }
+@media (max-width: 860px) { .lib-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 540px) { .lib-grid { grid-template-columns: 1fr; } }
+
 /* Sign-in screen: brand panel left, form right */
 .sign-in { display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh; }
 .sign-in-brand {
