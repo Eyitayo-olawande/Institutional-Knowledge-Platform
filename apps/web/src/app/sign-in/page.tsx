@@ -79,12 +79,10 @@ export default async function SignIn({
         <img className="sign-in-photo" src="/images/sunu-office.jpg" alt="" />
         <div className="sign-in-photo-shade" />
 
-        {/* Logo row: org identity | divider | eLibrary product identity */}
+        {/* Logo row: SUNU brand mark | divider | eLibrary product identity */}
         <div className="sign-in-branding">
-          <BookOpenSvg />
-          <div className="sign-in-org-name">
-            <strong>{resolution.tenant.name}</strong>
-          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="sign-in-logo" src="/images/sunu-logo.webp" alt="SUNU Assurances" />
           <span className="sign-in-brand-divider" />
           <div className="sign-in-brand-name">
             <strong>{t("nav.product_name")}</strong>
