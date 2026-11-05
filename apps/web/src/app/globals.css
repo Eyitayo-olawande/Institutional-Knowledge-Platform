@@ -255,34 +255,47 @@
 .welcome-banner-content p { color: rgba(255,255,255,0.80); font-size: 15px; line-height: 1.6; margin: 0; }
 .welcome-banner-rule { height: 4px; width: 48px; border-radius: 999px; background: var(--mantle-color-primary); margin-top: 14px; }
 
-/* Admin hero banner with office photo */
+/* Admin hero banner — layered composition: light office bg + colleagues cutout + dark text */
 .admin-banner {
   position: relative;
-  border-radius: var(--mantle-radius-lg);
-  overflow: hidden;
-  min-height: 180px;
+  isolation: isolate;
+  min-height: 200px;
   display: flex;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+  /* no overflow:hidden — person image overflows above the banner boundary */
 }
 .admin-banner-bg {
   position: absolute; inset: 0;
-  background: url('/images/sunu-office.jpg') center / cover no-repeat;
+  border-radius: var(--mantle-radius-lg);
+  overflow: hidden;
+  background: url('/images/administrator-office.png') center / cover no-repeat;
+  z-index: -2;
 }
 .admin-banner-shade {
   position: absolute; inset: 0;
-  background: linear-gradient(to right, rgba(50,5,18,0.94) 0%, rgba(50,5,18,0.74) 55%, rgba(50,5,18,0.16) 100%);
+  border-radius: var(--mantle-radius-lg);
+  background: linear-gradient(to right, rgba(255,255,255,0.72) 0%, rgba(255,255,255,0.40) 50%, rgba(255,255,255,0) 100%);
+  z-index: -1;
 }
-.admin-banner-content { position: relative; z-index: 1; padding: 28px 36px; color: #fff; }
-.admin-banner-content h1 { font-size: 28px; font-weight: 800; line-height: 1.2; margin: 0 0 6px; color: #fff; }
-.admin-banner-content p { color: rgba(255,255,255,0.80); font-size: 15px; line-height: 1.6; margin: 0; max-width: 480px; }
+.admin-banner-person {
+  position: absolute; right: 0; bottom: 0;
+  height: 130%; width: auto;
+  max-width: 52%;
+  z-index: 2;
+  pointer-events: none;
+  object-fit: contain; object-position: bottom right;
+}
 .admin-banner-rule { height: 4px; width: 56px; border-radius: 999px; background: var(--mantle-color-primary); margin-top: 14px; }
 
-/* Admin banner copy — Lovable-matched title block */
-.admin-banner-copy { position: relative; z-index: 1; padding: 28px 36px; color: #fff; }
-.admin-banner-copy h1 { font-size: 28px; font-weight: 800; line-height: 1.25; margin: 0 0 8px; color: #fff; }
+/* Admin banner copy — dark text on the light office background */
+.admin-banner-copy { position: relative; z-index: 3; padding: 28px 36px 36px; }
+.admin-banner-copy h1 { font-size: 28px; font-weight: 800; line-height: 1.25; margin: 0 0 8px; color: var(--mantle-color-text); }
 .admin-banner-copy h1 span { color: var(--mantle-color-primary); }
-.admin-banner-copy p { color: rgba(255,255,255,0.80); font-size: 15px; line-height: 1.6; margin: 0; max-width: 480px; }
+.admin-banner-copy p { color: var(--mantle-color-text_muted); font-size: 15px; line-height: 1.6; margin: 0; max-width: 400px; }
+/* keep legacy .admin-banner-content rules for older markup */
+.admin-banner-content { position: relative; z-index: 1; padding: 28px 36px; }
+.admin-banner-content h1 { font-size: 28px; font-weight: 800; line-height: 1.2; margin: 0 0 6px; }
 
 /* KPI tiles row */
 .admin-kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -354,7 +367,8 @@
 }
 @media (min-width: 1024px) {
   .admin-panels { grid-template-columns: 2fr 3fr; }
-  .admin-banner-copy h1 { font-size: 32px; }
+  .admin-banner-copy h1 { font-size: 32px; color: var(--mantle-color-text); }
+  .admin-banner-person { max-width: 46%; }
 }
 
 /* Learning progress gradient card */

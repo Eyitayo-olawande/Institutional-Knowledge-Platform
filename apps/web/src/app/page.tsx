@@ -116,6 +116,13 @@ export default async function Home() {
         <div className="admin-banner">
           <div className="admin-banner-bg" />
           <div className="admin-banner-shade" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/administrator-colleagues.png"
+            alt=""
+            className="admin-banner-person"
+            aria-hidden="true"
+          />
           <div className="admin-banner-copy">
             <h1>
               {t("home.admin.banner_heading")}{" "}
