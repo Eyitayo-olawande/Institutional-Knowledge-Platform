@@ -3,7 +3,7 @@ import { Button, Card } from "@mantle/ui";
 import Link from "next/link";
 import { t } from "../../../i18n.ts";
 import { requireFeature, requirePermission } from "../../../server/session.ts";
-import { AppShell, PageHead } from "../../_components/AppShell.tsx";
+import { AppShell } from "../../_components/AppShell.tsx";
 import { createPathAction } from "./actions.ts";
 
 export default async function Paths() {
@@ -14,7 +14,18 @@ export default async function Paths() {
 
   return (
     <AppShell ctx={ctx} active="paths">
-      <PageHead title={t("paths.admin.title")} sub={t("paths.admin.explain")} />
+      <div className="paths-banner">
+        <div className="paths-banner-bg" />
+        <div className="paths-banner-shade" />
+        <div className="paths-banner-copy">
+          <h1>
+            {t("paths.banner_heading").split(" ")[0]}{" "}
+            <span>{t("paths.banner_heading").split(" ").slice(1).join(" ")}</span>
+          </h1>
+          <p>{t("paths.banner_sub")}</p>
+          <div className="paths-banner-rule" />
+        </div>
+      </div>
 
       <div className="admin-2col">
         {/* Paths table */}

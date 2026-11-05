@@ -357,6 +357,8 @@
     "module_detail": "Module {n} of {total} · {stage}"
   },
   "paths": {
+    "banner_heading": "Learning Paths",
+    "banner_sub": "Structured learning to build your knowledge and meet your role requirements.",
     "stages": {
       "common": "Common",
       "department": "Department",

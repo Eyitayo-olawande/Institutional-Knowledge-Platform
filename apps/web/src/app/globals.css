@@ -465,3 +465,14 @@
 .my-keep-going h2 { font-size: 16px; font-weight: 700; color: var(--mantle-color-primary); margin: 0 0 4px; }
 .my-keep-going p { font-size: 13px; line-height: 1.5; margin: 0; }
 @media (min-width: 1024px) { .my-banner-copy h1 { font-size: 30px; } }
+
+/* ── Learning Paths admin banner ────────────────────────────── */
+.paths-banner { position: relative; overflow: hidden; border-radius: var(--mantle-radius-xl); min-height: 170px; display: flex; align-items: flex-end; margin-bottom: 24px; }
+.paths-banner-bg { position: absolute; inset: 0; background-image: url('/images/welcome-banner.jpg'); background-size: cover; background-position: center 40%; }
+.paths-banner-shade { position: absolute; inset: 0; background: linear-gradient(135deg, rgba(0,0,0,0.70) 0%, rgba(0,0,0,0.25) 65%, rgba(0,0,0,0.08) 100%); }
+.paths-banner-copy { position: relative; z-index: 1; padding: 24px 32px; color: #fff; }
+.paths-banner-copy h1 { font-size: 26px; font-weight: 800; line-height: 1.25; margin: 0 0 6px; color: #fff; }
+.paths-banner-copy h1 span { color: var(--mantle-color-primary); }
+.paths-banner-copy p { color: rgba(255,255,255,0.80); font-size: 14px; margin: 0; max-width: 420px; }
+.paths-banner-rule { width: 56px; height: 4px; border-radius: 999px; background: var(--mantle-color-primary); margin-top: 12px; }
+@media (min-width: 1024px) { .paths-banner-copy h1 { font-size: 30px; } }

@@ -339,7 +339,7 @@ export default async function MyLearning({
               </dl>
             </div>
             <Link href="/admin/paths" className="my-module-action-btn" style={{ display: "block", textAlign: "center", marginTop: 4 }}>
-              {t("paths.stages.certificate")}
+              {t("paths.admin.title")}
             </Link>
           </div>
 
