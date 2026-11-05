@@ -71,7 +71,13 @@ export default async function SignIn({
   if (!resolution.ok) redirect("/");
   const { error, code_sent: codeSent } = await searchParams;
 
+  const tenantBrand = resolution.tenant.name.split(" ")[0];
+
   return (
+    <>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap" rel="stylesheet" />
     <div className="sign-in">
       {/* Left: brand panel with office photo — decorative, aria-hidden */}
       <div className="sign-in-brand" aria-hidden="true">
@@ -123,7 +129,7 @@ export default async function SignIn({
           <div className="sign-in-card">
             <h2>
               {t("auth.welcome_heading")}<br />
-              <span style={{ color: "var(--mantle-color-primary)" }}>{t("nav.product_name")}</span>
+              {tenantBrand}{" "}<span style={{ color: "var(--mantle-color-primary)" }}>{t("nav.product_name")}</span>
             </h2>
             <p className="sign-in-card-sub">{t("auth.welcome_sub")}</p>
 
@@ -184,5 +190,6 @@ export default async function SignIn({
         </div>
       </div>
     </div>
+    </>
   );
 }

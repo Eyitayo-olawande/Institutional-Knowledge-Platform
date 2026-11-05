@@ -1,6 +1,7 @@
 import { Badge, Button, buttonStyle, Card, StatTile, type BadgeTone } from "@mantle/ui";
 import { headers } from "next/headers";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { t } from "../i18n.ts";
 import { authFor, requestHost } from "../server/auth.ts";
 import { buildNav } from "../server/nav.ts";
@@ -39,15 +40,7 @@ export default async function Home() {
   const { host, protocol } = await requestHost();
   const session = await authFor(resolution.tenant, host, protocol).api.getSession({ headers: await headers() });
   if (!session) {
-    return (
-      <div className="centered">
-        <Card className="panel">
-          <h1>{resolution.tenant.name}</h1>
-          <p className="sub" style={{ marginBottom: 20 }}>{t(view.key, view.params)}</p>
-          <Link href="/sign-in" style={{ ...buttonStyle(), width: "100%" }}>{t("auth.sign_in")}</Link>
-        </Card>
-      </div>
-    );
+    redirect("/sign-in");
   }
 
   const db = tenantDb(resolution.tenant);
