@@ -210,6 +210,9 @@
         "infected": "A file failed the malware scan. Nothing was saved."
       }
     },
+    "banner_heading": "Knowledge Library",
+    "banner_sub": "Find policies, procedures, guidelines and learning materials to support your work.",
+    "browse_heading": "Browse by topic",
     "areas": {
       "common": "Common Staff Learning",
       "all": "All",
@@ -282,16 +285,26 @@
       "stats": {
         "staff": "Active staff",
         "departments": "Departments",
-        "published": "Published library items",
+        "published": "Published resources",
         "sign_ins": "Sign-ins this week"
       },
       "quick_actions_heading": "Quick actions",
+      "quick_unavailable": "Not available",
+      "quick_reports": "Reports",
       "timeline_heading": "Recent activity",
       "timeline_view_all": "View all",
       "timeline_empty": "Nothing recorded yet.",
       "banner_heading": "Administrator",
       "banner_product": "Dashboard",
-      "banner_sub": "Manage learning, content, users and access across the organisation."
+      "banner_sub": "Manage learning, content, users and access across the organisation.",
+      "progress_heading": "Learning Progress",
+      "dept_heading": "Completion by Department",
+      "journey_heading": "Learning Journey",
+      "notices_heading": "System Notices",
+      "journey_common": "Organisation-wide learning",
+      "journey_dept": "Department-specific learning",
+      "journey_role": "Role-specific learning",
+      "journey_cert": "Coming soon"
     },
     "my_learning": {
       "heading": "My learning",

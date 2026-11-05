@@ -4,7 +4,7 @@ import { Badge, type BadgeTone, Button, buttonStyle, Card } from "@mantle/ui";
 import Link from "next/link";
 import { t } from "../../i18n.ts";
 import { requireFeature, requirePermission, viewerAreas } from "../../server/session.ts";
-import { AppShell, PageHead } from "../_components/AppShell.tsx";
+import { AppShell } from "../_components/AppShell.tsx";
 import { Icon } from "../_components/Icon.tsx";
 import { areaChoices, areaName } from "./areas.ts";
 
@@ -35,11 +35,16 @@ export default async function Library({ searchParams }: { searchParams: Promise<
 
   return (
     <AppShell ctx={ctx} active="library">
-      <PageHead
-        title={t("library.title")}
-        sub={t("library.heading", { name: tenant.name })}
-        action={editor ? <Link href="/library/new" style={buttonStyle()}><Icon name="plus" size={18} />{t("library.new")}</Link> : undefined}
-      />
+      {/* Hero banner */}
+      <div className="lib-hero">
+        <div className="lib-hero-bg" />
+        <div className="lib-hero-shade" />
+        <div className="lib-hero-copy">
+          <h1>{t("library.banner_heading")}</h1>
+          <p>{t("library.banner_sub")}</p>
+          <div className="lib-hero-rule" />
+        </div>
+      </div>
 
       <form method="get" role="search" className="row" style={{ marginBottom: 20 }}>
         <label style={{ flex: 1, minWidth: 220 }}>
@@ -49,14 +54,29 @@ export default async function Library({ searchParams }: { searchParams: Promise<
         {area ? <input type="hidden" name="area" value={area.id} /> : null}
         {type ? <input type="hidden" name="type" value={type.id} /> : null}
         <Button type="submit" variant="secondary">{t("library.search")}</Button>
+        {editor ? <Link href="/library/new" style={buttonStyle()}><Icon name="plus" size={18} />{t("library.new")}</Link> : null}
       </form>
 
-      <nav className="chips" aria-label={t("library.areas.filter_label")}>
-        <Link href={link({})} aria-current={area ? undefined : "true"}>{t("library.areas.all")}</Link>
-        {areas.map((a) => (
-          <Link key={a.id} href={link({ area: a.id })} aria-current={a.id === area?.id ? "true" : undefined}>{areaName(a)}</Link>
-        ))}
-      </nav>
+      {/* Topic tiles */}
+      <section aria-label={t("library.browse_heading")}>
+        <h2 className="lib-browse-heading">{t("library.browse_heading")}</h2>
+        <nav className="lib-topic-grid" aria-label={t("library.areas.filter_label")}>
+          {areas.map((a) => (
+            <Link
+              key={a.id}
+              href={link({ area: a.id })}
+              aria-current={a.id === area?.id ? "true" : undefined}
+              className="lib-topic-tile"
+            >
+              <span className="lib-topic-icon">
+                <Icon name={a.kind === "common" ? "library" : "tree"} size={20} />
+              </span>
+              <span className="lib-topic-name">{areaName(a)}</span>
+            </Link>
+          ))}
+        </nav>
+      </section>
+
       {area ? (
         <nav className="chips" aria-label={t("library.areas.type_filter_label")} style={{ marginBottom: 20 }}>
           <Link href={link({ area: area.id })} aria-current={type ? undefined : "true"}>{t("library.areas.all_types")}</Link>

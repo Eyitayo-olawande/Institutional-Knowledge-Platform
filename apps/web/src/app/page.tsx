@@ -1,4 +1,4 @@
-import { Badge, Button, buttonStyle, Card, StatTile, type BadgeTone } from "@mantle/ui";
+import { Badge, Button, buttonStyle, Card, type BadgeTone } from "@mantle/ui";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -83,17 +83,18 @@ export default async function Home() {
   // An administrator's portal overview: real counts and the most recent
   // changes, not placeholders for features that don't exist yet (no
   // courses, groups or custom reports until E8/E4/E12 are built).
-  let overview: { staff: number; departments: number; published: number; signIns: number; timeline: Awaited<ReturnType<typeof recentActivity>> } | null = null;
+  let overview: { staff: number; departments: number; departmentNames: string[]; published: number; signIns: number; timeline: Awaited<ReturnType<typeof recentActivity>>; notices: Awaited<ReturnType<typeof noticesFor>> } | null = null;
   if (isAdmin) {
-    const [staff, departments, items, activity] = await Promise.all([
+    const [staff, departments, items, activity, adminNotices] = await Promise.all([
       listActiveStaff(db),
       listStructure(db, "department"),
       libraryOn ? listLibraryItems(db, { publishedOnly: true, areas: "all" }) : Promise.resolve([]),
       recentActivity(db, 200),
+      noticesFor(db, session.user.id, 6),
     ]);
     const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
     const signIns = activity.filter((a) => a.action === "auth.signed_in" && a.at.getTime() >= weekAgo).length;
-    overview = { staff: staff.length, departments: departments.length, published: items.length, signIns, timeline: activity.slice(0, 6) };
+    overview = { staff: staff.length, departments: departments.length, departmentNames: departments.slice(0, 6).map((d) => d.name), published: items.length, signIns, timeline: activity.slice(0, 6), notices: adminNotices };
   }
 
   // Featured resources and recent notices for the staff home page only; the
@@ -115,12 +116,12 @@ export default async function Home() {
         <div className="admin-banner">
           <div className="admin-banner-bg" />
           <div className="admin-banner-shade" />
-          <div className="admin-banner-content">
-            <p style={{ margin: "0 0 6px", fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.60)", textTransform: "uppercase", letterSpacing: "0.09em" }}>
-              {t("home.admin.banner_heading")} &middot; {t("home.admin.banner_product")}
-            </p>
-            <h1 style={{ margin: "0 0 6px", fontSize: 30, fontWeight: 800, color: "#fff", lineHeight: 1.2 }}>{t("home.greeting", { name: firstName })}</h1>
-            <p style={{ margin: 0, color: "rgba(255,255,255,0.78)", fontSize: 15 }}>{t("home.admin.banner_sub")}</p>
+          <div className="admin-banner-copy">
+            <h1>
+              {t("home.admin.banner_heading")}{" "}
+              <span>{t("home.admin.banner_product")}</span>
+            </h1>
+            <p>{t("home.admin.banner_sub")}</p>
             <div className="admin-banner-rule" />
           </div>
         </div>
@@ -146,49 +147,165 @@ export default async function Home() {
 
       {overview ? (
         <>
-          <h2>{t("home.admin.overview_heading")}</h2>
-          <div className="grid grid-4">
-            <StatTile label={t("home.admin.stats.staff")} value={overview.staff} />
-            <StatTile label={t("home.admin.stats.departments")} value={overview.departments} />
-            {libraryOn ? <StatTile label={t("home.admin.stats.published")} value={overview.published} /> : null}
-            <StatTile label={t("home.admin.stats.sign_ins")} value={overview.signIns} />
+          {/* KPI tiles */}
+          <div className="admin-kpis">
+            <article className="admin-kpi">
+              <span className="admin-kpi-icon"><Icon name="people" size={28} /></span>
+              <div>
+                <p className="admin-kpi-value">{overview.staff}</p>
+                <h2 className="admin-kpi-label">{t("home.admin.stats.staff")}</h2>
+              </div>
+            </article>
+            {libraryOn ? (
+              <article className="admin-kpi">
+                <span className="admin-kpi-icon"><Icon name="library" size={28} /></span>
+                <div>
+                  <p className="admin-kpi-value">{overview.published}</p>
+                  <h2 className="admin-kpi-label">{t("home.admin.stats.published")}</h2>
+                </div>
+              </article>
+            ) : null}
+            <article className="admin-kpi">
+              <span className="admin-kpi-icon"><Icon name="tree" size={28} /></span>
+              <div>
+                <p className="admin-kpi-value">{overview.departments}</p>
+                <h2 className="admin-kpi-label">{t("home.admin.stats.departments")}</h2>
+              </div>
+            </article>
+            <article className="admin-kpi">
+              <span className="admin-kpi-icon"><Icon name="list" size={28} /></span>
+              <div>
+                <p className="admin-kpi-value">{overview.signIns}</p>
+                <h2 className="admin-kpi-label">{t("home.admin.stats.sign_ins")}</h2>
+              </div>
+            </article>
           </div>
 
-          <div className="grid grid-2" style={{ alignItems: "start", marginTop: 16 }}>
-            {adminDestinations.length > 0 ? (
-              <Card>
-                <h3>{t("home.admin.quick_actions_heading")}</h3>
-                <ul className="list">
-                  {adminDestinations.map((d) => (
-                    <li key={d.key}>
-                      <Link className="grow" href={d.href}>
-                        <Icon name={d.icon} size={18} />
-                        <span style={{ marginLeft: 8 }}>{t(`nav.${d.key}`)}</span>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </Card>
-            ) : null}
+          {/* Two-column panels */}
+          <div className="admin-panels">
+            {/* Left column: progress + department completion */}
+            <div className="admin-panels-col">
+              <section className="admin-panel">
+                <h2 className="admin-panel-title">{t("home.admin.progress_heading")}</h2>
+                <div className="admin-progress-content">
+                  <div className="admin-progress-ring">
+                    <div className="admin-progress-ring-inner">
+                      <strong>—</strong>
+                      <span style={{ fontSize: 11, color: "var(--mantle-color-text_muted)", marginTop: 4 }}>{t("home.admin.overview_heading")}</span>
+                    </div>
+                  </div>
+                  <dl className="admin-progress-stats">
+                    {(["Completed", "In Progress", "Not Started"] as const).map((label, i) => (
+                      <div key={label} className="admin-progress-stat">
+                        <span className={`admin-progress-dot admin-progress-dot-${i}`} />
+                        <dt>{label}</dt>
+                        <dd>—</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              </section>
 
-            <Card>
-              <div className="row" style={{ justifyContent: "space-between" }}>
-                <h3 style={{ margin: 0 }}>{t("home.admin.timeline_heading")}</h3>
-                <Link href="/admin/activity" className="muted">{t("home.admin.timeline_view_all")}</Link>
-              </div>
-              {overview.timeline.length === 0 ? (
-                <p className="sub">{t("home.admin.timeline_empty")}</p>
-              ) : (
-                <ul className="list">
-                  {overview.timeline.map((e) => (
-                    <li key={e.id}>
-                      <span className="grow">{e.action}</span>
-                      <span className="muted">{e.at.toISOString().replace("T", " ").slice(0, 16)}</span>
+              <section className="admin-panel">
+                <h2 className="admin-panel-title">{t("home.admin.dept_heading")}</h2>
+                <div className="admin-dept-list">
+                  {overview.departmentNames.map((name) => (
+                    <div key={name} className="admin-department-row">
+                      <span>{name}</span>
+                      <div className="admin-empty-track" />
+                      <span style={{ color: "var(--mantle-color-text_muted)", fontSize: 12 }}>—</span>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            </div>
+
+            {/* Right column: journey + quick/activity + notices */}
+            <div className="admin-panels-col">
+              <section className="admin-panel">
+                <h2 className="admin-panel-title">{t("home.admin.journey_heading")}</h2>
+                <ol className="admin-journey">
+                  {([
+                    { stage: "common", icon: "library", label: t("paths.stages.common"), desc: t("home.admin.journey_common") },
+                    { stage: "department", icon: "tree", label: t("paths.stages.department"), desc: t("home.admin.journey_dept") },
+                    { stage: "role", icon: "people", label: t("paths.stages.role"), desc: t("home.admin.journey_role") },
+                    { stage: "certificate", icon: "key", label: t("paths.stages.certificate"), desc: t("home.admin.journey_cert") },
+                  ] as const).map(({ stage, icon, label, desc }) => (
+                    <li key={stage} className={`admin-journey-stage admin-stage-${stage}`}>
+                      <span className="admin-journey-node"><Icon name={icon} size={18} /></span>
+                      <div>
+                        <h3>{label}</h3>
+                        <p>{desc}</p>
+                      </div>
                     </li>
                   ))}
-                </ul>
-              )}
-            </Card>
+                </ol>
+              </section>
+
+              <div className="admin-subgrid">
+                <section className="admin-panel">
+                  <h2 className="admin-panel-title">{t("home.admin.quick_actions_heading")}</h2>
+                  <div className="admin-quick-grid">
+                    {libraryOn ? (
+                      <Link href="/library" className="admin-quick-action">
+                        <Icon name="library" size={28} />
+                        <p>{t("nav.library")}</p>
+                      </Link>
+                    ) : null}
+                    {pathsOn ? (
+                      <Link href="/admin/paths" className="admin-quick-action">
+                        <Icon name="tree" size={28} />
+                        <p>{t("nav.paths")}</p>
+                      </Link>
+                    ) : null}
+                    <div className="admin-quick-unavailable">
+                      <Icon name="people" size={28} />
+                      <p>{t("nav.people")}</p>
+                      <span>{t("home.admin.quick_unavailable")}</span>
+                    </div>
+                    <div className="admin-quick-unavailable">
+                      <Icon name="list" size={28} />
+                      <p>{t("home.admin.quick_reports")}</p>
+                      <span>{t("home.admin.quick_unavailable")}</span>
+                    </div>
+                  </div>
+                </section>
+
+                <section className="admin-panel">
+                  <h2 className="admin-panel-title">{t("home.admin.timeline_heading")}</h2>
+                  {overview.timeline.length === 0 ? (
+                    <p className="sub">{t("home.admin.timeline_empty")}</p>
+                  ) : (
+                    <ul className="list">
+                      {overview.timeline.map((e) => (
+                        <li key={e.id}>
+                          <span className="grow">{e.action}</span>
+                          <span className="muted">{e.at.toISOString().replace("T", " ").slice(0, 16)}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  <Link href="/admin/activity" className="muted" style={{ display: "block", marginTop: 12, fontSize: 13 }}>{t("home.admin.timeline_view_all")}</Link>
+                </section>
+              </div>
+
+              {overview.notices.length > 0 ? (
+                <section className="admin-notices">
+                  <div className="admin-notices-header">
+                    <Icon name="bell" size={28} />
+                    <h2 className="admin-notices-title">{t("home.admin.notices_heading")}</h2>
+                  </div>
+                  <ul className="admin-notices-list">
+                    {overview.notices.map((n) => (
+                      <li key={n.id} className="admin-notices-item">
+                        <p>{n.subject}</p>
+                        <time dateTime={n.createdAt.toISOString()}>{n.createdAt.toISOString().slice(0, 10)}</time>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ) : null}
+            </div>
           </div>
         </>
       ) : null}
@@ -225,7 +342,7 @@ export default async function Home() {
         />
       ) : null}
 
-      {mainDestinations.length > 0 ? (
+      {mainDestinations.length > 0 && !isAdmin ? (
         <>
           <h2 style={{ marginTop: learningCards ? 24 : 0 }}>{t("home.quick_access_heading")}</h2>
           <div className="grid grid-3">
