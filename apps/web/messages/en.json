@@ -23,7 +23,12 @@
       "wrong_details": "That email and password do not match.",
       "wrong_code": "That code is wrong or has expired."
     },
-    "sign_in_hint": "Use your work email to continue."
+    "sign_in_hint": "Use your work email to continue.",
+    "benefits": {
+      "library": "Access your full knowledge library",
+      "progress": "Track your learning and meet deadlines",
+      "notices": "Stay up to date with notices and updates"
+    }
   },
   "people": {
     "back": "Back to home",

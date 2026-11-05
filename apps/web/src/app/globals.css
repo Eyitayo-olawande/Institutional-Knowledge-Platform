@@ -62,3 +62,123 @@
   .bottom-nav a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-width: 64px; min-height: 44px; font-size: 11px; color: var(--mantle-color-text_muted); text-decoration: none; }
   .bottom-nav a[aria-current="page"] { color: var(--mantle-color-primary); }
 }
+
+/* Sign-in screen: brand panel left, form right */
+.sign-in { display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh; }
+.sign-in-brand {
+  background: linear-gradient(160deg, var(--mantle-color-primary) 0%, #5c0320 100%);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 48px 52px;
+  position: relative;
+  overflow: hidden;
+}
+.sign-in-brand::before {
+  content: '';
+  position: absolute;
+  width: 500px; height: 500px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.04);
+  top: -120px; right: -160px;
+  pointer-events: none;
+}
+.sign-in-brand::after {
+  content: '';
+  position: absolute;
+  width: 320px; height: 320px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.04);
+  bottom: -80px; left: -60px;
+  pointer-events: none;
+}
+.sign-in-brand-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 52px;
+}
+.sign-in-brand-mark {
+  width: 40px; height: 40px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: var(--mantle-radius-md);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.sign-in-brand-name {
+  font-size: var(--mantle-font-size_lg);
+  font-weight: var(--mantle-font-weight_bold);
+}
+.sign-in-brand-org {
+  font-size: 36px;
+  font-weight: var(--mantle-font-weight_bold);
+  line-height: 1.15;
+  margin: 0 0 10px;
+}
+.sign-in-brand-tag {
+  color: rgba(255, 255, 255, 0.78);
+  margin: 0 0 36px;
+}
+.sign-in-benefits {
+  list-style: none;
+  padding: 0; margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.sign-in-benefits li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: var(--mantle-font-size_sm);
+  color: rgba(255, 255, 255, 0.9);
+}
+.sign-in-check {
+  width: 22px; height: 22px;
+  min-width: 22px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  position: relative;
+  display: block;
+}
+.sign-in-check::after {
+  content: '';
+  position: absolute;
+  left: 5px; top: 6px;
+  width: 10px; height: 6px;
+  border-left: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  transform: rotate(-45deg);
+}
+.sign-in-form {
+  background: var(--mantle-color-background);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 32px;
+}
+.sign-in-panel { width: 100%; max-width: 400px; }
+.sign-in-panel-org {
+  font-size: var(--mantle-font-size_sm);
+  font-weight: var(--mantle-font-weight_semibold);
+  color: var(--mantle-color-primary);
+  margin: 0 0 14px;
+}
+@media (max-width: 860px) {
+  .sign-in { grid-template-columns: 1fr; }
+  .sign-in-brand {
+    padding: 14px 20px;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    min-height: auto;
+  }
+  .sign-in-brand::before,
+  .sign-in-brand::after { display: none; }
+  .sign-in-brand-top { margin: 0; }
+  .sign-in-brand-org,
+  .sign-in-brand-tag,
+  .sign-in-benefits { display: none; }
+  .sign-in-form { padding: 24px 16px; align-items: flex-start; }
+}
