@@ -99,69 +99,87 @@
 @media (max-width: 860px) { .lib-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 540px) { .lib-grid { grid-template-columns: 1fr; } }
 
-/* Sign-in screen: office-photo brand panel (55%) left, floating form card (45%) right */
+/* Sign-in: office-photo brand panel (55%) left, auth panel (45%) right */
 .sign-in { display: grid; grid-template-columns: 55fr 45fr; min-height: 100vh; }
 
 .sign-in-brand {
   position: relative; overflow: hidden;
-  display: flex; flex-direction: column; justify-content: space-between;
-  padding: 40px; color: #fff; min-height: 100vh;
+  display: flex; flex-direction: column;
+  padding: 40px 44px 240px;  /* bottom padding reserves space for abs benefits footer */
+  color: #fff; min-height: 100vh;
 }
 .sign-in-photo {
   position: absolute; inset: 0;
-  width: 100%; height: 100%; object-fit: cover; z-index: 0;
+  width: 100%; height: 100%; object-fit: cover; object-position: 65% center; z-index: 0;
 }
+/* Lighter directional gradient — the subject on the right stays clearly visible */
 .sign-in-photo-shade {
   position: absolute; inset: 0; z-index: 1;
-  background: linear-gradient(to bottom, rgba(72,7,22,0.80) 0%, rgba(55,5,17,0.56) 42%, rgba(32,3,12,0.94) 100%);
+  background:
+    linear-gradient(to right, rgba(50,3,15,0.82) 0%, rgba(42,3,13,0.60) 28%, rgba(28,2,9,0.26) 55%, rgba(15,1,5,0.06) 78%, transparent 100%),
+    linear-gradient(to top, rgba(40,3,12,0.52) 0%, transparent 32%);
 }
-.sign-in-branding, .sign-in-copy, .sign-in-benefits-grid { position: relative; z-index: 2; }
+.sign-in-branding, .sign-in-copy, .sign-in-benefits-footer { position: relative; z-index: 2; }
 
-.sign-in-branding { display: flex; align-items: center; gap: 14px; }
-.sign-in-brand-mark {
-  font-size: 18px; font-weight: 800; letter-spacing: -0.01em; line-height: 1;
-  background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.22);
-  border-radius: 8px; padding: 7px 13px; white-space: nowrap;
-}
-.sign-in-brand-divider { width: 1px; height: 32px; background: rgba(255,255,255,0.28); flex-shrink: 0; }
-.sign-in-brand-name strong { display: block; font-size: var(--mantle-font-size_lg); font-weight: var(--mantle-font-weight_bold); line-height: 1.25; }
-.sign-in-brand-name span { display: block; font-size: 13px; color: rgba(255,255,255,0.70); margin-top: 2px; }
+/* Logo row: book icon | org name | divider | eLibrary product identity */
+.sign-in-branding { display: flex; align-items: center; gap: 10px; }
+.sign-in-branding > svg { width: 32px; height: 32px; flex-shrink: 0; color: #fff; }
+.sign-in-org-name strong { display: block; font-size: 15px; font-weight: 700; line-height: 1.25; color: #fff; }
+.sign-in-brand-divider { width: 1px; height: 42px; background: rgba(255,255,255,0.30); flex-shrink: 0; margin: 0 2px; }
+.sign-in-brand-name strong { display: block; font-size: 15px; font-weight: 700; line-height: 1.25; }
+.sign-in-brand-name span { display: block; font-size: 12px; color: rgba(255,255,255,0.68); margin-top: 2px; }
 
+/* Headline copy: pushed toward vertical centre of the visible panel area */
+.sign-in-copy { flex: 0 0 auto; }
 .sign-in-copy h1 {
-  font-size: clamp(38px, 3.4vw, 54px);
-  font-weight: 800; line-height: 1.1; margin: 0 0 18px; color: #fff;
+  font-size: clamp(40px, 3.6vw, 58px);
+  font-weight: 800; line-height: 1.08; margin: 0 0 20px; color: #fff;
 }
-.sign-in-rule { height: 6px; width: 80px; border-radius: 999px; background: var(--mantle-color-primary); margin-bottom: 20px; }
-.sign-in-copy p { color: rgba(255,255,255,0.84); font-size: 15px; line-height: 1.65; margin: 0; max-width: 380px; }
+.sign-in-rule { height: 5px; width: 72px; border-radius: 999px; background: var(--mantle-color-primary); margin-bottom: 18px; }
+.sign-in-copy p { color: rgba(255,255,255,0.84); font-size: 15px; line-height: 1.65; margin: 0; max-width: 360px; }
 
-.sign-in-benefits-grid {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
-  border-top: 1px solid rgba(255,255,255,0.14); padding-top: 24px; color: #fff;
+/* Burgundy wave footer — positioned absolutely at the bottom of the brand panel */
+.sign-in-benefits-footer { position: absolute; bottom: 0; left: 0; right: 0; z-index: 2; }
+.sign-in-wave-svg { display: block; width: 100%; height: 54px; margin-bottom: -1px; }
+.sign-in-benefits-items {
+  background: #86112A;
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  padding: 16px 28px 28px; gap: 0;
 }
-.sign-in-benefit { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+.sign-in-benefit { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; padding: 0 10px; }
+.sign-in-benefit:not(:last-child) { border-right: 1px solid rgba(255,255,255,0.22); }
 .sign-in-benefit svg { width: 32px; height: 32px; flex-shrink: 0; }
-.sign-in-benefit span { font-size: 12px; line-height: 1.4; }
+.sign-in-benefit span { font-size: 12px; line-height: 1.4; font-weight: 500; }
 
+/* Right: auth panel */
 .sign-in-form {
   background: var(--mantle-color-background);
   display: flex; align-items: center; justify-content: center;
   padding: 40px; min-height: 100vh;
+  position: relative; overflow: hidden;
 }
-.sign-in-panel { width: 100%; max-width: 440px; }
+/* Blush-pink decorative circle at top-right of the auth panel */
+.sign-in-form::before {
+  content: ''; position: absolute; top: -100px; right: -100px;
+  width: 360px; height: 360px; border-radius: 50%;
+  background: rgba(205,80,100,0.14); pointer-events: none; z-index: 0;
+}
+.sign-in-panel { position: relative; z-index: 1; width: 100%; max-width: 450px; }
 .sign-in-card {
   background: var(--mantle-color-surface);
-  border-radius: 20px; padding: 40px;
-  box-shadow: 0 1px 2px rgba(16,24,40,0.06), 0 4px 16px -6px rgba(16,24,40,0.10);
+  border-radius: 20px; padding: 44px 40px;
+  box-shadow: 0 1px 3px rgba(16,24,40,0.07), 0 8px 24px -8px rgba(16,24,40,0.11);
+  border: 1px solid rgba(0,0,0,0.05);
 }
-.sign-in-card h2 { font-size: 26px; font-weight: 800; line-height: 1.2; margin: 0 0 10px; }
-.sign-in-card-sub { color: var(--mantle-color-text_muted); font-size: 15px; line-height: 1.6; margin: 0 0 28px; }
+.sign-in-card h2 { font-size: 28px; font-weight: 800; line-height: 1.2; margin: 0 0 10px; }
+.sign-in-card-sub { color: var(--mantle-color-text_muted); font-size: 15px; line-height: 1.65; margin: 0 0 28px; }
 .sign-in-label { display: block; font-size: 14px; font-weight: var(--mantle-font-weight_semibold); margin-bottom: 6px; }
 .sign-in-field {
   display: flex; align-items: center; gap: 10px;
   border: 1px solid var(--mantle-color-border);
-  border-radius: var(--mantle-radius-md);
+  border-radius: 10px;
   background: var(--mantle-color-background);
-  padding: 0 14px; height: 48px; margin-bottom: 14px;
+  padding: 0 14px; height: 50px; margin-bottom: 14px;
   transition: box-shadow 0.15s, border-color 0.15s;
 }
 .sign-in-field:focus-within { box-shadow: 0 0 0 3px rgba(186,12,47,0.14); border-color: var(--mantle-color-primary); }
@@ -171,14 +189,22 @@
   font: inherit; font-size: 15px; color: var(--mantle-color-text); min-width: 0;
 }
 .sign-in-field input::placeholder { color: var(--mantle-color-text_muted); }
+/* Password visibility toggle */
+.sign-in-eye {
+  background: none; border: none; padding: 4px; margin: -4px -4px -4px 0;
+  cursor: pointer; color: var(--mantle-color-text_muted);
+  display: flex; align-items: center; flex-shrink: 0; border-radius: 4px; line-height: 0;
+}
+.sign-in-eye:hover { color: var(--mantle-color-text); }
 
 @media (max-width: 860px) {
   .sign-in { grid-template-columns: 1fr; }
-  .sign-in-brand { min-height: auto; padding: 16px 20px; flex-direction: row; align-items: center; gap: 10px; justify-content: flex-start; }
-  .sign-in-copy, .sign-in-benefits-grid { display: none; }
+  .sign-in-brand { min-height: auto; padding: 14px 20px; flex-direction: row; align-items: center; gap: 10px; }
+  .sign-in-copy, .sign-in-benefits-footer { display: none; }
   .sign-in-branding { flex: 1; }
   .sign-in-form { min-height: auto; padding: 24px 16px; align-items: flex-start; }
-  .sign-in-card { padding: 24px 20px; border-radius: 14px; box-shadow: none; }
+  .sign-in-form::before { display: none; }
+  .sign-in-card { padding: 24px 20px; border-radius: 14px; box-shadow: none; border: 0; }
 }
 
 /* Welcome banner — employee home hero with office photo background */
