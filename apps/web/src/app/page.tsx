@@ -113,9 +113,19 @@ export default async function Home() {
   return (
     <AppShell ctx={{ tenant: resolution.tenant, db, roles, user: session.user }} active="home">
       {isAdmin ? (
-        <div className="admin-banner">
-          <div className="admin-banner-bg" />
-          <div className="admin-banner-shade" />
+        <div className="admin-hero-wrap">
+          <div className="admin-banner">
+            <div className="admin-banner-bg" />
+            <div className="admin-banner-shade" />
+            <div className="admin-banner-copy">
+              <h1>
+                {t("home.admin.banner_heading")}{" "}
+                <span>{t("home.admin.banner_product")}</span>
+              </h1>
+              <p>{t("home.admin.banner_sub")}</p>
+              <div className="admin-banner-rule" />
+            </div>
+          </div>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/images/administrator-colleagues.png"
@@ -123,14 +133,6 @@ export default async function Home() {
             className="admin-banner-person"
             aria-hidden="true"
           />
-          <div className="admin-banner-copy">
-            <h1>
-              {t("home.admin.banner_heading")}{" "}
-              <span>{t("home.admin.banner_product")}</span>
-            </h1>
-            <p>{t("home.admin.banner_sub")}</p>
-            <div className="admin-banner-rule" />
-          </div>
         </div>
       ) : (
         <div className="welcome-banner">
@@ -233,12 +235,12 @@ export default async function Home() {
                 <h2 className="admin-panel-title">{t("home.admin.journey_heading")}</h2>
                 <ol className="admin-journey">
                   {([
-                    { stage: "common", icon: "library", label: t("paths.stages.common"), desc: t("home.admin.journey_common") },
-                    { stage: "department", icon: "tree", label: t("paths.stages.department"), desc: t("home.admin.journey_dept") },
-                    { stage: "role", icon: "people", label: t("paths.stages.role"), desc: t("home.admin.journey_role") },
-                    { stage: "certificate", icon: "key", label: t("paths.stages.certificate"), desc: t("home.admin.journey_cert") },
-                  ] as const).map(({ stage, icon, label, desc }) => (
-                    <li key={stage} className={`admin-journey-stage admin-stage-${stage}`}>
+                    { icon: "library", label: t("paths.stages.common"), desc: t("home.admin.journey_common") },
+                    { icon: "tree", label: t("paths.stages.department"), desc: t("home.admin.journey_dept") },
+                    { icon: "people", label: t("paths.stages.role"), desc: t("home.admin.journey_role") },
+                    { icon: "key", label: t("paths.stages.certificate"), desc: t("home.admin.journey_cert") },
+                  ] as const).map(({ icon, label, desc }) => (
+                    <li key={label} className="admin-journey-stage">
                       <span className="admin-journey-node"><Icon name={icon} size={18} /></span>
                       <div>
                         <h3>{label}</h3>

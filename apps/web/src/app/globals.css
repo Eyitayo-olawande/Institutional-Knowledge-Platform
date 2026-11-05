@@ -335,16 +335,26 @@
 .admin-department-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(40px, 1.3fr) 24px; align-items: center; gap: 12px; font-size: 13px; }
 .admin-empty-track { height: 12px; border-radius: 6px; background: var(--mantle-color-background); border: 1px solid var(--mantle-color-border); }
 
-/* Learning journey */
+/* Learning journey — mobile: vertical stack; ≥480px: horizontal four-column */
 .admin-journey { display: grid; gap: 16px; list-style: none; padding: 0; margin: 4px 0 0; }
-.admin-journey-stage { position: relative; display: grid; grid-template-columns: 36px minmax(0, 1fr); align-items: start; gap: 12px; }
-.admin-journey-stage:not(:last-child)::after { content: ""; position: absolute; width: 3px; top: 36px; bottom: -16px; left: 17px; background: var(--mantle-color-border); }
-.admin-journey-node { position: relative; z-index: 1; display: grid; width: 36px; height: 36px; place-items: center; border-radius: 50%; color: var(--mantle-color-text_muted); background: var(--mantle-color-background); border: 2px solid var(--mantle-color-border); }
-.admin-stage-common .admin-journey-node,
-.admin-stage-department .admin-journey-node { border-color: var(--mantle-color-success); color: var(--mantle-color-success); background: var(--mantle-color-surface); }
-.admin-stage-role .admin-journey-node { border-color: var(--mantle-color-primary); color: var(--mantle-color-primary); background: var(--mantle-color-primary_tint); }
-.admin-journey-stage h3 { font-size: 14px; font-weight: 700; margin: 0; padding-top: 9px; }
+.admin-journey-stage { position: relative; display: grid; grid-template-columns: 36px minmax(0, 1fr); align-items: center; gap: 12px; }
+.admin-journey-stage:not(:last-child)::after { content: ""; position: absolute; width: 3px; top: 26px; bottom: -26px; left: 17px; background: var(--mantle-color-border); }
+.admin-journey-node { position: relative; z-index: 1; display: grid; width: 36px; height: 36px; place-items: center; border-radius: 50%; color: var(--mantle-color-text_muted); background: var(--mantle-color-background); border: 2px solid var(--mantle-color-border); flex-shrink: 0; }
+/* State: completed — green node + green connector to the next stage */
+.admin-journey-stage.is-completed .admin-journey-node { border-color: var(--mantle-color-success); color: #fff; background: var(--mantle-color-success); }
+.admin-journey-stage.is-completed:not(:last-child)::after { background: var(--mantle-color-success); }
+/* State: current/active — burgundy outline, blush-pink node fill */
+.admin-journey-stage.is-current .admin-journey-node { border-color: var(--mantle-color-primary); color: var(--mantle-color-primary); background: var(--mantle-color-primary_tint); }
+.admin-journey-stage h3 { font-size: 14px; font-weight: 700; margin: 0; }
 .admin-journey-stage p { font-size: 12px; margin: 4px 0 0; color: var(--mantle-color-text_muted); line-height: 1.4; }
+/* Horizontal layout */
+@media (min-width: 480px) {
+  .admin-journey { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; }
+  .admin-journey-stage { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; padding: 12px 4px; border-radius: var(--mantle-radius-md); }
+  .admin-journey-stage:not(:last-child)::after { left: 50%; right: -50%; top: 17px; bottom: auto; width: auto; height: 3px; }
+  .admin-journey-stage.is-current { background: var(--mantle-color-primary_tint); }
+  .admin-journey-stage h3 { font-size: 13px; }
+}
 
 /* Quick actions + recent activity side by side */
 .admin-subgrid { display: grid; gap: 16px; }
