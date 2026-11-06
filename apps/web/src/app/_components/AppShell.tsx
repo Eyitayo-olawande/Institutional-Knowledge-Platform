@@ -47,14 +47,7 @@ export async function AppShell({ ctx, active, children }: { ctx: ShellContext; a
           <img src="/images/sunu-logo.webp" alt="" className="brand-logo" aria-hidden="true" />
           <span className="brand-name">{ctx.tenant.name}</span>
         </Link>
-        <Link className="brand product" href="/">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/sunu-logo.webp" alt="" className="brand-logo" aria-hidden="true" />
-          <span>
-            <span className="brand-name">{t("nav.product_name")}</span>
-            <span className="brand-tagline">{t("nav.product_tagline")}</span>
-          </span>
-        </Link>
+
         <nav className="nav" aria-label={t("nav.menu")}>
           {main.map(link)}
           {admin.length > 0 ? <div className="nav-section">{t("nav.admin_section")}</div> : null}
