@@ -37,13 +37,16 @@ export default async function Library({ searchParams }: { searchParams: Promise<
     <AppShell ctx={ctx} active="library">
       {/* Hero banner */}
       <div className="lib-hero">
-        <div className="lib-hero-bg" />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/images/library_banner.png" alt="" aria-hidden="true" className="lib-hero-photo-desktop" />
         <div className="lib-hero-shade" />
         <div className="lib-hero-copy">
           <h1>{t("library.banner_heading")}</h1>
           <p>{t("library.banner_sub")}</p>
           <div className="lib-hero-rule" />
         </div>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/images/library_banner.png" alt="" aria-hidden="true" className="lib-hero-photo-mobile" />
       </div>
 
       <form method="get" role="search" className="row" style={{ marginBottom: 20 }}>
