@@ -25,7 +25,7 @@ export interface NavInput {
 export function buildNav({ roles, libraryOn, peopleImportOn, pathsOn }: NavInput): NavItem[] {
   const items: NavItem[] = [{ key: "home", href: "/", icon: "home", section: "main" }];
   if (libraryOn && can(roles, "library.view")) items.push({ key: "library", href: "/library", icon: "library", section: "main" });
-  if (pathsOn && can(roles, "library.view")) items.push({ key: "my_learning", href: "/my-learning", icon: "doc", section: "main" });
+  if (pathsOn && can(roles, "library.view") && !can(roles, "activity.view")) items.push({ key: "my_learning", href: "/my-learning", icon: "doc", section: "main" });
   items.push({ key: "notices", href: "/notices", icon: "bell", section: "main" });
   if (peopleImportOn && can(roles, "people.view")) items.push({ key: "people", href: "/admin/people", icon: "people", section: "admin" });
   if (can(roles, "roles.manage")) items.push({ key: "roles", href: "/admin/roles", icon: "key", section: "admin" });

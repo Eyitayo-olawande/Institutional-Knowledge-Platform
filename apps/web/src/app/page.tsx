@@ -1,4 +1,4 @@
-import { Badge, Button, buttonStyle, Card, type BadgeTone } from "@mantle/ui";
+import { Badge, buttonStyle, Card, type BadgeTone } from "@mantle/ui";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -10,7 +10,6 @@ import { listActiveStaff, listLibraryItems, listModuleItems, listStructure, myLe
 import { can } from "@mantle/platform/identity";
 import { resolveRequestTenant } from "../server/tenant.ts";
 import { tenantView } from "../server/tenant_view.ts";
-import { signOut } from "./actions.ts";
 import { AppShell } from "./_components/AppShell.tsx";
 import { Icon } from "./_components/Icon.tsx";
 import { MyLearningSection, type PathCardData } from "./_components/MyLearning.tsx";
@@ -408,14 +407,6 @@ export default async function Home() {
           ) : null}
         </div>
       ) : null}
-      <Card flat style={{ marginTop: 16 }}>
-        <div className="row" style={{ justifyContent: "space-between" }}>
-          <p className="muted" style={{ margin: 0 }}>{t("auth.signed_in_as", { name: session.user.name })}</p>
-          <form action={signOut}>
-            <Button type="submit" variant="secondary" size="sm">{t("auth.sign_out")}</Button>
-          </form>
-        </div>
-      </Card>
     </AppShell>
   );
 }
