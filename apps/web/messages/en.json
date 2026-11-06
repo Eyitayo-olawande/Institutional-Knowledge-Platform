@@ -212,6 +212,8 @@
     },
     "banner_heading": "Knowledge Library",
     "banner_sub": "Find policies, procedures, guidelines and learning materials to support your work.",
+    "filter_heading": "Filters",
+    "filter_clear": "Clear all",
     "browse_heading": "Browse by topic",
     "areas": {
       "common": "Common Staff Learning",
