@@ -135,15 +135,19 @@ export default async function Home() {
           />
         </div>
       ) : (
-        <div className="welcome-banner">
-          <div className="welcome-banner-bg" />
-          <div className="welcome-banner-shade" />
-          <div className="welcome-banner-content">
-            <p style={{ margin: "0 0 4px", fontSize: 14, fontWeight: 600, color: "rgba(255,255,255,0.68)" }}>{t("home.greeting_prefix")}</p>
-            <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800, color: "#fff", lineHeight: 1.2 }}>{firstName}</h1>
-            <p style={{ margin: 0, color: "rgba(255,255,255,0.78)", fontSize: 15 }}>{t("home.sub", { name: resolution.tenant.name })}</p>
-            <div className="welcome-banner-rule" />
+        <div className="lib-hero-wrap">
+          <div className="lib-hero">
+            <div className="lib-hero-bg" />
+            <div className="lib-hero-shade" />
+            <div className="lib-hero-copy">
+              <p style={{ margin: "0 0 4px", fontSize: 14, fontWeight: 600 }}>{t("home.greeting_prefix")}</p>
+              <h1>{firstName}</h1>
+              <p>{t("home.sub", { name: resolution.tenant.name })}</p>
+              <div className="lib-hero-rule" />
+            </div>
           </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/images/library_person.webp" alt="" aria-hidden="true" className="lib-hero-person" />
         </div>
       )}
       {unread > 0 ? (
