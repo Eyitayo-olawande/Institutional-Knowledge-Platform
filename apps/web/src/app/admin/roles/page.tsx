@@ -30,9 +30,9 @@ export default async function Roles({ searchParams }: { searchParams: Promise<{ 
                   <input type="hidden" name="userId" value={u.id} />
                   <div className="title">{u.name}</div>
                   <div className="muted">{u.email}</div>
-                  <div className="row" style={{ gap: 4, margin: "6px 0 8px" }}>
+                  <div className="role-checks">
                     {ROLES.map((role) => (
-                      <label key={role} className="check" style={{ marginRight: 12 }}>
+                      <label key={role} className="check">
                         <input type="checkbox" name={`role_${role}`} defaultChecked={held.has(role)} /> {t(`roles.names.${role}`)}
                       </label>
                     ))}

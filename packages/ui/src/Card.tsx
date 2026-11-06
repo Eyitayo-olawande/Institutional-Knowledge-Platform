@@ -1,5 +1,5 @@
 import type { CSSProperties, HTMLAttributes } from "react";
-import { color, radius, shadow, space } from "./tokens.ts";
+import { colorVar, radius, shadow, space } from "./tokens.ts";
 
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
   // flat: no shadow, for cards inside other cards or dense lists.
@@ -7,8 +7,8 @@ export interface CardProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 const base: CSSProperties = {
-  background: color.surface,
-  border: `1px solid ${color.border}`,
+  background: colorVar("surface"),
+  border: `1px solid ${colorVar("border")}`,
   borderRadius: radius.lg,
   padding: space.lg,
 };
