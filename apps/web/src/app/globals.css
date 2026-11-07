@@ -552,3 +552,39 @@
 .paths-banner-copy p { color: rgba(255,255,255,0.80); font-size: 14px; margin: 0; max-width: 420px; }
 .paths-banner-rule { width: 56px; height: 4px; border-radius: 999px; background: var(--mantle-color-primary); margin-top: 12px; }
 @media (min-width: 1024px) { .paths-banner-copy h1 { font-size: 30px; } }
+
+/* ── Library item 3-panel viewer ────────────────────────────── */
+.lib-item-viewer { display: grid; grid-template-columns: 220px minmax(0,1fr) 280px; gap: 16px; align-items: start; }
+.lib-item-files { background: var(--mantle-color-surface); border: 1px solid var(--mantle-color-border); border-radius: var(--mantle-radius-lg); overflow: hidden; }
+.lib-item-files-head { padding: 12px 16px; font-size: 13px; font-weight: 700; border-bottom: 1px solid var(--mantle-color-border); }
+.lib-item-files-empty { padding: 16px; font-size: 13px; color: var(--mantle-color-text_muted); margin: 0; }
+.lib-item-file-row { display: flex; align-items: center; gap: 10px; padding: 12px 14px; font-size: 13px; text-decoration: none; color: var(--mantle-color-text); border-bottom: 1px solid var(--mantle-color-border); }
+.lib-item-file-row:last-child { border-bottom: 0; }
+.lib-item-file-row:hover { background: var(--mantle-color-background); }
+.lib-item-file-row.active { background: var(--mantle-color-primary_tint); }
+.lib-item-file-icon { width: 32px; height: 40px; border-radius: 4px; background: var(--mantle-color-background); border: 1px solid var(--mantle-color-border); display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 800; letter-spacing: 0.03em; flex-shrink: 0; color: var(--mantle-color-text_muted); }
+.lib-item-file-info { flex: 1; min-width: 0; }
+.lib-item-file-name { font-size: 13px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lib-item-file-size { font-size: 11px; color: var(--mantle-color-text_muted); margin-top: 1px; }
+.lib-item-stage { background: var(--mantle-color-surface); border: 1px solid var(--mantle-color-border); border-radius: var(--mantle-radius-lg); overflow: hidden; }
+.lib-item-stage iframe { width: 100%; height: 680px; border: 0; display: block; }
+.lib-item-stage img { width: 100%; display: block; }
+.lib-item-stage video { width: 100%; display: block; }
+.lib-item-stage-prose { padding: 24px; }
+.lib-item-stage-prose + .lib-item-stage-prose { border-top: 1px solid var(--mantle-color-border); }
+.lib-item-no-file { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 300px; color: var(--mantle-color-text_muted); font-size: 14px; }
+.lib-item-info { display: flex; flex-direction: column; gap: 16px; }
+.lib-item-info-panel { background: var(--mantle-color-surface); border: 1px solid var(--mantle-color-border); border-radius: var(--mantle-radius-lg); padding: 20px; }
+.lib-item-info-panel h2 { font-size: 14px; font-weight: 700; margin: 0 0 14px; }
+.lib-item-meta-row { display: flex; justify-content: space-between; align-items: baseline; padding: 8px 0; border-bottom: 1px solid var(--mantle-color-border); font-size: 13px; gap: 8px; }
+.lib-item-meta-row:last-child { border-bottom: 0; }
+.lib-item-meta-label { color: var(--mantle-color-text_muted); flex-shrink: 0; }
+.lib-item-meta-value { font-weight: 500; text-align: right; word-break: break-word; }
+.lib-item-related-row { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--mantle-color-border); font-size: 13px; text-decoration: none; color: var(--mantle-color-text); }
+.lib-item-related-row:last-child { border-bottom: 0; }
+.lib-item-related-row:hover { color: var(--mantle-color-primary); }
+.lib-item-related-icon { width: 36px; min-width: 36px; height: 36px; border-radius: var(--mantle-radius-sm); background: var(--mantle-color-primary_tint); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: var(--mantle-color-primary); }
+.lib-item-related-title { font-size: 13px; font-weight: 600; line-height: 1.4; }
+.lib-item-related-meta { font-size: 11px; color: var(--mantle-color-text_muted); margin-top: 2px; }
+@media (max-width: 1199px) { .lib-item-viewer { grid-template-columns: minmax(0,1fr) 260px; } .lib-item-files { display: none; } }
+@media (max-width: 860px) { .lib-item-viewer { grid-template-columns: 1fr; } .lib-item-info { display: none; } }

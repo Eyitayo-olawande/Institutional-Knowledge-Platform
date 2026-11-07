@@ -231,6 +231,18 @@
       "move": "Save area and type",
       "confirm": "Confirm area and type",
       "placed": "Area and type saved."
+    },
+    "viewer": {
+      "files_heading": "Files ({count})",
+      "details_heading": "Document Details",
+      "content_type_label": "Content type",
+      "department_label": "Department",
+      "version_label": "Version",
+      "last_updated_label": "Last updated",
+      "status_label": "Status",
+      "related_heading": "Related Resources",
+      "no_related": "No related resources.",
+      "no_file": "No file attached yet."
     }
   },
   "notices": {
@@ -371,10 +383,16 @@
       "title": "Learning paths",
       "explain": "Four stages, in order: Common, Department, Role, then Certificate. A module can sit in more than one path and is completed once for all of them.",
       "empty": "No paths yet.",
-      "columns": { "name": "Name", "department": "Department" },
+      "columns": {
+        "name": "Name",
+        "department": "Department"
+      },
       "open": "Open",
       "create_heading": "New path",
-      "fields": { "name": "Name", "department": "Department" },
+      "fields": {
+        "name": "Name",
+        "department": "Department"
+      },
       "all_departments": "All departments (company wide)",
       "create": "Create path"
     },
