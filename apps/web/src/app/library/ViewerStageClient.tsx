@@ -2,6 +2,7 @@
 
 import { type ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { t } from "../../i18n.ts";
+import { PdfViewer } from "./PdfViewer.tsx";
 
 interface Props {
   fileUrl: string | null;
@@ -38,18 +39,9 @@ function ExternalLinkSvg() {
   );
 }
 
-function CheckSvg() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width={15} height={15} aria-hidden="true">
-      <polyline points="20 6 9 17 4 12" />
-    </svg>
-  );
-}
-
 export function ViewerStageClient({ fileUrl, contentType, fileName, conversionFailed, itemTitle, children }: Props) {
   const stageRef = useRef<HTMLDivElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [acknowledged, setAcknowledged] = useState(false);
 
   const toggleFullscreen = useCallback(() => {
     if (!stageRef.current) return;
@@ -67,12 +59,18 @@ export function ViewerStageClient({ fileUrl, contentType, fileName, conversionFa
   }, []);
 
   const showFile = !!fileUrl && !conversionFailed;
+  const isPdf = contentType === "application/pdf";
   const isImage = contentType?.startsWith("image/") ?? false;
   const isVideo = contentType === "video/mp4";
 
+  // PDFs get the full PdfViewer (self-contained with thumbnails + toolbar)
+  if (isPdf && showFile) {
+    return <PdfViewer fileUrl={fileUrl} fileName={fileName} />;
+  }
+
   return (
     <div ref={stageRef} className="lib-item-stage">
-      {/* Toolbar */}
+      {/* Toolbar for non-PDF files */}
       <div className="lib-item-toolbar">
         <span className="lib-item-toolbar-title">{itemTitle}</span>
         <div className="lib-item-toolbar-actions">
@@ -109,25 +107,6 @@ export function ViewerStageClient({ fileUrl, contentType, fileName, conversionFa
 
       {/* Prose body (when file and body both present) */}
       {showFile && children ? children : null}
-
-      {/* Acknowledgement */}
-      {showFile ? (
-        <div className="lib-item-ack">
-          <span className="lib-item-ack-prompt">
-            {acknowledged ? t("library.viewer.ack_done") : t("library.viewer.ack_prompt")}
-          </span>
-          <button
-            type="button"
-            className="lib-item-ack-btn"
-            onClick={() => setAcknowledged(true)}
-            aria-pressed={acknowledged}
-            disabled={acknowledged}
-          >
-            {acknowledged ? <CheckSvg /> : null}
-            {acknowledged ? t("library.viewer.ack_done") : t("library.viewer.ack_button")}
-          </button>
-        </div>
-      ) : null}
     </div>
   );
 }

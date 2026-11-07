@@ -19,6 +19,7 @@
     "@mantle/platform": "*",
     "@mantle/ui": "*",
     "next": "^16.4.1",
+    "pdfjs-dist": "^5.6.205",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "server-only": "^0.0.1"

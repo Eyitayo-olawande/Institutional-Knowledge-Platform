@@ -10,6 +10,7 @@ import { AppShell } from "../../_components/AppShell.tsx";
 import { placeLibraryItem, publishItem, saveItemDraft, uploadItemFile } from "../actions.ts";
 import { areaChoices, areaName } from "../areas.ts";
 import { PlacementFields } from "../PlacementFields.tsx";
+import { ViewerActionsClient } from "../ViewerActionsClient.tsx";
 import { ViewerStageClient } from "../ViewerStageClient.tsx";
 
 const FILE_ERRORS = new Set(["empty", "too_many", "too_large", "type_not_allowed", "content_mismatch", "infected"]);
@@ -63,7 +64,7 @@ export default async function Item({
     <AppShell ctx={ctx} active="library">
       <p className="crumb"><Link href="/library">{t("library.back")}</Link></p>
       <div className="page-head">
-        <div>
+        <div style={{ flex: 1, minWidth: 0 }}>
           <h1>{item.title}</h1>
           <div className="row">
             {found.published ? (
@@ -76,6 +77,7 @@ export default async function Item({
             {item.reviewDate ? <span className="muted">{t("library.review_by", { date: item.reviewDate })}</span> : null}
           </div>
         </div>
+        <ViewerActionsClient hasFile={!!selectedFile} />
       </div>
 
       {saved ? <div className="alert alert-success" role="status"><p>{t("library.saved")}</p></div> : null}
@@ -91,27 +93,7 @@ export default async function Item({
       ) : null}
 
       <div className="lib-item-viewer">
-        {/* Left: file list */}
-        <div className="lib-item-files">
-          <div className="lib-item-files-head">{t("library.viewer.files_heading", { count: attachments.length })}</div>
-          {attachments.length > 0 ? attachments.map((f) => (
-            <Link
-              key={f.id}
-              href={`?file=${f.id}`}
-              className={`lib-item-file-row${selectedFile?.id === f.id ? " active" : ""}`}
-            >
-              <div className="lib-item-file-icon">{fileTypeAbbr(f.contentType)}</div>
-              <div className="lib-item-file-info">
-                <div className="lib-item-file-name">{f.name}</div>
-                <div className="lib-item-file-size">{t("library.files.size", { kb: Math.max(1, Math.round(f.size / 1024)) })}</div>
-              </div>
-            </Link>
-          )) : (
-            <p className="lib-item-files-empty">{t("library.viewer.no_file")}</p>
-          )}
-        </div>
-
-        {/* Center: document stage with toolbar */}
+        {/* Main: document viewer (PDF gets its own thumbs + toolbar; others get the stage wrapper) */}
         <ViewerStageClient
           fileUrl={selectedFile ? `/files/${selectedFile.id}` : null}
           contentType={selectedFile?.contentType ?? null}
@@ -129,7 +111,7 @@ export default async function Item({
           </div>
         </ViewerStageClient>
 
-        {/* Right: document details + related resources */}
+        {/* Right: document details + files + related resources */}
         <div className="lib-item-info">
           <div className="lib-item-info-panel">
             <h2>{t("library.viewer.details_heading")}</h2>
@@ -167,6 +149,20 @@ export default async function Item({
                 )}
               </span>
             </div>
+            {attachments.length > 0 ? (
+              <div style={{ marginTop: 12 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", color: "var(--mantle-color-text_muted)", marginBottom: 6 }}>{t("library.viewer.files_heading", { count: attachments.length })}</div>
+                {attachments.map((f) => (
+                  <Link key={f.id} href={`?file=${f.id}`} className={`lib-item-file-row${selectedFile?.id === f.id ? " active" : ""}`}>
+                    <div className="lib-item-file-icon">{fileTypeAbbr(f.contentType)}</div>
+                    <div className="lib-item-file-info">
+                      <div className="lib-item-file-name">{f.name}</div>
+                      <div className="lib-item-file-size">{t("library.files.size", { kb: Math.max(1, Math.round(f.size / 1024)) })}</div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            ) : null}
           </div>
 
           {relatedItems.length > 0 ? (
@@ -174,7 +170,7 @@ export default async function Item({
               <h2>{t("library.viewer.related_heading")}</h2>
               {relatedItems.map((r) => (
                 <Link key={r.id} href={`/library/${r.id}`} className="lib-item-related-row">
-                  <div className="lib-item-related-icon">{r.typeLabel.slice(0, 3).toUpperCase()}</div>
+                  <div className={`lib-item-related-icon lib-item-related-icon--${r.typeLabel.toLowerCase().replace(/[^a-z]/g, "")}`}>{r.typeLabel.slice(0, 3).toUpperCase()}</div>
                   <div>
                     <div className="lib-item-related-title">{r.title}</div>
                     {area ? <div className="lib-item-related-meta">{areaName(area)} · {r.typeLabel}</div> : null}

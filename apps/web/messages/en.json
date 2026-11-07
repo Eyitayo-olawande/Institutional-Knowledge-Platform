@@ -247,8 +247,11 @@
       "exit_fullscreen": "Exit",
       "open_in_tab": "Open in new tab",
       "ack_prompt": "Have you read this document?",
-      "ack_button": "Mark as read",
-      "ack_done": "Marked as read"
+      "ack_button": "Acknowledge",
+      "ack_done": "Acknowledged",
+      "add_to_favourites": "Add to favourites",
+      "remove_from_favourites": "Remove from favourites",
+      "more_actions": "More actions"
     }
   },
   "notices": {
