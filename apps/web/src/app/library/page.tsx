@@ -24,6 +24,7 @@ export default async function Library({ searchParams }: { searchParams: Promise<
   const { tenant, db, roles } = ctx;
   await requireFeature(tenant, "knowledge_library");
   const editor = can(roles, "library.edit");
+  const isAdmin = can(roles, "activity.view");
   const params = await searchParams;
   const q = (params.q ?? "").slice(0, 200);
   const visible = await viewerAreas(ctx);
@@ -68,20 +69,22 @@ export default async function Library({ searchParams }: { searchParams: Promise<
 
   return (
     <AppShell ctx={ctx} active="library">
-      {/* Hero banner — BG photo + person popup (admin-style) */}
-      <div className="lib-hero-wrap">
-        <div className="lib-hero">
-          <div className="lib-hero-bg" />
-          <div className="lib-hero-shade" />
-          <div className="lib-hero-copy">
-            <h1>{t("library.banner_heading")}</h1>
-            <p>{t("library.banner_sub")}</p>
-            <div className="lib-hero-rule" />
+      {/* Hero banner — staff only; admins use the page-head instead */}
+      {!isAdmin ? (
+        <div className="lib-hero-wrap">
+          <div className="lib-hero">
+            <div className="lib-hero-bg" />
+            <div className="lib-hero-shade" />
+            <div className="lib-hero-copy">
+              <h1>{t("library.banner_heading")}</h1>
+              <p>{t("library.banner_sub")}</p>
+              <div className="lib-hero-rule" />
+            </div>
           </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/images/library_person.webp" alt="" aria-hidden="true" className="lib-hero-person" />
         </div>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/images/library_person.webp" alt="" aria-hidden="true" className="lib-hero-person" />
-      </div>
+      ) : null}
 
       {/* Search + Add */}
       <form method="get" role="search" className="row" style={{ marginBottom: 20 }}>

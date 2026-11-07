@@ -48,6 +48,15 @@
 .quick-tile .icon { width: 40px; height: 40px; border-radius: var(--mantle-radius-md); background: var(--mantle-color-primary_tint); color: var(--mantle-color-primary); display: flex; align-items: center; justify-content: center; }
 .quick-tile:hover h3 { color: var(--mantle-color-primary); }
 
+/* Staff home Quick Access tile grid (Lovable icon-tile design) */
+.qa-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+@media (max-width: 768px) { .qa-grid { grid-template-columns: repeat(2, 1fr); } }
+.qa-tile { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 28px 20px 24px; border-radius: var(--mantle-radius-lg); background: var(--mantle-color-surface); border: 1px solid var(--mantle-color-border); text-decoration: none; color: var(--mantle-color-text); gap: 10px; transition: border-color 0.15s, box-shadow 0.15s; }
+.qa-tile:hover { border-color: var(--mantle-color-primary); box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.qa-tile-icon { width: 60px; height: 60px; border-radius: 50%; background: var(--mantle-color-primary_tint); display: flex; align-items: center; justify-content: center; color: var(--mantle-color-primary); flex-shrink: 0; }
+.qa-tile-name { font-size: 15px; font-weight: 700; line-height: 1.3; }
+.qa-tile-desc { font-size: 13px; color: var(--mantle-color-text_muted); line-height: 1.4; }
+
 /* Phone: one column, bottom menu */
 .bottom-nav { display: none; }
 @media (max-width: 860px) {

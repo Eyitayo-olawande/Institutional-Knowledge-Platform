@@ -1,4 +1,4 @@
-import { Badge, buttonStyle, Card, type BadgeTone } from "@mantle/ui";
+import { buttonStyle, Card } from "@mantle/ui";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -14,13 +14,14 @@ import { AppShell } from "./_components/AppShell.tsx";
 import { Icon } from "./_components/Icon.tsx";
 import { MyLearningSection, type PathCardData } from "./_components/MyLearning.tsx";
 
-function typeTone(label: string): BadgeTone {
-  if (label === "Policy") return "brand";
-  if (label === "Guideline") return "info";
-  if (label === "Training") return "warning";
-  if (label === "Template") return "strong";
-  return "neutral";
-}
+const THUMB_GRADIENT: Record<string, string> = {
+  "Policy":    "linear-gradient(135deg, #ba0c2f 0%, #8a0920 100%)",
+  "Procedure": "linear-gradient(135deg, #1a56db 0%, #0a3796 100%)",
+  "Guideline": "linear-gradient(135deg, #057a55 0%, #015f43 100%)",
+  "Training":  "linear-gradient(135deg, #c27803 0%, #9f6002 100%)",
+  "Template":  "linear-gradient(135deg, #6c3791 0%, #4e2770 100%)",
+};
+const THUMB_DEFAULT = "linear-gradient(135deg, #374151 0%, #1f2937 100%)";
 
 export default async function Home() {
   const resolution = await resolveRequestTenant();
@@ -357,15 +358,13 @@ export default async function Home() {
       {mainDestinations.length > 0 && !isAdmin ? (
         <>
           <h2 style={{ marginTop: learningCards ? 24 : 0 }}>{t("home.quick_access_heading")}</h2>
-          <div className="grid grid-3">
+          <div className="qa-grid">
             {mainDestinations.map((d) => (
-              <Card key={d.key}>
-                <Link className="quick-tile" href={d.href}>
-                  <span className="icon"><Icon name={d.icon} size={22} /></span>
-                  <h3>{t(`nav.${d.key}`)}</h3>
-                  <span className="muted">{t(`home.cards.${d.key}`)}</span>
-                </Link>
-              </Card>
+              <Link key={d.key} href={d.href} className="qa-tile">
+                <div className="qa-tile-icon"><Icon name={d.icon} size={28} /></div>
+                <div className="qa-tile-name">{t(`nav.${d.key}`)}</div>
+                <div className="qa-tile-desc">{t(`home.cards.${d.key}`)}</div>
+              </Link>
             ))}
           </div>
         </>
@@ -379,12 +378,17 @@ export default async function Home() {
                 <h2 style={{ margin: 0 }}>{t("home.featured_heading")}</h2>
                 <Link href="/library" className="muted">{t("home.featured_view_all")}</Link>
               </div>
-              <div className="grid grid-2" style={{ marginTop: 12 }}>
+              <div className="lib-grid" style={{ marginTop: 12, gridTemplateColumns: "repeat(2, minmax(0, 1fr))" }}>
                 {featuredResources.map((item) => (
-                  <Card key={item.id} flat>
-                    <Badge tone={typeTone(item.typeLabel)}>{item.typeLabel}</Badge>
-                    <h3 style={{ marginTop: 8 }}><Link href={`/library/${item.id}`}>{item.title}</Link></h3>
-                  </Card>
+                  <Link key={item.id} className="lib-card" href={`/library/${item.id}`}>
+                    <div className="lib-card-thumb" style={{ background: THUMB_GRADIENT[item.typeLabel ?? ""] ?? THUMB_DEFAULT }}>
+                      <span className="lib-card-thumb-icon"><Icon name="doc" size={28} /></span>
+                      {item.typeLabel ? <span className="lib-card-badge">{item.typeLabel}</span> : null}
+                    </div>
+                    <div className="lib-card-body">
+                      <div className="lib-card-title">{item.title}</div>
+                    </div>
+                  </Link>
                 ))}
               </div>
             </div>

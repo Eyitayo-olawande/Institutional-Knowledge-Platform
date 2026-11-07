@@ -293,7 +293,8 @@
       "activity": "See the record of every change and result.",
       "structure": "See and tidy the structure people belong to.",
       "areas": "Let people outside a team see its learning area.",
-      "paths": "Build the stages, modules and due dates staff work through."
+      "paths": "Build the stages, modules and due dates staff work through.",
+      "my_learning": "Track your assigned training paths and learning modules."
     },
     "admin": {
       "overview_heading": "Portal overview",
