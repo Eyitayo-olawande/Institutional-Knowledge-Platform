@@ -242,7 +242,13 @@
       "status_label": "Status",
       "related_heading": "Related Resources",
       "no_related": "No related resources.",
-      "no_file": "No file attached yet."
+      "no_file": "No file attached yet.",
+      "fullscreen": "Full screen",
+      "exit_fullscreen": "Exit",
+      "open_in_tab": "Open in new tab",
+      "ack_prompt": "Have you read this document?",
+      "ack_button": "Mark as read",
+      "ack_done": "Marked as read"
     }
   },
   "notices": {
@@ -337,6 +343,8 @@
       "due": "Due {date}",
       "start": "Start",
       "review": "Review",
+      "journey_heading": "Your Learning Journey",
+      "open_module": "Continue learning",
       "status": {
         "not_started": "Not started",
         "in_progress": "In progress",

@@ -6,13 +6,12 @@ import { t } from "../i18n.ts";
 import { authFor, requestHost } from "../server/auth.ts";
 import { buildNav } from "../server/nav.ts";
 import { featureOn, tenantDb } from "../server/session.ts";
-import { listActiveStaff, listLibraryItems, listModuleItems, listStructure, myLearning, noticesFor, personByUserId, recentActivity, unreadCount } from "@mantle/db/tenant";
+import { listActiveStaff, listLibraryItems, listStructure, myLearning, noticesFor, personByUserId, recentActivity, STAGE_ORDER, unreadCount } from "@mantle/db/tenant";
 import { can } from "@mantle/platform/identity";
 import { resolveRequestTenant } from "../server/tenant.ts";
 import { tenantView } from "../server/tenant_view.ts";
 import { AppShell } from "./_components/AppShell.tsx";
 import { Icon } from "./_components/Icon.tsx";
-import { MyLearningSection, type PathCardData } from "./_components/MyLearning.tsx";
 
 const THUMB_GRADIENT: Record<string, string> = {
   "Policy":    "linear-gradient(135deg, #ba0c2f 0%, #8a0920 100%)",
@@ -57,26 +56,12 @@ export default async function Home() {
   const adminDestinations = destinations.filter((d) => d.section === "admin");
   const firstName = session.user.name.split(" ")[0] ?? session.user.name;
 
-  // My Learning replaces the staff home cards once a person has at least
-  // one path assigned; with no path they still see the library and glossary
-  // cards (E8 My Learning, acceptance criterion 4).
-  let learningCards: PathCardData[] | null = null;
+  // My Learning: load summary for the journey widget and progress card.
   let learningSummary: Awaited<ReturnType<typeof myLearning>> | null = null;
   if (pathsOn) {
     const person = await personByUserId(db, session.user.id);
     if (person) {
       learningSummary = await myLearning(db, person.id);
-      if (learningSummary.pathsEnrolled > 0) {
-        learningCards = await Promise.all(
-          learningSummary.assignments.map(async (view) => {
-            const currentModules = view.stages.find((s) => !s.complete)?.modules.slice(0, 3) ?? [];
-            const modules = await Promise.all(
-              currentModules.map(async (m) => ({ ...m, items: m.completed ? await listModuleItems(db, m.id) : [] })),
-            );
-            return { view, modules };
-          }),
-        );
-      }
     }
   }
 
@@ -137,7 +122,7 @@ export default async function Home() {
       ) : (
         <div className="lib-hero-wrap">
           <div className="lib-hero">
-            <div className="lib-hero-bg" style={{ backgroundImage: "url('/images/learning-office.png')" }} />
+            <div className="lib-hero-bg" style={{ backgroundImage: "url('/images/welcome-banner.jpg')" }} />
             <div className="lib-hero-shade" />
             <div className="lib-hero-copy">
               <p style={{ margin: "0 0 4px", fontSize: 14, fontWeight: 600 }}>{t("home.greeting_prefix")}</p>
@@ -147,7 +132,7 @@ export default async function Home() {
             </div>
           </div>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/Collaborative-Smiles-trans2.png" alt="" aria-hidden="true" className="lib-hero-person" />
+          <img src="/images/learning-professional.png" alt="" aria-hidden="true" className="lib-hero-person" />
         </div>
       )}
       {unread > 0 ? (
@@ -324,40 +309,68 @@ export default async function Home() {
       ) : null}
 
       {learningSummary && learningSummary.pathsEnrolled > 0 && !isAdmin ? (
-        <div className="learning-progress-card">
-          <div className="row" style={{ alignItems: "flex-start", justifyContent: "space-between", gap: 16 }}>
-            <div>
-              <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.68)", marginBottom: 4 }}>{t("home.my_learning.in_progress")}</div>
-              <div className="learning-progress-pct">{learningSummary.completionRate}%</div>
-              <div style={{ fontSize: 14, color: "rgba(255,255,255,0.72)", marginTop: 4 }}>
-                {t("home.my_learning.modules_summary", { done: learningSummary.modulesCompleted, total: learningSummary.modulesTotal })}
+        <>
+          {/* Learning progress gradient card */}
+          <div className="learning-progress-card">
+            <div className="row" style={{ alignItems: "flex-start", justifyContent: "space-between", gap: 16 }}>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.68)", marginBottom: 4 }}>{t("home.my_learning.in_progress")}</div>
+                <div className="learning-progress-pct">{learningSummary.completionRate}%</div>
+                <div style={{ fontSize: 14, color: "rgba(255,255,255,0.72)", marginTop: 4 }}>
+                  {t("home.my_learning.modules_summary", { done: learningSummary.modulesCompleted, total: learningSummary.modulesTotal })}
+                </div>
+              </div>
+              <div className="learning-status-pill">
+                <span className="learning-status-dot" />
+                {t("home.my_learning.tiles.paths")}: {learningSummary.pathsEnrolled}
               </div>
             </div>
-            <div className="learning-status-pill">
-              <span className="learning-status-dot" />
-              {t("home.my_learning.tiles.paths")}: {learningSummary.pathsEnrolled}
+            <div className="learning-progress-bar">
+              <div className="learning-progress-fill" style={{ width: `${learningSummary.completionRate}%` }} />
             </div>
           </div>
-          <div className="learning-progress-bar">
-            <div className="learning-progress-fill" style={{ width: `${learningSummary.completionRate}%` }} />
-          </div>
-        </div>
-      ) : null}
 
-      {learningCards && learningSummary ? (
-        <MyLearningSection
-          pathsEnrolled={learningSummary.pathsEnrolled}
-          modulesCompleted={learningSummary.modulesCompleted}
-          modulesTotal={learningSummary.modulesTotal}
-          completionRate={learningSummary.completionRate}
-          nextUp={learningSummary.nextUp}
-          cards={learningCards}
-        />
+          {/* Learning Journey — 4-stage horizontal panel */}
+          {learningSummary.assignments[0] ? (
+            <div className="my-journey-panel" style={{ marginBottom: 16 }}>
+              <h2>{t("home.my_learning.journey_heading")}</h2>
+              <p className="sub">{learningSummary.assignments[0].pathName}</p>
+              <ol className="my-journey-ol">
+                {STAGE_ORDER.map((kind) => {
+                  const stage = learningSummary!.assignments[0]?.stages.find((s) => s.kind === kind);
+                  const state = !stage ? "upcoming" : stage.complete ? "completed" : stage.unlocked ? "current" : "upcoming";
+                  return (
+                    <li key={kind} className={`my-journey-stage ${state}`}>
+                      <div className="my-journey-node">
+                        <Icon name={kind === "common" ? "library" : kind === "department" ? "tree" : kind === "role" ? "people" : "key"} size={16} />
+                      </div>
+                      <div className="my-journey-label">
+                        <p className="stage-name">{t(`paths.stages.${kind}`)}</p>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ol>
+            </div>
+          ) : null}
+
+          {/* Next Up card */}
+          {learningSummary.nextUp ? (
+            <div className="my-panel row" style={{ justifyContent: "space-between", alignItems: "center", gap: 16, marginBottom: 16 }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--mantle-color-text_muted)", margin: "0 0 4px" }}>{t("home.my_learning.next_up_heading")}</p>
+                <h3 style={{ fontSize: 15, fontWeight: 600, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{learningSummary.nextUp.title}</h3>
+                <p style={{ fontSize: 12, color: "var(--mantle-color-text_muted)", margin: "2px 0 0" }}>{learningSummary.nextUp.pathName}</p>
+              </div>
+              <Link href="/my-learning" style={buttonStyle("primary", "sm")}>{t("home.my_learning.open_module")}</Link>
+            </div>
+          ) : null}
+        </>
       ) : null}
 
       {mainDestinations.length > 0 && !isAdmin ? (
         <>
-          <h2 style={{ marginTop: learningCards ? 24 : 0 }}>{t("home.quick_access_heading")}</h2>
+          <h2 style={{ marginTop: (learningSummary && learningSummary.pathsEnrolled > 0 && !isAdmin) ? 24 : 0 }}>{t("home.quick_access_heading")}</h2>
           <div className="qa-grid">
             {mainDestinations.map((d) => (
               <Link key={d.key} href={d.href} className="qa-tile">

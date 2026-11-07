@@ -10,6 +10,7 @@ import { AppShell } from "../../_components/AppShell.tsx";
 import { placeLibraryItem, publishItem, saveItemDraft, uploadItemFile } from "../actions.ts";
 import { areaChoices, areaName } from "../areas.ts";
 import { PlacementFields } from "../PlacementFields.tsx";
+import { ViewerStageClient } from "../ViewerStageClient.tsx";
 
 const FILE_ERRORS = new Set(["empty", "too_many", "too_large", "type_not_allowed", "content_mismatch", "infected"]);
 
@@ -110,35 +111,23 @@ export default async function Item({
           )}
         </div>
 
-        {/* Center: document stage */}
-        <div className="lib-item-stage">
-          {selectedFile ? (
-            needsConversion(selectedFile.contentType) && selectedFile.conversionStatus !== "ready" ? (
-              <div className="lib-item-no-file"><p>{t("library.files.failed")}</p></div>
-            ) : selectedFile.contentType.startsWith("image/") ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={`/files/${selectedFile.id}`} alt={selectedFile.name} />
-            ) : selectedFile.contentType === "video/mp4" ? (
-              <video src={`/files/${selectedFile.id}`} controls />
-            ) : (
-              <iframe src={`/files/${selectedFile.id}`} title={selectedFile.name} />
-            )
-          ) : (
-            <div className="lib-item-stage-prose">
-              {found.published ? (
-                <div className="prose">{found.published.body}</div>
-              ) : (
-                <p className="sub">{t("library.not_published")}</p>
-              )}
-            </div>
-          )}
-          {/* Prose body shown below the file viewer when both exist */}
-          {selectedFile && found.published?.body ? (
-            <div className="lib-item-stage-prose">
+        {/* Center: document stage with toolbar */}
+        <ViewerStageClient
+          fileUrl={selectedFile ? `/files/${selectedFile.id}` : null}
+          contentType={selectedFile?.contentType ?? null}
+          fileName={selectedFile?.name ?? ""}
+          conversionFailed={!!(selectedFile && needsConversion(selectedFile.contentType) && selectedFile.conversionStatus !== "ready")}
+          itemTitle={item.title}
+        >
+          {/* Prose body — rendered server-side, shown when no file or below file */}
+          <div className="lib-item-stage-prose">
+            {found.published ? (
               <div className="prose">{found.published.body}</div>
-            </div>
-          ) : null}
-        </div>
+            ) : (
+              <p className="sub">{t("library.not_published")}</p>
+            )}
+          </div>
+        </ViewerStageClient>
 
         {/* Right: document details + related resources */}
         <div className="lib-item-info">
