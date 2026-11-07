@@ -3,7 +3,7 @@ import { Badge, Button, Card, StatTile } from "@mantle/ui";
 import { cookies } from "next/headers";
 import { t } from "../../../i18n.ts";
 import { requireFeature, requirePermission } from "../../../server/session.ts";
-import { AppShell, PageHead } from "../../_components/AppShell.tsx";
+import { AppShell } from "../../_components/AppShell.tsx";
 import { importStaff } from "./actions.ts";
 import { RESULT_COOKIE, type ImportResult } from "./import_result.ts";
 
@@ -20,11 +20,55 @@ export default async function People() {
 
   return (
     <AppShell ctx={ctx} active="people">
-      <PageHead title={t("people.title")} sub={t("people.heading", { name: tenant.name })} />
+      <div className="paths-banner">
+        <div className="people-banner-bg" />
+        <div className="paths-banner-shade" />
+        <div className="paths-banner-copy">
+          <h1>
+            {t("people.banner_heading").split(" ")[0]}{" "}
+            <span>{t("people.banner_heading").split(" ").slice(1).join(" ")}</span>
+          </h1>
+          <p>{t("people.banner_sub")}</p>
+          <div className="paths-banner-rule" />
+        </div>
+      </div>
 
-      <div className="admin-2col">
+      <div className="paths-admin-layout">
+        {/* Staff table */}
+        <Card>
+          <h2 style={{ marginTop: 0 }}>{t("people.list_heading", { count: people.length })}</h2>
+          {people.length === 0 ? (
+            <p className="sub">{t("people.empty")}</p>
+          ) : (
+            <div className="table-wrap">
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>{t("people.columns.employee_id")}</th>
+                    <th>{t("people.columns.name")}</th>
+                    <th>{t("people.columns.email")}</th>
+                    <th>{labels.department.singular}</th>
+                    <th>{t("people.columns.status")}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {people.map((p) => (
+                    <tr key={p.id}>
+                      <td>{p.employeeId}</td>
+                      <td><strong>{p.fullName}</strong></td>
+                      <td>{p.workEmail}</td>
+                      <td>{p.department}</td>
+                      <td><Badge tone={p.status === "active" ? "success" : "neutral"}>{t(`people.statuses.${p.status}`)}</Badge></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </Card>
+
         {/* Import sidebar */}
-        <div className="admin-2col-aside">
+        <aside className="paths-admin-aside">
           {result ? (
             <section role="status" style={{ marginBottom: 16 }}>
               {result.joined !== undefined ? (
@@ -64,40 +108,7 @@ export default async function People() {
               </div>
             </form>
           </Card>
-        </div>
-
-        {/* Staff table */}
-        <Card>
-          <h2 style={{ marginTop: 0 }}>{t("people.list_heading", { count: people.length })}</h2>
-          {people.length === 0 ? (
-            <p className="sub">{t("people.empty")}</p>
-          ) : (
-            <div className="table-wrap">
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>{t("people.columns.employee_id")}</th>
-                    <th>{t("people.columns.name")}</th>
-                    <th>{t("people.columns.email")}</th>
-                    <th>{labels.department.singular}</th>
-                    <th>{t("people.columns.status")}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {people.map((p) => (
-                    <tr key={p.id}>
-                      <td>{p.employeeId}</td>
-                      <td><strong>{p.fullName}</strong></td>
-                      <td>{p.workEmail}</td>
-                      <td>{p.department}</td>
-                      <td><Badge tone={p.status === "active" ? "success" : "neutral"}>{t(`people.statuses.${p.status}`)}</Badge></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </Card>
+        </aside>
       </div>
     </AppShell>
   );

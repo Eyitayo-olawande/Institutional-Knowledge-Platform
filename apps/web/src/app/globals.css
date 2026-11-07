@@ -561,6 +561,8 @@
 .paths-banner-copy p { color: rgba(255,255,255,0.80); font-size: 14px; margin: 0; max-width: 420px; }
 .paths-banner-rule { width: 56px; height: 4px; border-radius: 999px; background: var(--mantle-color-primary); margin-top: 12px; }
 @media (min-width: 1024px) { .paths-banner-copy h1 { font-size: 30px; } }
+/* People banner uses library_banner.png for visual distinction from paths */
+.people-banner-bg { position: absolute; inset: 0; background-image: url('/images/library_banner.png'); background-size: cover; background-position: center 30%; }
 
 /* ── Learning Paths admin card layout ──────────────────────── */
 .paths-admin-layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 20px; align-items: start; }

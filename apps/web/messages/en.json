@@ -45,6 +45,8 @@
   },
   "people": {
     "back": "Back to home",
+    "banner_heading": "People Management",
+    "banner_sub": "Import staff from HR and manage who has joined, moved or left.",
     "heading": "People at {name}",
     "list_heading": "Staff ({count})",
     "empty": "No staff yet. Import a staff file to add people.",
