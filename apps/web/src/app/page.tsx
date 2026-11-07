@@ -136,7 +136,7 @@ export default async function Home() {
       ) : (
         <div className="lib-hero-wrap">
           <div className="lib-hero">
-            <div className="lib-hero-bg" />
+            <div className="lib-hero-bg" style={{ backgroundImage: "url('/images/learning-office.png')" }} />
             <div className="lib-hero-shade" />
             <div className="lib-hero-copy">
               <p style={{ margin: "0 0 4px", fontSize: 14, fontWeight: 600 }}>{t("home.greeting_prefix")}</p>
@@ -146,7 +146,7 @@ export default async function Home() {
             </div>
           </div>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/library_person.webp" alt="" aria-hidden="true" className="lib-hero-person" />
+          <img src="/images/Collaborative-Smiles-trans2.png" alt="" aria-hidden="true" className="lib-hero-person" />
         </div>
       )}
       {unread > 0 ? (
