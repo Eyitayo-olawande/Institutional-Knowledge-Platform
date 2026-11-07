@@ -18,12 +18,12 @@
 
 | Screen | Route | IKP file | Implementation | Visual QA | Functional QA | Notes |
 |--------|-------|----------|----------------|-----------|---------------|-------|
-| Sign-In | `/sign-in` | `app/sign-in/page.tsx` | ✅ Complete | ⏳ Pending | ✅ Complete | Split-panel, SUNU diamond logo, benefits strip, wave background — `4e597f5`, `dcb6ee0`, `d68d45f`, `a1cfbf9` |
-| Employee Dashboard | `/` (staff) | `app/page.tsx` | ✅ Complete | ⏳ Pending | ✅ Complete | WelcomeBanner with cutout photo + office BG, 4-stage HomeJourney panel, Next Up card, Quick Access icon tiles — `53daa1f`, `9d5f187`, `a1cfbf9` |
-| Administrator Dashboard | `/` (admin) | `app/page.tsx` | ✅ Complete | ⏳ Pending | ✅ Complete | Hero banner, KPI tiles, horizontal journey, activity feed — `0d9f8a7`, `c541c05`, `449f630`, `a1cfbf9` |
-| Knowledge Library | `/library` | `app/library/page.tsx` | ✅ Complete | ⏳ Pending | ✅ Complete | Hero with person banner, topic icon grid, item card grid with type badges, search + filter bar — `7ee20a3`, `449f630` |
-| Document Viewer | `/library/[id]` | `app/library/[id]/page.tsx` | ✅ Complete | ⏳ Pending | 🔧 In Progress | 2-col layout; prose/image/video confirmed in browser; PDF viewer (PDF.js v5 thumbnails + toolbar) built but awaits a PDF file upload to fully verify — `1ccc297`, `a91ad6b` |
-| My Learning | `/my-learning` | `app/my-learning/page.tsx` | ✅ Complete | ⏳ Pending | ✅ Complete | Hero banner, horizontal 4-stage journey, module tabs, progress donut, keep-going nudge. Demo data seeded and verified for `ada@alpha.test` — `e706e66`, `940eb1c` |
+| Sign-In | `/sign-in` | `app/sign-in/page.tsx` | ✅ Complete | ✅ Complete | ✅ Complete | Split-panel, SUNU diamond logo, benefits strip, wave background — `4e597f5`, `dcb6ee0`, `d68d45f`, `a1cfbf9`, `be42899` |
+| Employee Dashboard | `/` (staff) | `app/page.tsx` | ✅ Complete | ✅ Complete | ✅ Complete | WelcomeBanner with cutout photo + office BG, 4-stage HomeJourney panel, Next Up card, Quick Access icon tiles — `53daa1f`, `9d5f187`, `a1cfbf9` |
+| Administrator Dashboard | `/` (admin) | `app/page.tsx` | ✅ Complete | ✅ Complete | ✅ Complete | Hero banner, KPI tiles (Active Users / Learning Paths / Total Resources / Active Assignments), horizontal journey, activity feed — `0d9f8a7`, `c541c05`, `449f630`, `a1cfbf9`, `be42899` |
+| Knowledge Library | `/library` | `app/library/page.tsx` | ✅ Complete | ✅ Complete | ✅ Complete | Hero with person banner (shown to all users), topic icon grid, item card grid with type badges, search + filter bar — `7ee20a3`, `449f630`, `be42899` |
+| Document Viewer | `/library/[id]` | `app/library/[id]/page.tsx` | ✅ Complete | ✅ Complete | 🔧 In Progress | 2-col layout; prose/image/video confirmed in browser; PDF viewer (PDF.js v5 thumbnails + toolbar) built but awaits a PDF file upload to fully verify — `1ccc297`, `a91ad6b` |
+| My Learning | `/my-learning` | `app/my-learning/page.tsx` | ✅ Complete | ✅ Complete | ✅ Complete | Hero banner, horizontal 4-stage journey, module tabs, progress donut, keep-going nudge ("Keep going!" heading + target icon). Demo data seeded and verified for `ada@alpha.test` — `e706e66`, `940eb1c`, `be42899` |
 | Notices | `/notices` | `app/notices/page.tsx` | ⏳ Pending | ⏳ Pending | ✅ Complete | Functional (unread count, mark-read); no Lovable redesign applied |
 | Admin — Learning Paths | `/admin/paths` | `app/admin/paths/page.tsx` | 🔧 In Progress | ⏳ Pending | ✅ Complete | Hero banner added (`f9eec14`); path builder functional; Lovable card-based layout not yet applied |
 | Admin — People | `/admin/people` | `app/admin/people/page.tsx` | ⏳ Pending | ⏳ Pending | ✅ Complete | Functional; no Lovable redesign applied |
@@ -73,7 +73,7 @@
 |--------|-------------|----------|
 | Document Viewer | PDF viewer not yet tested with an actual uploaded PDF file; thumbnail rendering unconfirmed in live app | High |
 | Document Viewer | "Compare" icon in Lovable toolbar reference not implemented | Low |
-| All screens | Formal side-by-side Visual QA against Lovable reference not yet performed for any screen | High |
+| All screens | Visual QA complete for Phases 1–5 screens (`be42899`); Phase 6 done | ✅ Resolved |
 | Learning Paths (admin) | Lovable card-based path layout not yet applied | Medium |
 | People Management | Full Lovable redesign not yet started | Low |
 | Notices | Lovable redesign not yet started | Low |
@@ -89,11 +89,11 @@
 | 3 — Staff home banner | WelcomeBanner with cutout photo + office BG | ✅ Done |
 | 4 — Document viewer uplift | 2-col layout, PdfViewer (PDF.js v5 thumbnails + toolbar), page header actions | ✅ Done |
 | 5 — My Learning | Page structure + demo data seeded and verified in browser | ✅ Done |
-| 6 — Visual QA pass | Formal screenshot comparison for each implemented screen | ⏳ Pending |
+| 6 — Visual QA pass | Formal screenshot comparison for each implemented screen | ✅ Done |
 | 7 — Learning Paths admin redesign | Apply Lovable card layout to `/admin/paths` | ⏳ Pending |
 | 8 — People Management redesign | Apply Lovable design to `/admin/people` | ⏳ Pending |
 | 9 — Notices redesign | Apply Lovable design to `/notices` | ⏳ Pending |
 
 ---
 
-*Last updated: 2026-11-07 — Phases 1–5 complete; Visual QA pass is next*
+*Last updated: 2026-11-07 — Phases 1–6 complete; Phase 7 (Learning Paths admin redesign) is next*
