@@ -579,6 +579,13 @@
 .path-card-open:hover { text-decoration: underline; }
 .path-card-open svg { transform: rotate(-90deg); }
 
+/* ── Notices page ───────────────────────────────────────────── */
+.notices-list { list-style: none; margin: 0; padding: 0; }
+.notices-item { display: flex; align-items: flex-start; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--mantle-color-border); }
+.notices-item:last-child { border-bottom: 0; padding-bottom: 0; }
+.notices-icon { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: var(--mantle-radius-md); background: var(--mantle-color-primary_tint); color: var(--mantle-color-primary); flex-shrink: 0; margin-top: 2px; }
+.notices-date { font-size: 12px; color: var(--mantle-color-text_muted); white-space: nowrap; flex-shrink: 0; }
+
 /* ── Library item viewer — 2-column (main stage + details panel) ── */
 .lib-item-viewer { display: grid; grid-template-columns: minmax(0,1fr) 300px; gap: 16px; align-items: start; }
 /* File rows used inside the right details panel */
