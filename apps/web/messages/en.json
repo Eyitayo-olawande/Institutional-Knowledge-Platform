@@ -308,10 +308,10 @@
     "admin": {
       "overview_heading": "Portal overview",
       "stats": {
-        "staff": "Active staff",
-        "departments": "Departments",
-        "published": "Published resources",
-        "sign_ins": "Sign-ins this week"
+        "staff": "Active Users",
+        "departments": "Learning Paths",
+        "published": "Total Resources",
+        "sign_ins": "Active Assignments"
       },
       "quick_actions_heading": "Quick actions",
       "quick_unavailable": "Not available",
@@ -380,7 +380,9 @@
     "action_review": "Review",
     "stage_cert": "Certificate",
     "stage_cert_soon": "Coming soon",
-    "module_detail": "Module {n} of {total} · {stage}"
+    "module_detail": "Module {n} of {total} · {stage}",
+    "keep_going_heading": "Keep going!",
+    "keep_going_body": "Complete the remaining modules to meet your role requirements."
   },
   "paths": {
     "banner_heading": "Learning Paths",

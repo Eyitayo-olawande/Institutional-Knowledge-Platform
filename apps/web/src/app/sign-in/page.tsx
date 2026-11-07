@@ -25,21 +25,20 @@ function GraduationCapSvg() {
   );
 }
 
-function AwardSvg() {
+function TrendingUpSvg() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <circle cx="12" cy="8" r="6" />
-      <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11" />
+      <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+      <polyline points="16 7 22 7 22 13" />
     </svg>
   );
 }
 
-function BarChartSvg() {
+function LightbulbSvg() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <line x1="12" y1="20" x2="12" y2="10" />
-      <line x1="18" y1="20" x2="18" y2="4" />
-      <line x1="6" y1="20" x2="6" y2="16" />
+      <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" />
+      <path d="M9 18h6M10 22h4" />
     </svg>
   );
 }
@@ -117,8 +116,8 @@ export default async function SignIn({
           <div className="sign-in-benefits-items">
             <div className="sign-in-benefit"><BookOpenSvg /><span>{t("auth.benefits.access_resources")}</span></div>
             <div className="sign-in-benefit"><GraduationCapSvg /><span>{t("auth.benefits.learning_paths")}</span></div>
-            <div className="sign-in-benefit"><AwardSvg /><span>{t("auth.benefits.earn_certificates")}</span></div>
-            <div className="sign-in-benefit"><BarChartSvg /><span>{t("auth.benefits.build_expertise")}</span></div>
+            <div className="sign-in-benefit"><TrendingUpSvg /><span>{t("auth.benefits.track_progress")}</span></div>
+            <div className="sign-in-benefit"><LightbulbSvg /><span>{t("auth.benefits.build_expertise")}</span></div>
           </div>
         </div>
       </div>

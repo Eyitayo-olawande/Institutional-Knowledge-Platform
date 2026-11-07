@@ -6,7 +6,7 @@ import { t } from "../i18n.ts";
 import { authFor, requestHost } from "../server/auth.ts";
 import { buildNav } from "../server/nav.ts";
 import { featureOn, tenantDb } from "../server/session.ts";
-import { listActiveStaff, listLibraryItems, listStructure, myLearning, noticesFor, personByUserId, recentActivity, STAGE_ORDER, unreadCount } from "@mantle/db/tenant";
+import { listActiveStaff, listLibraryItems, listPaths, listStructure, myLearning, noticesFor, personByUserId, recentActivity, STAGE_ORDER, tenantSchema, unreadCount } from "@mantle/db/tenant";
 import { can } from "@mantle/platform/identity";
 import { resolveRequestTenant } from "../server/tenant.ts";
 import { tenantView } from "../server/tenant_view.ts";
@@ -68,18 +68,18 @@ export default async function Home() {
   // An administrator's portal overview: real counts and the most recent
   // changes, not placeholders for features that don't exist yet (no
   // courses, groups or custom reports until E8/E4/E12 are built).
-  let overview: { staff: number; departments: number; departmentNames: string[]; published: number; signIns: number; timeline: Awaited<ReturnType<typeof recentActivity>>; notices: Awaited<ReturnType<typeof noticesFor>> } | null = null;
+  let overview: { staff: number; paths: number; departmentNames: string[]; published: number; assignments: number; timeline: Awaited<ReturnType<typeof recentActivity>>; notices: Awaited<ReturnType<typeof noticesFor>> } | null = null;
   if (isAdmin) {
-    const [staff, departments, items, activity, adminNotices] = await Promise.all([
+    const [staff, departments, items, activity, adminNotices, pathRows, assignmentRows] = await Promise.all([
       listActiveStaff(db),
       listStructure(db, "department"),
-      libraryOn ? listLibraryItems(db, { publishedOnly: true, areas: "all" }) : Promise.resolve([]),
+      libraryOn ? listLibraryItems(db, { publishedOnly: false, areas: "all" }) : Promise.resolve([]),
       recentActivity(db, 200),
       noticesFor(db, session.user.id, 6),
+      listPaths(db),
+      db.select({ id: tenantSchema.assignments.id }).from(tenantSchema.assignments),
     ]);
-    const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-    const signIns = activity.filter((a) => a.action === "auth.signed_in" && a.at.getTime() >= weekAgo).length;
-    overview = { staff: staff.length, departments: departments.length, departmentNames: departments.slice(0, 6).map((d) => d.name), published: items.length, signIns, timeline: activity.slice(0, 6), notices: adminNotices };
+    overview = { staff: staff.length, paths: pathRows.length, departmentNames: departments.slice(0, 6).map((d) => d.name), published: items.length, assignments: assignmentRows.length, timeline: activity.slice(0, 6), notices: adminNotices };
   }
 
   // Featured resources and recent notices for the staff home page only; the
@@ -164,16 +164,16 @@ export default async function Home() {
               </article>
             ) : null}
             <article className="admin-kpi">
-              <span className="admin-kpi-icon"><Icon name="tree" size={28} /></span>
+              <span className="admin-kpi-icon"><Icon name="graduation_cap" size={28} /></span>
               <div>
-                <p className="admin-kpi-value">{overview.departments}</p>
+                <p className="admin-kpi-value">{overview.paths}</p>
                 <h2 className="admin-kpi-label">{t("home.admin.stats.departments")}</h2>
               </div>
             </article>
             <article className="admin-kpi">
-              <span className="admin-kpi-icon"><Icon name="list" size={28} /></span>
+              <span className="admin-kpi-icon"><Icon name="clipboard" size={28} /></span>
               <div>
-                <p className="admin-kpi-value">{overview.signIns}</p>
+                <p className="admin-kpi-value">{overview.assignments}</p>
                 <h2 className="admin-kpi-label">{t("home.admin.stats.sign_ins")}</h2>
               </div>
             </article>

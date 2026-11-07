@@ -374,12 +374,17 @@ export default async function MyLearning({
               <div style={{ color: "var(--mantle-color-primary)", flexShrink: 0 }} aria-hidden>
                 <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
                   <circle cx="20" cy="20" r="20" fill="var(--mantle-color-primary_tint)" />
-                  <path d="M14 20h12M20 14l6 6-6 6" stroke="var(--mantle-color-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <circle cx="20" cy="20" r="8" stroke="var(--mantle-color-primary)" strokeWidth="2" fill="none" />
+                  <circle cx="20" cy="20" r="3" fill="var(--mantle-color-primary)" />
+                  <line x1="20" y1="4" x2="20" y2="10" stroke="var(--mantle-color-primary)" strokeWidth="2" strokeLinecap="round" />
+                  <line x1="20" y1="30" x2="20" y2="36" stroke="var(--mantle-color-primary)" strokeWidth="2" strokeLinecap="round" />
+                  <line x1="4" y1="20" x2="10" y2="20" stroke="var(--mantle-color-primary)" strokeWidth="2" strokeLinecap="round" />
+                  <line x1="30" y1="20" x2="36" y2="20" stroke="var(--mantle-color-primary)" strokeWidth="2" strokeLinecap="round" />
                 </svg>
               </div>
               <div>
-                <h2>{t("paths.stages.role")}</h2>
-                <p>{t("learning.banner_sub")}</p>
+                <h2 style={{ color: "var(--mantle-color-primary)" }}>{t("learning.keep_going_heading")}</h2>
+                <p>{t("learning.keep_going_body")}</p>
                 <p style={{ fontSize: 12, color: "var(--mantle-color-text_muted)", marginTop: 8 }}>
                   {t("home.my_learning.due", { date: nextDue.toISOString().slice(0, 10) })}
                 </p>
