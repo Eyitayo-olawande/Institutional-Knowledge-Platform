@@ -136,7 +136,7 @@ export default async function Home() {
       ) : (
         <div className="lib-hero-wrap">
           <div className="lib-hero">
-            <div className="lib-hero-bg" style={{ backgroundImage: "url('/images/welcome-banner.jpg')" }} />
+            <div className="lib-hero-bg" style={{ backgroundImage: "url('/images/administrator-office.png')" }} />
             <div className="lib-hero-shade" />
             <div className="lib-hero-copy">
               <p style={{ margin: "0 0 4px", fontSize: 14, fontWeight: 600 }}>{t("home.greeting_prefix")}</p>
