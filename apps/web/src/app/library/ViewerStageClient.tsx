@@ -1,8 +1,24 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { type ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { t } from "../../i18n.ts";
-import { PdfViewer } from "./PdfViewer.tsx";
+
+// pdfjs-dist calls `new DOMMatrix()` at module evaluation time, which crashes
+// during Next.js SSR. Skipping SSR here prevents the import from running on
+// the server at all.
+const PdfViewer = dynamic(
+  () => import("./PdfViewer.tsx").then((m) => ({ default: m.PdfViewer })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="pdf-loading">
+        <div className="pdf-loading-spinner" />
+        <p>Loading document…</p>
+      </div>
+    ),
+  },
+);
 
 interface Props {
   fileUrl: string | null;

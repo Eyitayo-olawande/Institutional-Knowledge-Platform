@@ -64,21 +64,29 @@ export function PdfViewer({ fileUrl, fileName }: Props) {
 
   // Load PDF
   useEffect(() => {
+    let alive = true;
     setLoading(true);
     setError(null);
     const task = pdfjsLib.getDocument({ url: fileUrl, withCredentials: true });
     task.promise
       .then((doc) => {
+        if (!alive) return;
         setPdf(doc);
         setNumPages(doc.numPages);
         setCurrentPage(1);
         setLoading(false);
       })
-      .catch(() => {
+      .catch((err: unknown) => {
+        if (!alive) return;
+        // AbortException is thrown when task.destroy() is called; not a real error.
+        if ((err as { name?: string })?.name === "AbortException") return;
         setError("Could not load PDF. The file may not be a valid PDF document.");
         setLoading(false);
       });
-    return () => { task.destroy(); };
+    return () => {
+      alive = false;
+      task.destroy();
+    };
   }, [fileUrl]);
 
   // Render main page canvas
