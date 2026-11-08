@@ -7,33 +7,9 @@ import { requireFeature, requirePermission, viewerAreas } from "../../server/ses
 import { AppShell } from "../_components/AppShell.tsx";
 import { Icon } from "../_components/Icon.tsx";
 import { areaChoices, areaName } from "./areas.ts";
+import { cardThumbBg } from "./card-cover.ts";
 
 const STATUS_TONE: Record<string, BadgeTone> = { draft: "neutral", published: "success", retired: "neutral" };
-
-const RES_IMAGES: Array<[string[], string]> = [
-  [["aml", "anti-money", "cft", "laundering"],                       "res-aml.jpg"],
-  [["intake", "checklist"],                                           "res-intake.jpg"],
-  [["motor", "vehicle", "automobile"],                               "res-motor.jpg"],
-  [["claim", "claims", "claimant"],                                   "res-claims.jpg"],
-  [["conduct", "ethics", "code of conduct"],                         "res-conduct.jpg"],
-  [["data protection", "privacy", "gdpr", "personal data"],          "res-data.jpg"],
-  [["safety", "fire", "marine", "hazard", "health and safety"],      "res-safety.jpg"],
-  [["customer service", "service standards"],                        "res-service.jpg"],
-  [["security", "cyber", "information security"],                    "res-data.jpg"],
-];
-const FALLBACK_CYCLE = [
-  "res-aml.jpg", "res-claims.jpg", "res-conduct.jpg", "res-data.jpg",
-  "res-intake.jpg", "res-motor.jpg", "res-safety.jpg", "res-service.jpg",
-] as const;
-
-function cardCover(title: string, area?: string): string {
-  const lower = `${title} ${area ?? ""}`.toLowerCase();
-  for (const [keys, img] of RES_IMAGES) {
-    if (keys.some((k) => lower.includes(k))) return img;
-  }
-  const idx = [...title].reduce((s, c) => s + c.charCodeAt(0), 0) % FALLBACK_CYCLE.length;
-  return FALLBACK_CYCLE[idx]!;
-}
 
 export default async function Library({ searchParams }: { searchParams: Promise<{ q?: string; area?: string; type?: string }> }) {
   const ctx = await requirePermission("library.view");
@@ -188,7 +164,7 @@ export default async function Library({ searchParams }: { searchParams: Promise<
                   <Link key={item.id} className="lib-card" href={`/library/${item.id}`}>
                     <div
                       className="lib-card-thumb"
-                      style={{ background: `linear-gradient(rgba(0,0,0,0.42),rgba(0,0,0,0.42)),url('/images/${cardCover(item.title, itemArea ? areaName(itemArea) : undefined)}') center/cover no-repeat` }}
+                      style={{ background: cardThumbBg(item.title, itemArea ? areaName(itemArea) : undefined) }}
                     >
                       <span className="lib-card-thumb-icon"><Icon name="doc" size={28} /></span>
                       {item.typeLabel ? <span className="lib-card-badge">{item.typeLabel}</span> : null}

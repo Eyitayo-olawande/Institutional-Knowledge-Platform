@@ -12,15 +12,7 @@ import { resolveRequestTenant } from "../server/tenant.ts";
 import { tenantView } from "../server/tenant_view.ts";
 import { AppShell } from "./_components/AppShell.tsx";
 import { Icon } from "./_components/Icon.tsx";
-
-const THUMB_GRADIENT: Record<string, string> = {
-  "Policy":    "linear-gradient(135deg, #ba0c2f 0%, #8a0920 100%)",
-  "Procedure": "linear-gradient(135deg, #1a56db 0%, #0a3796 100%)",
-  "Guideline": "linear-gradient(135deg, #057a55 0%, #015f43 100%)",
-  "Training":  "linear-gradient(135deg, #c27803 0%, #9f6002 100%)",
-  "Template":  "linear-gradient(135deg, #6c3791 0%, #4e2770 100%)",
-};
-const THUMB_DEFAULT = "linear-gradient(135deg, #374151 0%, #1f2937 100%)";
+import { cardThumbBg } from "./library/card-cover.ts";
 
 function KpiTile({ href, icon, value, label }: { href?: string; icon: Parameters<typeof Icon>[0]["name"]; value: number; label: string }) {
   const inner = (
@@ -382,7 +374,7 @@ export default async function Home() {
               <div className="lib-grid" style={{ marginTop: 12, gridTemplateColumns: "repeat(2, minmax(0, 1fr))" }}>
                 {featuredResources.map((item) => (
                   <Link key={item.id} className="lib-card" href={`/library/${item.id}`}>
-                    <div className="lib-card-thumb" style={{ background: THUMB_GRADIENT[item.typeLabel ?? ""] ?? THUMB_DEFAULT }}>
+                    <div className="lib-card-thumb" style={{ background: cardThumbBg(item.title) }}>
                       <span className="lib-card-thumb-icon"><Icon name="doc" size={28} /></span>
                       {item.typeLabel ? <span className="lib-card-badge">{item.typeLabel}</span> : null}
                     </div>
