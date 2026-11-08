@@ -1,5 +1,6 @@
 import { canSeeArea, getLibraryItem, itemFiles, listLibraryItems } from "@mantle/db/tenant";
 import { needsConversion } from "@mantle/documents/convert";
+import { ACCEPT_ATTR } from "@mantle/platform/files";
 import { can } from "@mantle/platform/identity";
 import { Badge, Button, Card } from "@mantle/ui";
 import Link from "next/link";
@@ -19,7 +20,7 @@ function fileTypeAbbr(contentType: string): string {
   if (contentType === "application/pdf") return "PDF";
   if (contentType.includes("wordprocessingml") || contentType.includes("msword")) return "DOC";
   if (contentType.includes("spreadsheetml") || contentType.includes("excel")) return "XLS";
-  if (contentType.includes("presentationml") || contentType.includes("powerpoint")) return "PPT";
+  if (contentType.includes("presentationml") || contentType === "application/vnd.ms-powerpoint") return "PPT";
   if (contentType.startsWith("image/")) return "IMG";
   if (contentType === "video/mp4") return "MP4";
   return "FILE";
@@ -228,7 +229,7 @@ export default async function Item({
               <input type="hidden" name="id" value={item.id} />
               <label className="field">
                 {t("library.files.add")}
-                <input className="input" type="file" name="file" multiple required accept=".pdf,.docx,.xlsx,.pptx,.png,.jpg,.jpeg,.mp4" />
+                <input className="input" type="file" name="file" multiple required accept={ACCEPT_ATTR} />
               </label>
               <Button type="submit" variant="secondary">{t("library.files.upload")}</Button>
             </form>

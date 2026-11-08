@@ -7,15 +7,23 @@ export const MAX_FILES_PER_UPLOAD = 10;
 // Type allowed by extension and by the first bytes of the file, so a
 // renamed executable is refused.
 const TYPES: Record<string, { contentType: string; magic: number[][] }> = {
-  pdf: { contentType: "application/pdf", magic: [[0x25, 0x50, 0x44, 0x46]] },
+  pdf:  { contentType: "application/pdf", magic: [[0x25, 0x50, 0x44, 0x46]] },
   docx: { contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", magic: [[0x50, 0x4b, 0x03, 0x04]] },
   xlsx: { contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", magic: [[0x50, 0x4b, 0x03, 0x04]] },
   pptx: { contentType: "application/vnd.openxmlformats-officedocument.presentationml.presentation", magic: [[0x50, 0x4b, 0x03, 0x04]] },
-  png: { contentType: "image/png", magic: [[0x89, 0x50, 0x4e, 0x47]] },
-  jpg: { contentType: "image/jpeg", magic: [[0xff, 0xd8, 0xff]] },
+  // Legacy binary PowerPoint format — OLE2 Compound Document magic (same container as .doc/.xls)
+  ppt:  { contentType: "application/vnd.ms-powerpoint", magic: [[0xd0, 0xcf, 0x11, 0xe0]] },
+  png:  { contentType: "image/png", magic: [[0x89, 0x50, 0x4e, 0x47]] },
+  jpg:  { contentType: "image/jpeg", magic: [[0xff, 0xd8, 0xff]] },
   jpeg: { contentType: "image/jpeg", magic: [[0xff, 0xd8, 0xff]] },
-  mp4: { contentType: "video/mp4", magic: [] },
+  mp4:  { contentType: "video/mp4", magic: [] },
 };
+
+// Single source of truth for the browser file-input accept attribute and any
+// server-side display of supported formats.
+export const ACCEPT_ATTR = Object.keys(TYPES)
+  .map((ext) => `.${ext}`)
+  .join(",");
 
 export type FileCheck =
   | { readonly ok: true; readonly contentType: string; readonly name: string }

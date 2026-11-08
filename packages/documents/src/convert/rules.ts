@@ -5,6 +5,7 @@ export const CONVERTIBLE_EXTENSIONS: Readonly<Record<string, string>> = {
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "docx",
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "xlsx",
   "application/vnd.openxmlformats-officedocument.presentationml.presentation": "pptx",
+  "application/vnd.ms-powerpoint": "ppt",
 };
 
 export function needsConversion(contentType: string): boolean {
