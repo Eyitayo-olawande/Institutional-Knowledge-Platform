@@ -337,7 +337,9 @@
 
 /* KPI tiles row */
 .admin-kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.admin-kpi { display: flex; align-items: center; gap: 16px; min-height: 88px; padding: 16px 20px; border-radius: var(--mantle-radius-lg); border: 1px solid var(--mantle-color-border); background: var(--mantle-color-surface); box-shadow: 0 1px 2px rgba(0,0,0,0.06), 0 4px 16px -6px rgba(0,0,0,0.10); }
+.admin-kpi { display: flex; align-items: center; gap: 16px; min-height: 88px; padding: 16px 20px; border-radius: var(--mantle-radius-lg); border: 1px solid var(--mantle-color-border); background: var(--mantle-color-surface); box-shadow: 0 1px 2px rgba(0,0,0,0.06), 0 4px 16px -6px rgba(0,0,0,0.10); text-decoration: none; color: inherit; transition: box-shadow 0.15s, transform 0.12s, border-color 0.15s; }
+a.admin-kpi { cursor: pointer; }
+a.admin-kpi:hover { box-shadow: 0 4px 20px -4px rgba(0,0,0,0.14), 0 1px 3px rgba(0,0,0,0.08); transform: translateY(-2px); border-color: var(--mantle-color-primary); }
 .admin-kpi-icon { display: grid; place-items: center; width: 48px; height: 48px; flex-shrink: 0; border-radius: var(--mantle-radius-md); background: var(--mantle-color-primary_tint); color: var(--mantle-color-primary); }
 .admin-kpi-value { font-size: 32px; font-weight: 700; line-height: 1; margin: 0; }
 .admin-kpi-label { font-size: 13px; font-weight: 500; margin: 4px 0 0; color: var(--mantle-color-text_muted); }

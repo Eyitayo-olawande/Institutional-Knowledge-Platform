@@ -22,6 +22,20 @@ const THUMB_GRADIENT: Record<string, string> = {
 };
 const THUMB_DEFAULT = "linear-gradient(135deg, #374151 0%, #1f2937 100%)";
 
+function KpiTile({ href, icon, value, label }: { href?: string; icon: Parameters<typeof Icon>[0]["name"]; value: number; label: string }) {
+  const inner = (
+    <>
+      <span className="admin-kpi-icon"><Icon name={icon} size={28} /></span>
+      <div>
+        <p className="admin-kpi-value">{value}</p>
+        <h2 className="admin-kpi-label">{label}</h2>
+      </div>
+    </>
+  );
+  if (href) return <Link href={href} className="admin-kpi">{inner}</Link>;
+  return <article className="admin-kpi">{inner}</article>;
+}
+
 export default async function Home() {
   const resolution = await resolveRequestTenant();
   const view = tenantView(resolution);
@@ -145,38 +159,12 @@ export default async function Home() {
 
       {overview ? (
         <>
-          {/* KPI tiles */}
+          {/* KPI tiles — each links to the page where that data lives */}
           <div className="admin-kpis">
-            <article className="admin-kpi">
-              <span className="admin-kpi-icon"><Icon name="people" size={28} /></span>
-              <div>
-                <p className="admin-kpi-value">{overview.staff}</p>
-                <h2 className="admin-kpi-label">{t("home.admin.stats.staff")}</h2>
-              </div>
-            </article>
-            {libraryOn ? (
-              <article className="admin-kpi">
-                <span className="admin-kpi-icon"><Icon name="library" size={28} /></span>
-                <div>
-                  <p className="admin-kpi-value">{overview.published}</p>
-                  <h2 className="admin-kpi-label">{t("home.admin.stats.published")}</h2>
-                </div>
-              </article>
-            ) : null}
-            <article className="admin-kpi">
-              <span className="admin-kpi-icon"><Icon name="graduation_cap" size={28} /></span>
-              <div>
-                <p className="admin-kpi-value">{overview.paths}</p>
-                <h2 className="admin-kpi-label">{t("home.admin.stats.departments")}</h2>
-              </div>
-            </article>
-            <article className="admin-kpi">
-              <span className="admin-kpi-icon"><Icon name="clipboard" size={28} /></span>
-              <div>
-                <p className="admin-kpi-value">{overview.assignments}</p>
-                <h2 className="admin-kpi-label">{t("home.admin.stats.sign_ins")}</h2>
-              </div>
-            </article>
+            <KpiTile icon="people" value={overview.staff} label={t("home.admin.stats.staff")} href={peopleImportOn ? "/admin/people" : undefined} />
+            {libraryOn ? <KpiTile icon="library" value={overview.published} label={t("home.admin.stats.published")} href="/library" /> : null}
+            <KpiTile icon="graduation_cap" value={overview.paths} label={t("home.admin.stats.departments")} href={pathsOn ? "/admin/paths" : undefined} />
+            <KpiTile icon="clipboard" value={overview.assignments} label={t("home.admin.stats.sign_ins")} href={pathsOn ? "/admin/paths" : undefined} />
           </div>
 
           {/* Two-column panels */}
