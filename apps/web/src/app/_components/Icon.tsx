@@ -12,6 +12,9 @@ const PATHS = {
   search: "M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM20 20l-3.5-3.5",
   doc: "M14 3H6v18h12V7zM14 3v4h4M9 13h6M9 17h6",
   plus: "M12 5v14M5 12h14",
+  chevron_down: "M6 9l6 6 6-6",
+  graduation_cap: "M22 10v6M2 10l10-5 10 5-10 5zM6 12v5c3 3 9 3 12 0v-5",
+  clipboard: "M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2M9 12h6M9 16h3",
 } as const;
 
 export type IconName = keyof typeof PATHS;

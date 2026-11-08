@@ -78,10 +78,12 @@ export const phoneBreakpoint = "860px";
 
 type TokenGroup = Record<string, string>;
 
+function cssVarName(prefix: string, key: string): string {
+  return `--mantle-${prefix}-${key.replace(/[A-Z]/g, (c) => `_${c.toLowerCase()}`)}`;
+}
+
 function toVars(prefix: string, group: TokenGroup): string[] {
-  return Object.entries(group).map(
-    ([key, value]) => `--mantle-${prefix}-${key.replace(/[A-Z]/g, (c) => `_${c.toLowerCase()}`)}: ${value};`,
-  );
+  return Object.entries(group).map(([key, value]) => `${cssVarName(prefix, key)}: ${value};`);
 }
 
 export function cssVariables(): string {
@@ -93,6 +95,14 @@ export function cssVariables(): string {
     ...toVars("shadow", shadow),
     `--mantle-touch_target: ${touchTarget};`,
   ].join("\n");
+}
+
+// A colour token's CSS variable rather than its build time default. Components
+// read colour through this so a tenant's theme (once it exists) repaints them
+// without a code change — only the `:root` variables written by cssVariables()
+// need to change (ADR 0020: "Brand colours become tenant settings later").
+export function colorVar(key: keyof typeof color): string {
+  return `var(${cssVarName("color", key)})`;
 }
 
 // WCAG contrast ratio between two hex colours. Tests use it to keep every

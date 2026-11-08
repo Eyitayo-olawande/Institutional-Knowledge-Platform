@@ -245,6 +245,16 @@ export async function personByUserId(db: TenantDb, userId: string): Promise<{ id
   return found ?? null;
 }
 
+// The department shown next to a signed in person's name in the app shell.
+export async function personDepartmentByUserId(db: TenantDb, userId: string): Promise<string | null> {
+  const [found] = await db
+    .select({ department: departments.name })
+    .from(people)
+    .leftJoin(departments, eq(people.departmentId, departments.id))
+    .where(eq(people.userId, userId));
+  return found?.department ?? null;
+}
+
 // Active staff with their department, for choosing people on admin pages.
 export async function listActiveStaff(db: TenantDb) {
   return db

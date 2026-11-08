@@ -23,10 +23,30 @@
       "wrong_details": "That email and password do not match.",
       "wrong_code": "That code is wrong or has expired."
     },
-    "sign_in_hint": "Use your work email to continue."
+    "sign_in_hint": "Use your work email to continue.",
+    "benefits": {
+      "library": "Access your full knowledge library",
+      "progress": "Track your learning and meet deadlines",
+      "notices": "Stay up to date with notices and updates",
+      "access_resources": "Access Key Resources",
+      "learning_paths": "Complete Learning Paths",
+      "earn_certificates": "Earn Certificates",
+      "track_progress": "Track Your Progress",
+      "build_expertise": "Build Your Expertise"
+    },
+    "welcome_heading": "Welcome to the",
+    "welcome_sub": "Sign in to access your learning, resources and training.",
+    "tagline_1": "Learn.",
+    "tagline_2": "Grow.",
+    "tagline_3": "Perform.",
+    "tagline_description": "Your digital library for policies, procedures, guidelines and role-based learning.",
+    "email_placeholder": "Enter your work email",
+    "password_placeholder": "Enter your password"
   },
   "people": {
     "back": "Back to home",
+    "banner_heading": "People Management",
+    "banner_sub": "Import staff from HR and manage who has joined, moved or left.",
     "heading": "People at {name}",
     "list_heading": "Staff ({count})",
     "empty": "No staff yet. Import a staff file to add people.",
@@ -192,6 +212,11 @@
         "infected": "A file failed the malware scan. Nothing was saved."
       }
     },
+    "banner_heading": "Knowledge Library",
+    "banner_sub": "Find policies, procedures, guidelines and learning materials to support your work.",
+    "filter_heading": "Filters",
+    "filter_clear": "Clear all",
+    "browse_heading": "Browse by topic",
     "areas": {
       "common": "Common Staff Learning",
       "all": "All",
@@ -208,6 +233,27 @@
       "move": "Save area and type",
       "confirm": "Confirm area and type",
       "placed": "Area and type saved."
+    },
+    "viewer": {
+      "files_heading": "Files ({count})",
+      "details_heading": "Document Details",
+      "content_type_label": "Content type",
+      "department_label": "Department",
+      "version_label": "Version",
+      "last_updated_label": "Last updated",
+      "status_label": "Status",
+      "related_heading": "Related Resources",
+      "no_related": "No related resources.",
+      "no_file": "No file attached yet.",
+      "fullscreen": "Full screen",
+      "exit_fullscreen": "Exit",
+      "open_in_tab": "Open in new tab",
+      "ack_prompt": "Have you read this document?",
+      "ack_button": "Acknowledge",
+      "ack_done": "Acknowledged",
+      "add_to_favourites": "Add to favourites",
+      "remove_from_favourites": "Remove from favourites",
+      "more_actions": "More actions"
     }
   },
   "notices": {
@@ -219,6 +265,8 @@
     "new": "New"
   },
   "nav": {
+    "product_name": "eLibrary",
+    "product_tagline": "Knowledge & Learning Hub",
     "home": "Home",
     "library": "Library",
     "notices": "Notices",
@@ -232,15 +280,21 @@
     "search_label": "Search the library",
     "search_placeholder": "Search the library",
     "notices_unread": "Notices, {count} new",
+    "my_learning": "My Learning",
     "structure": "Structure",
     "areas": "Area access",
     "paths": "Learning paths"
   },
   "home": {
     "greeting": "Welcome, {name}",
+    "greeting_prefix": "Welcome back,",
     "sub": "Your learning, library and notices at {name}.",
     "unread": "You have {count} new notices.",
     "read_notices": "Read notices",
+    "quick_access_heading": "Quick access",
+    "featured_heading": "Featured resources",
+    "featured_view_all": "View all",
+    "notices_heading": "Recent notices",
     "cards": {
       "library": "Read and search learning materials for your department and the whole company.",
       "notices": "Messages and reminders sent to you.",
@@ -250,21 +304,34 @@
       "activity": "See the record of every change and result.",
       "structure": "See and tidy the structure people belong to.",
       "areas": "Let people outside a team see its learning area.",
-      "paths": "Build the stages, modules and due dates staff work through."
+      "paths": "Build the stages, modules and due dates staff work through.",
+      "my_learning": "Track your assigned training paths and learning modules."
     },
     "admin": {
       "overview_heading": "Portal overview",
       "stats": {
-        "staff": "Active staff",
-        "departments": "Departments",
-        "published": "Published library items",
-        "sign_ins": "Sign-ins this week"
+        "staff": "Active Users",
+        "departments": "Learning Paths",
+        "published": "Total Resources",
+        "sign_ins": "Active Assignments"
       },
       "quick_actions_heading": "Quick actions",
+      "quick_unavailable": "Not available",
+      "quick_reports": "Reports",
       "timeline_heading": "Recent activity",
       "timeline_view_all": "View all",
       "timeline_empty": "Nothing recorded yet.",
-      "destinations_heading": "Go to"
+      "banner_heading": "Administrator",
+      "banner_product": "Dashboard",
+      "banner_sub": "Manage learning, content, users and access across the organisation.",
+      "progress_heading": "Learning Progress",
+      "dept_heading": "Completion by Department",
+      "journey_heading": "Learning Journey",
+      "notices_heading": "System Notices",
+      "journey_common": "Organisation-wide learning",
+      "journey_dept": "Department-specific learning",
+      "journey_role": "Role-specific learning",
+      "journey_cert": "Coming soon"
     },
     "my_learning": {
       "heading": "My learning",
@@ -275,10 +342,14 @@
         "completion": "Completion rate"
       },
       "next_up_heading": "Next up",
+      "in_progress": "In progress",
+      "modules_summary": "{done} of {total} modules completed",
       "next_up": "{module}, in {path}.",
       "due": "Due {date}",
       "start": "Start",
       "review": "Review",
+      "journey_heading": "Your Learning Journey",
+      "open_module": "Continue learning",
       "status": {
         "not_started": "Not started",
         "in_progress": "In progress",
@@ -288,7 +359,36 @@
       }
     }
   },
+  "learning": {
+    "title": "My Learning",
+    "banner_sub": "Build your knowledge and meet your role requirements.",
+    "journey_heading": "My Learning Path",
+    "journey_sub": "A structured journey to build your knowledge and meet role requirements.",
+    "tabs_all": "My Enrolled Courses",
+    "tabs_in_progress": "In Progress",
+    "tabs_completed": "Completed",
+    "no_assignments": "No modules match this filter.",
+    "empty_heading": "No learning paths assigned",
+    "empty_body": "You have not been assigned any learning paths yet.",
+    "progress_heading": "My Progress",
+    "progress_sub": "Overall learning-path completion",
+    "progress_completed": "Completed",
+    "progress_in_progress": "In progress",
+    "progress_not_started": "Not started",
+    "certs_heading": "My Certificates",
+    "certs_coming_soon": "Coming soon",
+    "certs_none": "No certificates have been issued.",
+    "action_start": "Start",
+    "action_review": "Review",
+    "stage_cert": "Certificate",
+    "stage_cert_soon": "Coming soon",
+    "module_detail": "Module {n} of {total} · {stage}",
+    "keep_going_heading": "Keep going!",
+    "keep_going_body": "Complete the remaining modules to meet your role requirements."
+  },
   "paths": {
+    "banner_heading": "Learning Paths",
+    "banner_sub": "Structured learning to build your knowledge and meet your role requirements.",
     "stages": {
       "common": "Common",
       "department": "Department",
@@ -299,10 +399,16 @@
       "title": "Learning paths",
       "explain": "Four stages, in order: Common, Department, Role, then Certificate. A module can sit in more than one path and is completed once for all of them.",
       "empty": "No paths yet.",
-      "columns": { "name": "Name", "department": "Department" },
+      "columns": {
+        "name": "Name",
+        "department": "Department"
+      },
       "open": "Open",
       "create_heading": "New path",
-      "fields": { "name": "Name", "department": "Department" },
+      "fields": {
+        "name": "Name",
+        "department": "Department"
+      },
       "all_departments": "All departments (company wide)",
       "create": "Create path"
     },
