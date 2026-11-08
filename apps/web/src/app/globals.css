@@ -97,8 +97,8 @@
 .lib-hero-copy p { color: var(--mantle-color-text_muted); font-size: 15px; line-height: 1.6; margin: 0; max-width: 420px; }
 .lib-hero-rule { width: 56px; height: 4px; border-radius: 999px; background: var(--mantle-color-primary); margin-top: 14px; }
 .lib-hero-person { position: absolute; right: 0; bottom: 0; height: 180px; width: auto; max-width: 100%; object-fit: contain; object-position: bottom right; pointer-events: none; }
-@media (min-width: 860px) { .lib-hero { height: 200px; } .lib-hero-person { height: 248px; max-width: 50%; } }
-@media (min-width: 1024px) { .lib-hero { height: 220px; } .lib-hero-copy h1 { font-size: 32px; } .lib-hero-person { height: 272px; max-width: 54%; } }
+@media (min-width: 860px) { .lib-hero { height: 200px; } .lib-hero-person { height: 260px; max-width: 60%; } }
+@media (min-width: 1024px) { .lib-hero { height: 220px; } .lib-hero-copy h1 { font-size: 32px; } .lib-hero-person { height: 290px; max-width: 65%; } }
 
 /* Topic tiles grid */
 .lib-browse-heading { font-size: 18px; font-weight: 700; margin: 0 0 14px; }

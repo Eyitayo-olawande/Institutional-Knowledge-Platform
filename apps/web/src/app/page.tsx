@@ -138,7 +138,7 @@ export default async function Home() {
             </div>
           </div>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/learning-professional.png" alt="" aria-hidden="true" className="lib-hero-person" />
+          <img src="/images/Collaborative-Smiles-trans2.png" alt="" aria-hidden="true" className="lib-hero-person" />
         </div>
       )}
       {unread > 0 ? (
