@@ -564,7 +564,7 @@ a.admin-kpi:hover { box-shadow: 0 4px 20px -4px rgba(0,0,0,0.14), 0 1px 3px rgba
 .paths-banner-rule { width: 56px; height: 4px; border-radius: 999px; background: var(--mantle-color-primary); margin-top: 12px; }
 @media (min-width: 1024px) { .paths-banner-copy h1 { font-size: 30px; } }
 /* People banner uses library_banner.png for visual distinction from paths */
-.people-banner-bg { position: absolute; inset: 0; background-image: url('/images/library_banner.png'); background-size: cover; background-position: center 30%; }
+.people-banner-bg { position: absolute; inset: 0; border-radius: var(--mantle-radius-lg); overflow: hidden; background: url('/images/administrator-office.png') center / cover no-repeat; z-index: -2; }
 
 /* ── Learning Paths admin card layout ──────────────────────── */
 .paths-admin-layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 20px; align-items: start; }

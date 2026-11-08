@@ -20,17 +20,21 @@ export default async function People() {
 
   return (
     <AppShell ctx={ctx} active="people">
-      <div className="paths-banner">
-        <div className="people-banner-bg" />
-        <div className="paths-banner-shade" />
-        <div className="paths-banner-copy">
-          <h1>
-            {t("people.banner_heading").split(" ")[0]}{" "}
-            <span>{t("people.banner_heading").split(" ").slice(1).join(" ")}</span>
-          </h1>
-          <p>{t("people.banner_sub")}</p>
-          <div className="paths-banner-rule" />
+      <div className="admin-hero-wrap">
+        <div className="admin-banner">
+          <div className="people-banner-bg" />
+          <div className="admin-banner-shade" />
+          <div className="admin-banner-copy">
+            <h1>
+              {t("people.banner_heading").split(" ")[0]}{" "}
+              <span>{t("people.banner_heading").split(" ").slice(1).join(" ")}</span>
+            </h1>
+            <p>{t("people.banner_sub")}</p>
+            <div className="admin-banner-rule" />
+          </div>
         </div>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/images/learning-professional.png" alt="" aria-hidden="true" className="admin-banner-person" />
       </div>
 
       <div className="paths-admin-layout">
