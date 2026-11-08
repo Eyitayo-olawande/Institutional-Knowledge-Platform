@@ -10,14 +10,30 @@ import { areaChoices, areaName } from "./areas.ts";
 
 const STATUS_TONE: Record<string, BadgeTone> = { draft: "neutral", published: "success", retired: "neutral" };
 
-const THUMB_GRADIENT: Record<string, string> = {
-  "Policy":    "linear-gradient(135deg, #ba0c2f 0%, #8a0920 100%)",
-  "Procedure": "linear-gradient(135deg, #1a56db 0%, #0a3796 100%)",
-  "Guideline": "linear-gradient(135deg, #057a55 0%, #015f43 100%)",
-  "Training":  "linear-gradient(135deg, #c27803 0%, #9f6002 100%)",
-  "Template":  "linear-gradient(135deg, #6c3791 0%, #4e2770 100%)",
-};
-const THUMB_DEFAULT = "linear-gradient(135deg, #374151 0%, #1f2937 100%)";
+const RES_IMAGES: Array<[string[], string]> = [
+  [["aml", "anti-money", "cft", "laundering"],                       "res-aml.jpg"],
+  [["intake", "checklist"],                                           "res-intake.jpg"],
+  [["motor", "vehicle", "automobile"],                               "res-motor.jpg"],
+  [["claim", "claims", "claimant"],                                   "res-claims.jpg"],
+  [["conduct", "ethics", "code of conduct"],                         "res-conduct.jpg"],
+  [["data protection", "privacy", "gdpr", "personal data"],          "res-data.jpg"],
+  [["safety", "fire", "marine", "hazard", "health and safety"],      "res-safety.jpg"],
+  [["customer service", "service standards"],                        "res-service.jpg"],
+  [["security", "cyber", "information security"],                    "res-data.jpg"],
+];
+const FALLBACK_CYCLE = [
+  "res-aml.jpg", "res-claims.jpg", "res-conduct.jpg", "res-data.jpg",
+  "res-intake.jpg", "res-motor.jpg", "res-safety.jpg", "res-service.jpg",
+] as const;
+
+function cardCover(title: string, area?: string): string {
+  const lower = `${title} ${area ?? ""}`.toLowerCase();
+  for (const [keys, img] of RES_IMAGES) {
+    if (keys.some((k) => lower.includes(k))) return img;
+  }
+  const idx = [...title].reduce((s, c) => s + c.charCodeAt(0), 0) % FALLBACK_CYCLE.length;
+  return FALLBACK_CYCLE[idx]!;
+}
 
 export default async function Library({ searchParams }: { searchParams: Promise<{ q?: string; area?: string; type?: string }> }) {
   const ctx = await requirePermission("library.view");
@@ -172,7 +188,7 @@ export default async function Library({ searchParams }: { searchParams: Promise<
                   <Link key={item.id} className="lib-card" href={`/library/${item.id}`}>
                     <div
                       className="lib-card-thumb"
-                      style={{ background: THUMB_GRADIENT[item.typeLabel ?? ""] ?? THUMB_DEFAULT }}
+                      style={{ background: `linear-gradient(rgba(0,0,0,0.42),rgba(0,0,0,0.42)),url('/images/${cardCover(item.title, itemArea ? areaName(itemArea) : undefined)}') center/cover no-repeat` }}
                     >
                       <span className="lib-card-thumb-icon"><Icon name="doc" size={28} /></span>
                       {item.typeLabel ? <span className="lib-card-badge">{item.typeLabel}</span> : null}
