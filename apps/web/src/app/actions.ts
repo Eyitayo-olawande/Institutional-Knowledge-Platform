@@ -1,6 +1,6 @@
 "use server";
 
-import { completeModule, personByUserId, submitAssessmentAttempt, type AttemptResponse } from "@mantle/db/tenant";
+import { completeModule, personByUserId, recordItemView, submitAssessmentAttempt, type AttemptResponse } from "@mantle/db/tenant";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { authFor, requestHost } from "../server/auth.ts";
@@ -85,6 +85,9 @@ export async function submitAssessmentAction(form: FormData): Promise<void> {
 
   const person = await personByUserId(db, user.id);
   if (!person) redirect("/my-learning");
+
+  // Record a view for the assessment item itself so Gate 1 counts it.
+  await recordItemView(db, person.id, moduleId, itemId, `user:${user.id}`);
 
   const responses: AttemptResponse[] = [];
   for (const [key, value] of form.entries()) {

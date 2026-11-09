@@ -1,4 +1,4 @@
-import { canSeeArea, getAssessmentForItem, getAttemptResults, getLibraryItem, itemFiles, listLibraryItems, listModuleItems, personByUserId, recordItemView } from "@mantle/db/tenant";
+import { canSeeArea, getAssessmentForItem, getAttemptResults, getLibraryItem, hasViewedAllModuleItems, itemFiles, listLibraryItems, listModuleItems, personByUserId, recordItemView } from "@mantle/db/tenant";
 import { needsConversion } from "@mantle/documents/convert";
 import { ACCEPT_ATTR } from "@mantle/platform/files";
 import { can } from "@mantle/platform/identity";
@@ -8,7 +8,7 @@ import { notFound } from "next/navigation";
 import { t } from "../../../i18n.ts";
 import { requireFeature, requirePermission, viewerAreas } from "../../../server/session.ts";
 import { AppShell } from "../../_components/AppShell.tsx";
-import { submitAssessmentAction } from "../../actions.ts";
+import { completeModuleAction, submitAssessmentAction } from "../../actions.ts";
 import { placeLibraryItem, publishItem, saveItemDraft, uploadItemFile } from "../actions.ts";
 import { areaChoices, areaName } from "../areas.ts";
 import { PlacementFields } from "../PlacementFields.tsx";
@@ -77,20 +77,28 @@ export default async function Item({
   const nextModuleItem = moduleIdx >= 0 && moduleIdx < moduleItems.length - 1
     ? moduleItems[moduleIdx + 1] ?? null
     : null;
+  const isLastModuleItem = moduleIdx >= 0 && moduleIdx === moduleItems.length - 1;
 
   // Assessment (Gate 2) — check if this item has a knowledge check attached.
-  const assessment = moduleId ? await getAssessmentForItem(db, item.id) : null;
-  const isAssessmentItem = !!assessment;
+  // Always fetched: editors see the admin panel; learners get the quiz when moduleId is set.
+  const assessment = await getAssessmentForItem(db, item.id);
+  const isAssessmentItem = !!assessment && !!moduleId;
+
+  // Compute viewer's person record once; used for view recording and gate checks.
+  const { user: viewer } = ctx;
+  const viewerPerson = moduleId ? await personByUserId(db, viewer.id) : null;
 
   // For content items (not assessments): record a view so Gate 1 can be evaluated.
-  // Uses upsert — safe to call on every render.
-  const { user: viewer } = ctx;
-  if (moduleId && !isAssessmentItem) {
-    const viewerPerson = await personByUserId(db, viewer.id);
-    if (viewerPerson) {
-      await recordItemView(db, viewerPerson.id, moduleId, item.id, `user:${viewer.id}`);
-    }
+  // Assessment items record their own view in submitAssessmentAction on submission.
+  if (moduleId && !isAssessmentItem && viewerPerson) {
+    await recordItemView(db, viewerPerson.id, moduleId, item.id, `user:${viewer.id}`);
   }
+
+  // Gate 1 pre-check: has this person viewed all content items in the module?
+  // Used to show a warning on the quiz page when earlier items are unread.
+  const gate1Met = isAssessmentItem && viewerPerson
+    ? await hasViewedAllModuleItems(db, viewerPerson.id, moduleId!)
+    : true;
 
   // If ?attempt= is present, load prior results to show the feedback panel.
   const attemptResults =
@@ -202,6 +210,9 @@ export default async function Item({
               ) : (
                 // Fresh quiz form
                 <form action={submitAssessmentAction} className="quiz-form">
+                  {!gate1Met ? (
+                    <div className="quiz-gate1-warning">{t("learning.quiz_gate1_warning")}</div>
+                  ) : null}
                   <p className="quiz-intro">{t("learning.quiz_intro", { passing: String(assessment.passingScore) })}</p>
                   <input type="hidden" name="assessmentId" value={assessment.id} />
                   <input type="hidden" name="moduleId" value={moduleId} />
@@ -321,9 +332,16 @@ export default async function Item({
       {moduleId && moduleItems.length > 0 ? (
         <div className="lib-module-nav">
           <div className="lib-module-nav-inner">
-            <Link href="/my-learning" className="lib-module-nav-back">
-              ← {t("learning.back_to_learning")}
-            </Link>
+            <div className="lib-module-nav-left">
+              <Link href="/my-learning" className="lib-module-nav-back">
+                ← {t("learning.back_to_learning")}
+              </Link>
+              {moduleIdx >= 0 ? (
+                <span className="lib-module-nav-counter">
+                  {t("learning.item_of_total", { n: String(moduleIdx + 1), total: String(moduleItems.length) })}
+                </span>
+              ) : null}
+            </div>
             <div className="lib-module-nav-actions">
               {prevModuleItem ? (
                 <Link
@@ -340,6 +358,13 @@ export default async function Item({
                 >
                   {t("learning.action_next")}: {nextModuleItem.title} →
                 </Link>
+              ) : isLastModuleItem && !isAssessmentItem ? (
+                <form action={completeModuleAction}>
+                  <input type="hidden" name="moduleId" value={moduleId} />
+                  <button type="submit" className="my-module-action-btn primary">
+                    {t("learning.action_mark_done")}
+                  </button>
+                </form>
               ) : null}
             </div>
           </div>
@@ -409,6 +434,24 @@ export default async function Item({
                 </li>
               ))}
             </ul>
+          </Card>
+          <Card>
+            <h2>{t("library.assessment.heading")}</h2>
+            {assessment ? (
+              <div>
+                <div className="lib-item-meta-row">
+                  <span className="lib-item-meta-label">{t("library.assessment.questions_label")}</span>
+                  <span className="lib-item-meta-value">{assessment.questions.length}</span>
+                </div>
+                <div className="lib-item-meta-row">
+                  <span className="lib-item-meta-label">{t("library.assessment.passing_label")}</span>
+                  <span className="lib-item-meta-value">{assessment.passingScore}%</span>
+                </div>
+                <p className="sub" style={{ marginTop: 10, fontSize: 12 }}>{t("library.assessment.seeded_note")}</p>
+              </div>
+            ) : (
+              <p className="sub">{t("library.assessment.none")}</p>
+            )}
           </Card>
         </div>
       ) : null}

@@ -24,11 +24,12 @@ function stageDesc(kind: string, pathName: string): string {
 export default async function MyLearning({
   searchParams,
 }: {
-  searchParams: Promise<{ tab?: string }>;
+  searchParams: Promise<{ tab?: string; completed?: string }>;
 }) {
   const ctx = await requirePermission("library.view");
   const { tenant, db, user } = ctx;
   await requireFeature(tenant, "learning_paths");
+  const { completed } = await searchParams;
 
   const person = await personByUserId(db, user.id);
   if (!person) {
@@ -167,6 +168,12 @@ export default async function MyLearning({
           <div className="my-banner-rule" />
         </div>
       </div>
+
+      {completed ? (
+        <div className="alert alert-success" role="status" style={{ marginBottom: 0 }}>
+          <p>{t("learning.module_completed_banner")}</p>
+        </div>
+      ) : null}
 
       <div className="my-layout">
         {/* Main column */}
