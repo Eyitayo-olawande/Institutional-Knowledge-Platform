@@ -69,5 +69,5 @@ export async function completeModuleAction(form: FormData): Promise<void> {
   const moduleId = String(form.get("moduleId") ?? "");
   const person = await personByUserId(db, user.id);
   if (person) await completeModule(db, person.id, moduleId, `user:${user.id}`);
-  redirect("/");
+  redirect("/my-learning");
 }

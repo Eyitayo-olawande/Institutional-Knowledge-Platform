@@ -380,6 +380,7 @@
     "certs_none": "No certificates have been issued.",
     "action_start": "Start",
     "action_review": "Review",
+    "action_mark_done": "Mark as Done",
     "stage_cert": "Certificate",
     "stage_cert_soon": "Coming soon",
     "module_detail": "Module {n} of {total} · {stage}",

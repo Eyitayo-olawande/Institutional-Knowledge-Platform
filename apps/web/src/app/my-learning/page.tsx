@@ -292,12 +292,20 @@ export default async function MyLearning({
                               {t("learning.action_review")}
                             </Link>
                           ) : (
-                            <form action={completeModuleAction} style={{ flexShrink: 0 }}>
-                              <input type="hidden" name="moduleId" value={m.id} />
-                              <button type="submit" className="my-module-action-btn primary">
+                            <div style={{ display: "flex", gap: 8, flexShrink: 0, alignItems: "center" }}>
+                              <Link
+                                href={m.itemId ? `/library/${m.itemId}` : "/library"}
+                                className="my-module-action-btn primary"
+                              >
                                 {t("learning.action_start")}
-                              </button>
-                            </form>
+                              </Link>
+                              <form action={completeModuleAction}>
+                                <input type="hidden" name="moduleId" value={m.id} />
+                                <button type="submit" className="my-module-action-btn">
+                                  {t("learning.action_mark_done")}
+                                </button>
+                              </form>
+                            </div>
                           )
                         ) : null}
                       </div>
