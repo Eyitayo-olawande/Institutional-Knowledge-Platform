@@ -12,6 +12,8 @@ export interface NewItem {
   // Every item sits in one learning area with a content type that suits it.
   readonly areaId: string;
   readonly contentTypeId: string;
+  // Optional YouTube/Vimeo embed URL shown above body text in the viewer.
+  readonly videoUrl?: string | null;
 }
 
 export class PlacementError extends Error {
@@ -32,6 +34,7 @@ export async function createLibraryItem(db: TenantDb, item: NewItem, actor: stri
         reviewDate: item.reviewDate,
         areaId: item.areaId,
         contentTypeId: item.contentTypeId,
+        videoUrl: item.videoUrl ?? null,
         changedBy: actor,
       })
       .returning({ id: libraryItems.id });

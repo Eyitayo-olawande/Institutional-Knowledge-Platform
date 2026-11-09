@@ -84,7 +84,7 @@ export default async function SignIn({
         <img className="sign-in-photo" src="/images/sunu-office.jpg" alt="" />
         <div className="sign-in-photo-shade" />
 
-        {/* Logo row: SUNU brand mark | divider | eLibrary product identity */}
+        {/* Logo row: SUNU brand mark | divider | Nigeria eLearning product identity */}
         <div className="sign-in-branding">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img className="sign-in-logo" src="/images/sunu-logo.webp" alt="SUNU Assurances" />

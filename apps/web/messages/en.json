@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "Mantle",
+    "title": "SUNU Nigeria eLearning",
     "status": "The customer application is being built."
   },
   "tenant": {
@@ -265,7 +265,7 @@
     "new": "New"
   },
   "nav": {
-    "product_name": "eLibrary",
+    "product_name": "Nigeria eLearning",
     "product_tagline": "Knowledge & Learning Hub",
     "home": "Home",
     "library": "Library",

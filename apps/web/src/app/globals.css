@@ -176,7 +176,7 @@
 }
 .sign-in-branding, .sign-in-copy, .sign-in-benefits-footer { position: relative; z-index: 2; }
 
-/* Logo row: SUNU brand mark | divider | eLibrary product identity */
+/* Logo row: SUNU brand mark | divider | Nigeria eLearning product identity */
 .sign-in-branding { display: flex; align-items: center; gap: 12px; }
 .sign-in-logo { height: 56px; width: auto; flex-shrink: 0; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.45)); }
 .sign-in-brand-divider { width: 1px; height: 42px; background: rgba(255,255,255,0.30); flex-shrink: 0; margin: 0 2px; }
@@ -612,6 +612,8 @@ a.admin-kpi:hover { box-shadow: 0 4px 20px -4px rgba(0,0,0,0.14), 0 1px 3px rgba
 .lib-item-stage-content video { width: 100%; display: block; }
 .lib-item-stage-prose { padding: 24px; }
 .lib-item-stage-prose + .lib-item-stage-prose { border-top: 1px solid var(--mantle-color-border); }
+.lib-item-video-wrap { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: var(--mantle-radius-md); margin-bottom: 20px; background: #000; }
+.lib-item-video-wrap iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
 .lib-item-no-file { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 300px; color: var(--mantle-color-text_muted); font-size: 14px; }
 /* Right: document details panel */
 .lib-item-info { display: flex; flex-direction: column; gap: 16px; }

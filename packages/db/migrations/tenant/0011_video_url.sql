@@ -1,0 +1,1 @@
+ALTER TABLE "library_items" ADD COLUMN "video_url" text;

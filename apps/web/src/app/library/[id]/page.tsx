@@ -16,6 +16,12 @@ import { ViewerStageClient } from "../ViewerStageClient.tsx";
 
 const FILE_ERRORS = new Set(["empty", "too_many", "too_large", "type_not_allowed", "content_mismatch", "infected"]);
 
+function youtubeEmbedUrl(url: string): string {
+  const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+  if (match?.[1]) return `https://www.youtube.com/embed/${match[1]}`;
+  return url;
+}
+
 function fileTypeAbbr(contentType: string): string {
   if (contentType === "application/pdf") return "PDF";
   if (contentType.includes("wordprocessingml") || contentType.includes("msword")) return "DOC";
@@ -104,6 +110,16 @@ export default async function Item({
         >
           {/* Prose body — rendered server-side, shown when no file or below file */}
           <div className="lib-item-stage-prose">
+            {item.videoUrl ? (
+              <div className="lib-item-video-wrap">
+                <iframe
+                  src={youtubeEmbedUrl(item.videoUrl)}
+                  title={item.title}
+                  allowFullScreen
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                />
+              </div>
+            ) : null}
             {found.published ? (
               <div className="prose">{found.published.body}</div>
             ) : (

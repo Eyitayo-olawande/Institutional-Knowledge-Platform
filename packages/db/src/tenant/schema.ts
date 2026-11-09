@@ -284,6 +284,8 @@ export const libraryItems = pgTable("library_items", {
   // Set on items the migration placed in Common Staff Learning, until a
   // content owner confirms or moves them.
   needsAreaReview: boolean("needs_area_review").notNull().default(false),
+  // Optional YouTube/Vimeo embed URL shown above the body text in the viewer.
+  videoUrl: text("video_url"),
   ...auditColumns,
 });
 
