@@ -620,6 +620,34 @@ a.admin-kpi:hover { box-shadow: 0 4px 20px -4px rgba(0,0,0,0.14), 0 1px 3px rgba
 .lib-module-nav-back { font-size: 13px; color: var(--mantle-color-text_muted); text-decoration: none; }
 .lib-module-nav-back:hover { color: var(--mantle-color-text); }
 .lib-module-nav-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+/* ── Quiz (assessment / knowledge check) ───────────────────── */
+.quiz-form, .quiz-retry-form { display: flex; flex-direction: column; gap: 24px; }
+.quiz-intro { font-size: 14px; color: var(--mantle-color-text_muted); margin: 0; }
+.quiz-question { display: flex; flex-direction: column; gap: 10px; padding: 20px; background: var(--mantle-color-surface); border: 1px solid var(--mantle-color-border); border-radius: var(--mantle-radius-lg); }
+.quiz-question-text { font-size: 15px; font-weight: 600; color: var(--mantle-color-text); line-height: 1.5; }
+.quiz-options { display: flex; flex-direction: column; gap: 8px; }
+.quiz-option { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; padding: 10px 14px; border-radius: var(--mantle-radius-md); border: 1px solid var(--mantle-color-border); transition: background 0.1s, border-color 0.1s; }
+.quiz-option:hover { background: var(--mantle-color-background); border-color: var(--mantle-color-primary); }
+.quiz-option input[type="radio"] { margin-top: 2px; flex-shrink: 0; accent-color: var(--mantle-color-primary); }
+.quiz-option span { font-size: 14px; color: var(--mantle-color-text); line-height: 1.5; }
+.quiz-submit-btn { align-self: flex-start; padding: 10px 24px; background: var(--mantle-color-primary); color: var(--mantle-color-primary_foreground, #fff); border: none; border-radius: var(--mantle-radius-md); font-size: 15px; font-weight: 600; cursor: pointer; transition: opacity 0.15s; }
+.quiz-submit-btn:hover { opacity: 0.88; }
+/* Results */
+.quiz-results { display: flex; flex-direction: column; gap: 24px; }
+.quiz-results-banner { padding: 28px 24px; border-radius: var(--mantle-radius-lg); text-align: center; display: flex; flex-direction: column; gap: 6px; }
+.quiz-results-banner--pass { background: color-mix(in srgb, var(--mantle-color-success, #16a34a) 12%, transparent); border: 1px solid color-mix(in srgb, var(--mantle-color-success, #16a34a) 30%, transparent); }
+.quiz-results-banner--fail { background: color-mix(in srgb, var(--mantle-color-danger, #dc2626) 10%, transparent); border: 1px solid color-mix(in srgb, var(--mantle-color-danger, #dc2626) 25%, transparent); }
+.quiz-results-score { font-size: 48px; font-weight: 800; line-height: 1; color: var(--mantle-color-text); }
+.quiz-results-verdict { font-size: 18px; font-weight: 700; color: var(--mantle-color-text); }
+.quiz-results-tally { font-size: 14px; color: var(--mantle-color-text_muted); }
+.quiz-results-retry-hint { font-size: 14px; color: var(--mantle-color-text_muted); margin: 0; padding: 14px 18px; background: var(--mantle-color-surface); border: 1px solid var(--mantle-color-border); border-radius: var(--mantle-radius-md); }
+.quiz-review { display: flex; flex-direction: column; gap: 12px; }
+.quiz-review-item { padding: 16px 18px; border-radius: var(--mantle-radius-md); border: 1px solid var(--mantle-color-border); display: flex; flex-direction: column; gap: 6px; }
+.quiz-review-item--correct { border-color: color-mix(in srgb, var(--mantle-color-success, #16a34a) 35%, transparent); background: color-mix(in srgb, var(--mantle-color-success, #16a34a) 6%, transparent); }
+.quiz-review-item--wrong { border-color: color-mix(in srgb, var(--mantle-color-danger, #dc2626) 30%, transparent); background: color-mix(in srgb, var(--mantle-color-danger, #dc2626) 5%, transparent); }
+.quiz-review-q { font-size: 14px; font-weight: 600; color: var(--mantle-color-text); }
+.quiz-review-your, .quiz-review-correct { font-size: 13px; color: var(--mantle-color-text_muted); }
+.quiz-review-correct strong { color: color-mix(in srgb, var(--mantle-color-success, #16a34a) 80%, var(--mantle-color-text)); }
 .lib-item-no-file { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 300px; color: var(--mantle-color-text_muted); font-size: 14px; }
 /* Right: document details panel */
 .lib-item-info { display: flex; flex-direction: column; gap: 16px; }

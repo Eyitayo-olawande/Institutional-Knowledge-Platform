@@ -53,6 +53,20 @@ export {
   type StructureKind,
 } from "./structure.ts";
 export {
+  addOption,
+  addQuestion,
+  createAssessment,
+  getAssessmentForItem,
+  getAttemptResults,
+  hasViewedAllModuleItems,
+  recordItemView,
+  submitAssessmentAttempt,
+  type AssessmentForItem,
+  type AssessmentQuestion,
+  type AttemptResponse,
+  type AttemptResult,
+} from "./assessments.ts";
+export {
   addDays,
   addItemToModule,
   addModuleToStage,

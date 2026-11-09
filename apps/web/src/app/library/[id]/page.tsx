@@ -1,4 +1,4 @@
-import { canSeeArea, getLibraryItem, itemFiles, listLibraryItems, listModuleItems } from "@mantle/db/tenant";
+import { canSeeArea, getAssessmentForItem, getAttemptResults, getLibraryItem, itemFiles, listLibraryItems, listModuleItems, personByUserId, recordItemView } from "@mantle/db/tenant";
 import { needsConversion } from "@mantle/documents/convert";
 import { ACCEPT_ATTR } from "@mantle/platform/files";
 import { can } from "@mantle/platform/identity";
@@ -8,7 +8,7 @@ import { notFound } from "next/navigation";
 import { t } from "../../../i18n.ts";
 import { requireFeature, requirePermission, viewerAreas } from "../../../server/session.ts";
 import { AppShell } from "../../_components/AppShell.tsx";
-import { completeModuleAction } from "../../actions.ts";
+import { submitAssessmentAction } from "../../actions.ts";
 import { placeLibraryItem, publishItem, saveItemDraft, uploadItemFile } from "../actions.ts";
 import { areaChoices, areaName } from "../areas.ts";
 import { PlacementFields } from "../PlacementFields.tsx";
@@ -38,13 +38,13 @@ export default async function Item({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ saved?: string; published?: string; error?: string; placed?: string; file_added?: string; file_error?: string; file?: string; moduleId?: string }>;
+  searchParams: Promise<{ saved?: string; published?: string; error?: string; placed?: string; file_added?: string; file_error?: string; file?: string; moduleId?: string; attempt?: string }>;
 }) {
   const ctx = await requirePermission("library.view");
   const { tenant, db, roles } = ctx;
   await requireFeature(tenant, "knowledge_library");
   const { id } = await params;
-  const { saved, published, error, placed, file_added: fileAdded, file_error: fileError, file: fileParam, moduleId } = await searchParams;
+  const { saved, published, error, placed, file_added: fileAdded, file_error: fileError, file: fileParam, moduleId, attempt: attemptId } = await searchParams;
   const found = /^[0-9a-f-]{36}$/.test(id) ? await getLibraryItem(db, id) : null;
   const editor = can(roles, "library.edit");
   const visible = await viewerAreas(ctx);
@@ -77,7 +77,26 @@ export default async function Item({
   const nextModuleItem = moduleIdx >= 0 && moduleIdx < moduleItems.length - 1
     ? moduleItems[moduleIdx + 1] ?? null
     : null;
-  const isLastModuleItem = moduleIdx >= 0 && moduleIdx === moduleItems.length - 1;
+
+  // Assessment (Gate 2) — check if this item has a knowledge check attached.
+  const assessment = moduleId ? await getAssessmentForItem(db, item.id) : null;
+  const isAssessmentItem = !!assessment;
+
+  // For content items (not assessments): record a view so Gate 1 can be evaluated.
+  // Uses upsert — safe to call on every render.
+  const { user: viewer } = ctx;
+  if (moduleId && !isAssessmentItem) {
+    const viewerPerson = await personByUserId(db, viewer.id);
+    if (viewerPerson) {
+      await recordItemView(db, viewerPerson.id, moduleId, item.id, `user:${viewer.id}`);
+    }
+  }
+
+  // If ?attempt= is present, load prior results to show the feedback panel.
+  const attemptResults =
+    attemptId && /^[0-9a-f-]{36}$/.test(attemptId)
+      ? await getAttemptResults(db, attemptId)
+      : null;
 
   return (
     <AppShell ctx={ctx} active="library">
@@ -120,22 +139,109 @@ export default async function Item({
           conversionFailed={!!(selectedFile && needsConversion(selectedFile.contentType) && selectedFile.conversionStatus !== "ready")}
           itemTitle={item.title}
         >
-          {/* Prose body — rendered server-side, shown when no file or below file */}
+          {/* Prose body or assessment quiz */}
           <div className="lib-item-stage-prose">
-            {item.videoUrl ? (
-              <div className="lib-item-video-wrap">
-                <iframe
-                  src={youtubeEmbedUrl(item.videoUrl)}
-                  title={item.title}
-                  allowFullScreen
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                />
-              </div>
-            ) : null}
-            {found.published ? (
-              <div className="prose">{found.published.body}</div>
+            {isAssessmentItem && assessment && moduleId ? (
+              attemptResults ? (
+                // Results panel — shown after submission
+                <div className="quiz-results">
+                  <div className={`quiz-results-banner ${attemptResults.passed ? "quiz-results-banner--pass" : "quiz-results-banner--fail"}`}>
+                    <div className="quiz-results-score">{attemptResults.score}%</div>
+                    <div className="quiz-results-verdict">
+                      {attemptResults.passed ? t("learning.quiz_passed") : t("learning.quiz_failed")}
+                    </div>
+                    <div className="quiz-results-tally">
+                      {t("learning.quiz_tally", { correct: String(attemptResults.correct), total: String(attemptResults.total) })}
+                    </div>
+                  </div>
+                  {!attemptResults.passed ? (
+                    <p className="quiz-results-retry-hint">{t("learning.quiz_retry_hint", { score: String(assessment.passingScore) })}</p>
+                  ) : !attemptResults.gate1Satisfied ? (
+                    <p className="quiz-results-retry-hint">{t("learning.quiz_gate1_pending")}</p>
+                  ) : null}
+                  <div className="quiz-review">
+                    {attemptResults.responses.map((r, i) => (
+                      <div key={r.questionId} className={`quiz-review-item ${r.isCorrect ? "quiz-review-item--correct" : "quiz-review-item--wrong"}`}>
+                        <div className="quiz-review-q">{i + 1}. {r.questionText}</div>
+                        <div className="quiz-review-your">
+                          {t("learning.quiz_your_answer")}: <strong>{r.chosenOptionText}</strong>
+                          {r.isCorrect ? " ✓" : " ✗"}
+                        </div>
+                        {!r.isCorrect ? (
+                          <div className="quiz-review-correct">
+                            {t("learning.quiz_correct_answer")}: <strong>{r.correctOptionText}</strong>
+                          </div>
+                        ) : null}
+                      </div>
+                    ))}
+                  </div>
+                  {!attemptResults.passed ? (
+                    <form action={submitAssessmentAction} className="quiz-retry-form">
+                      <input type="hidden" name="assessmentId" value={assessment.id} />
+                      <input type="hidden" name="moduleId" value={moduleId} />
+                      <input type="hidden" name="itemId" value={item.id} />
+                      {assessment.questions.map((q) => (
+                        <div key={q.id} className="quiz-question">
+                          <div className="quiz-question-text">{q.questionText}</div>
+                          <div className="quiz-options">
+                            {q.options.map((o) => (
+                              <label key={o.id} className="quiz-option">
+                                <input type="radio" name={`response_${q.id}`} value={o.id} required />
+                                <span>{o.optionText}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                      <button type="submit" className="quiz-submit-btn">
+                        {t("learning.quiz_submit")}
+                      </button>
+                    </form>
+                  ) : null}
+                </div>
+              ) : (
+                // Fresh quiz form
+                <form action={submitAssessmentAction} className="quiz-form">
+                  <p className="quiz-intro">{t("learning.quiz_intro", { passing: String(assessment.passingScore) })}</p>
+                  <input type="hidden" name="assessmentId" value={assessment.id} />
+                  <input type="hidden" name="moduleId" value={moduleId} />
+                  <input type="hidden" name="itemId" value={item.id} />
+                  {assessment.questions.map((q, i) => (
+                    <div key={q.id} className="quiz-question">
+                      <div className="quiz-question-text">{i + 1}. {q.questionText}</div>
+                      <div className="quiz-options">
+                        {q.options.map((o) => (
+                          <label key={o.id} className="quiz-option">
+                            <input type="radio" name={`response_${q.id}`} value={o.id} required />
+                            <span>{o.optionText}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                  <button type="submit" className="quiz-submit-btn">
+                    {t("learning.quiz_submit")}
+                  </button>
+                </form>
+              )
             ) : (
-              <p className="sub">{t("library.not_published")}</p>
+              <>
+                {item.videoUrl ? (
+                  <div className="lib-item-video-wrap">
+                    <iframe
+                      src={youtubeEmbedUrl(item.videoUrl)}
+                      title={item.title}
+                      allowFullScreen
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    />
+                  </div>
+                ) : null}
+                {found.published ? (
+                  <div className="prose">{found.published.body}</div>
+                ) : (
+                  <p className="sub">{t("library.not_published")}</p>
+                )}
+              </>
             )}
           </div>
         </ViewerStageClient>
@@ -234,13 +340,6 @@ export default async function Item({
                 >
                   {t("learning.action_next")}: {nextModuleItem.title} →
                 </Link>
-              ) : isLastModuleItem ? (
-                <form action={completeModuleAction}>
-                  <input type="hidden" name="moduleId" value={moduleId} />
-                  <button type="submit" className="my-module-action-btn primary">
-                    {t("learning.action_complete_module")} ✓
-                  </button>
-                </form>
               ) : null}
             </div>
           </div>

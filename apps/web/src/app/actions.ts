@@ -1,6 +1,6 @@
 "use server";
 
-import { completeModule, personByUserId } from "@mantle/db/tenant";
+import { completeModule, personByUserId, submitAssessmentAttempt, type AttemptResponse } from "@mantle/db/tenant";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { authFor, requestHost } from "../server/auth.ts";
@@ -62,12 +62,51 @@ export async function signOut(): Promise<void> {
   redirect("/");
 }
 
-// "I have read this" (My Learning). Refused quietly if the module's stage
-// is not yet unlocked for this person, rather than trusting the button.
+// No longer used directly — module completion is system-driven via submitAssessmentAction.
+// Kept for any admin tooling that may call it directly.
 export async function completeModuleAction(form: FormData): Promise<void> {
   const { db, user } = await requireSignedIn();
   const moduleId = String(form.get("moduleId") ?? "");
   const person = await personByUserId(db, user.id);
   if (person) await completeModule(db, person.id, moduleId, `user:${user.id}`);
   redirect("/my-learning");
+}
+
+// Gate 2: score the assessment, record the attempt, and — if both gates
+// pass — mark the module complete. Gate 1 (all content items viewed) is
+// checked inside submitAssessmentAttempt via hasViewedAllModuleItems.
+export async function submitAssessmentAction(form: FormData): Promise<void> {
+  const { db, user } = await requireSignedIn();
+  const assessmentId = String(form.get("assessmentId") ?? "");
+  const moduleId = String(form.get("moduleId") ?? "");
+  const itemId = String(form.get("itemId") ?? "");
+
+  if (!assessmentId || !moduleId || !itemId) redirect("/my-learning");
+
+  const person = await personByUserId(db, user.id);
+  if (!person) redirect("/my-learning");
+
+  const responses: AttemptResponse[] = [];
+  for (const [key, value] of form.entries()) {
+    if (key.startsWith("response_")) {
+      const questionId = key.slice("response_".length);
+      responses.push({ questionId, optionId: String(value) });
+    }
+  }
+
+  const result = await submitAssessmentAttempt(
+    db,
+    person.id,
+    assessmentId,
+    moduleId,
+    responses,
+    `user:${user.id}`,
+  );
+
+  if (result.passed && result.gate1Satisfied) {
+    await completeModule(db, person.id, moduleId, `system:assessment:${result.attemptId}`);
+    redirect("/my-learning?completed=1");
+  }
+
+  redirect(`/library/${itemId}?moduleId=${moduleId}&attempt=${result.attemptId}`);
 }

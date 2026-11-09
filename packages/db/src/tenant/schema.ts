@@ -493,3 +493,73 @@ export const moduleProgress = pgTable(
   },
   (t) => [uniqueIndex("module_progress_unique").on(t.personId, t.moduleId)],
 );
+
+// Assessments (LMS, work package E9): a knowledge check linked to a
+// library item, completed through the two-gate model — Gate 1: all content
+// items in the module viewed; Gate 2: assessment score ≥ passing_score%.
+export const itemViews = pgTable(
+  "item_views",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    personId: uuid("person_id").notNull().references(() => people.id),
+    moduleId: uuid("module_id").notNull().references(() => modules.id),
+    itemId: uuid("item_id").notNull().references(() => libraryItems.id),
+    viewedAt: timestamp("viewed_at", { withTimezone: true }).notNull().defaultNow(),
+    ...auditColumns,
+  },
+  (t) => [uniqueIndex("item_views_unique").on(t.personId, t.moduleId, t.itemId)],
+);
+
+export const assessments = pgTable(
+  "assessments",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    itemId: uuid("item_id").notNull().references(() => libraryItems.id),
+    passingScore: integer("passing_score").notNull().default(70),
+    ...auditColumns,
+  },
+  (t) => [uniqueIndex("assessments_item_unique").on(t.itemId)],
+);
+
+export const assessmentQuestions = pgTable("assessment_questions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  assessmentId: uuid("assessment_id")
+    .notNull()
+    .references(() => assessments.id, { onDelete: "cascade" }),
+  questionText: text("question_text").notNull(),
+  sortOrder: integer("sort_order").notNull().default(0),
+  ...auditColumns,
+});
+
+export const assessmentOptions = pgTable("assessment_options", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  questionId: uuid("question_id")
+    .notNull()
+    .references(() => assessmentQuestions.id, { onDelete: "cascade" }),
+  optionText: text("option_text").notNull(),
+  isCorrect: boolean("is_correct").notNull().default(false),
+  sortOrder: integer("sort_order").notNull().default(0),
+  ...auditColumns,
+});
+
+export const assessmentAttempts = pgTable("assessment_attempts", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  personId: uuid("person_id").notNull().references(() => people.id),
+  assessmentId: uuid("assessment_id").notNull().references(() => assessments.id),
+  moduleId: uuid("module_id").notNull().references(() => modules.id),
+  score: integer("score"),
+  passed: boolean("passed"),
+  submittedAt: timestamp("submitted_at", { withTimezone: true }),
+  ...auditColumns,
+});
+
+export const assessmentResponses = pgTable("assessment_responses", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  attemptId: uuid("attempt_id")
+    .notNull()
+    .references(() => assessmentAttempts.id, { onDelete: "cascade" }),
+  questionId: uuid("question_id").notNull().references(() => assessmentQuestions.id),
+  optionId: uuid("option_id").notNull().references(() => assessmentOptions.id),
+  isCorrect: boolean("is_correct").notNull().default(false),
+  ...auditColumns,
+});
