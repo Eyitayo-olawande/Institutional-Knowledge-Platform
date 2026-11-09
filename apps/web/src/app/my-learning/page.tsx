@@ -3,7 +3,6 @@ import Link from "next/link";
 import { t } from "../../i18n.ts";
 import { requireFeature, requirePermission } from "../../server/session.ts";
 import { AppShell } from "../_components/AppShell.tsx";
-import { completeModuleAction } from "../actions.ts";
 import { Button } from "@mantle/ui";
 
 type StageState = "completed" | "current" | "upcoming";
@@ -292,20 +291,12 @@ export default async function MyLearning({
                               {t("learning.action_review")}
                             </Link>
                           ) : (
-                            <div style={{ display: "flex", gap: 8, flexShrink: 0, alignItems: "center" }}>
-                              <Link
-                                href={m.itemId ? `/library/${m.itemId}` : "/library"}
-                                className="my-module-action-btn primary"
-                              >
-                                {t("learning.action_start")}
-                              </Link>
-                              <form action={completeModuleAction}>
-                                <input type="hidden" name="moduleId" value={m.id} />
-                                <button type="submit" className="my-module-action-btn">
-                                  {t("learning.action_mark_done")}
-                                </button>
-                              </form>
-                            </div>
+                            <Link
+                              href={m.itemId ? `/library/${m.itemId}?moduleId=${m.id}` : "/library"}
+                              className="my-module-action-btn primary"
+                            >
+                              {t("learning.action_start")}
+                            </Link>
                           )
                         ) : null}
                       </div>

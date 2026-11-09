@@ -1,4 +1,4 @@
-import { canSeeArea, getLibraryItem, itemFiles, listLibraryItems } from "@mantle/db/tenant";
+import { canSeeArea, getLibraryItem, itemFiles, listLibraryItems, listModuleItems } from "@mantle/db/tenant";
 import { needsConversion } from "@mantle/documents/convert";
 import { ACCEPT_ATTR } from "@mantle/platform/files";
 import { can } from "@mantle/platform/identity";
@@ -8,6 +8,7 @@ import { notFound } from "next/navigation";
 import { t } from "../../../i18n.ts";
 import { requireFeature, requirePermission, viewerAreas } from "../../../server/session.ts";
 import { AppShell } from "../../_components/AppShell.tsx";
+import { completeModuleAction } from "../../actions.ts";
 import { placeLibraryItem, publishItem, saveItemDraft, uploadItemFile } from "../actions.ts";
 import { areaChoices, areaName } from "../areas.ts";
 import { PlacementFields } from "../PlacementFields.tsx";
@@ -37,13 +38,13 @@ export default async function Item({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ saved?: string; published?: string; error?: string; placed?: string; file_added?: string; file_error?: string; file?: string }>;
+  searchParams: Promise<{ saved?: string; published?: string; error?: string; placed?: string; file_added?: string; file_error?: string; file?: string; moduleId?: string }>;
 }) {
   const ctx = await requirePermission("library.view");
   const { tenant, db, roles } = ctx;
   await requireFeature(tenant, "knowledge_library");
   const { id } = await params;
-  const { saved, published, error, placed, file_added: fileAdded, file_error: fileError, file: fileParam } = await searchParams;
+  const { saved, published, error, placed, file_added: fileAdded, file_error: fileError, file: fileParam, moduleId } = await searchParams;
   const found = /^[0-9a-f-]{36}$/.test(id) ? await getLibraryItem(db, id) : null;
   const editor = can(roles, "library.edit");
   const visible = await viewerAreas(ctx);
@@ -66,6 +67,17 @@ export default async function Item({
   const lastUpdated = found.published?.publishedAt
     ? new Date(found.published.publishedAt).toISOString().slice(0, 10)
     : null;
+
+  // Module navigation — only when arriving from My Learning with a moduleId
+  const moduleItems = moduleId && /^[0-9a-f-]{36}$/.test(moduleId)
+    ? await listModuleItems(db, moduleId)
+    : [];
+  const moduleIdx = moduleItems.findIndex((mi) => mi.id === id);
+  const prevModuleItem = moduleIdx > 0 ? moduleItems[moduleIdx - 1] ?? null : null;
+  const nextModuleItem = moduleIdx >= 0 && moduleIdx < moduleItems.length - 1
+    ? moduleItems[moduleIdx + 1] ?? null
+    : null;
+  const isLastModuleItem = moduleIdx >= 0 && moduleIdx === moduleItems.length - 1;
 
   return (
     <AppShell ctx={ctx} active="library">
@@ -198,6 +210,42 @@ export default async function Item({
           ) : null}
         </div>
       </div>
+
+      {/* Module navigation — shown when arriving from My Learning */}
+      {moduleId && moduleItems.length > 0 ? (
+        <div className="lib-module-nav">
+          <div className="lib-module-nav-inner">
+            <Link href="/my-learning" className="lib-module-nav-back">
+              ← {t("learning.back_to_learning")}
+            </Link>
+            <div className="lib-module-nav-actions">
+              {prevModuleItem ? (
+                <Link
+                  href={`/library/${prevModuleItem.id}?moduleId=${moduleId}`}
+                  className="my-module-action-btn"
+                >
+                  ← {t("learning.action_prev")}
+                </Link>
+              ) : null}
+              {nextModuleItem ? (
+                <Link
+                  href={`/library/${nextModuleItem.id}?moduleId=${moduleId}`}
+                  className="my-module-action-btn primary"
+                >
+                  {t("learning.action_next")}: {nextModuleItem.title} →
+                </Link>
+              ) : isLastModuleItem ? (
+                <form action={completeModuleAction}>
+                  <input type="hidden" name="moduleId" value={moduleId} />
+                  <button type="submit" className="my-module-action-btn primary">
+                    {t("learning.action_complete_module")} ✓
+                  </button>
+                </form>
+              ) : null}
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       {/* Admin editor forms — below viewer */}
       {editor && current ? (
