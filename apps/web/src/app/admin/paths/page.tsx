@@ -6,6 +6,7 @@ import { requireFeature, requirePermission } from "../../../server/session.ts";
 import { AppShell } from "../../_components/AppShell.tsx";
 import { Icon } from "../../_components/Icon.tsx";
 import { createPathAction } from "./actions.ts";
+import { DeletePathButton } from "./DeletePathButton.tsx";
 
 export default async function Paths() {
   const ctx = await requirePermission("paths.edit");
@@ -44,10 +45,13 @@ export default async function Paths() {
                     <h2 className="path-card-name">{p.name}</h2>
                     <p className="path-card-dept">{departmentName(p.departmentId)}</p>
                   </div>
-                  <Link href={`/admin/paths/${p.id}`} className="path-card-open">
-                    {t("paths.admin.open")}
-                    <Icon name="chevron_down" size={14} />
-                  </Link>
+                  <div className="path-card-footer">
+                    <Link href={`/admin/paths/${p.id}`} className="path-card-open">
+                      {t("paths.admin.open")}
+                      <Icon name="chevron_down" size={14} />
+                    </Link>
+                    <DeletePathButton pathId={p.id} pathName={p.name} />
+                  </div>
                 </article>
               ))}
             </div>

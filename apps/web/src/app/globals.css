@@ -595,6 +595,9 @@ a.admin-kpi:hover { box-shadow: 0 4px 20px -4px rgba(0,0,0,0.14), 0 1px 3px rgba
 .path-card-open { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 600; color: var(--mantle-color-primary); text-decoration: none; align-self: flex-start; }
 .path-card-open:hover { text-decoration: underline; }
 .path-card-open svg { transform: rotate(-90deg); }
+.path-card-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.path-card-delete { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: var(--mantle-radius-sm); border: 1px solid transparent; background: transparent; color: var(--mantle-color-text_muted); cursor: pointer; padding: 0; transition: background 0.12s, color 0.12s; flex-shrink: 0; }
+.path-card-delete:hover { background: color-mix(in srgb, var(--mantle-color-destructive) 10%, transparent); color: var(--mantle-color-destructive); border-color: color-mix(in srgb, var(--mantle-color-destructive) 30%, transparent); }
 
 /* ── Notices page ───────────────────────────────────────────── */
 .notices-list { list-style: none; margin: 0; padding: 0; }

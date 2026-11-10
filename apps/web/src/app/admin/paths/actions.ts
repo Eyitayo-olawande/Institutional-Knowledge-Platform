@@ -5,6 +5,7 @@ import {
   addModuleToStage,
   createModule,
   createPath,
+  deletePath,
   moveStageModule,
   removeAssignmentRule,
   removeItemFromModule,
@@ -30,6 +31,14 @@ function field(form: FormData, name: string): string {
 function optionalId(form: FormData, name: string): string | null {
   const value = field(form, name);
   return ID.test(value) ? value : null;
+}
+
+export async function deletePathAction(form: FormData): Promise<void> {
+  const { db, user } = await builder();
+  const pathId = field(form, "pathId");
+  if (!ID.test(pathId)) redirect("/admin/paths");
+  await deletePath(db, pathId, `user:${user.id}`);
+  redirect("/admin/paths");
 }
 
 export async function createPathAction(form: FormData): Promise<void> {

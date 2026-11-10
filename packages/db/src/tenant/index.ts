@@ -77,6 +77,7 @@ export {
   createModule,
   createPath,
   DEFAULT_DUE_DAYS,
+  deletePath,
   getPathBuilder,
   isStageUnlocked,
   listAssignmentRules,

@@ -433,7 +433,9 @@
         "department": "Department"
       },
       "all_departments": "All departments (company wide)",
-      "create": "Create path"
+      "create": "Create path",
+      "delete": "Delete path",
+      "delete_confirm": "Delete \"{name}\" and all its stages and rules? This cannot be undone."
     },
     "builder": {
       "back": "Back to learning paths",

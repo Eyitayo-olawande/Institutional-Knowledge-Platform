@@ -349,3 +349,17 @@ export async function myLearning(db: TenantDb, personId: string, today = new Dat
 
   return { pathsEnrolled: views.length, modulesCompleted, modulesTotal, completionRate, nextUp, assignments: sorted };
 }
+
+export async function deletePath(db: TenantDb, pathId: string, actor: string): Promise<void> {
+  await db.transaction(async (tx) => {
+    // Delete dependent rows in dependency order (no cascade on these FKs)
+    const stages = await tx.select({ id: pathStages.id }).from(pathStages).where(eq(pathStages.pathId, pathId));
+    const stageIds = stages.map((s) => s.id);
+    if (stageIds.length > 0) await tx.delete(stageModules).where(inArray(stageModules.stageId, stageIds));
+    await tx.delete(assignmentRules).where(eq(assignmentRules.pathId, pathId));
+    await tx.delete(assignments).where(eq(assignments.pathId, pathId));
+    await tx.delete(pathStages).where(eq(pathStages.pathId, pathId));
+    await tx.delete(paths).where(eq(paths.id, pathId));
+    await recordActivity(tx, { actor, action: "paths.deleted", entityType: "path", entityId: pathId, details: {} });
+  });
+}
