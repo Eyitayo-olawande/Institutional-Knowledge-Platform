@@ -16,17 +16,21 @@ export default async function Paths() {
 
   return (
     <AppShell ctx={ctx} active="paths">
-      <div className="paths-banner">
-        <div className="paths-banner-bg" />
-        <div className="paths-banner-shade" />
-        <div className="paths-banner-copy">
-          <h1>
-            {t("paths.banner_heading").split(" ")[0]}{" "}
-            <span>{t("paths.banner_heading").split(" ").slice(1).join(" ")}</span>
-          </h1>
-          <p>{t("paths.banner_sub")}</p>
-          <div className="paths-banner-rule" />
+      <div className="lib-hero-wrap">
+        <div className="lib-hero">
+          <div className="lib-hero-bg" style={{ backgroundImage: "url('/images/administrator-office.png')" }} />
+          <div className="lib-hero-shade" />
+          <div className="lib-hero-copy">
+            <h1>
+              {t("paths.banner_heading").split(" ")[0]}{" "}
+              <span style={{ color: "var(--mantle-color-primary)" }}>{t("paths.banner_heading").split(" ").slice(1).join(" ")}</span>
+            </h1>
+            <p>{t("paths.banner_sub")}</p>
+            <div className="lib-hero-rule" />
+          </div>
         </div>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/images/Collaborative-Smiles-trans2.png" alt="" aria-hidden="true" className="lib-hero-person" />
       </div>
 
       <div className="paths-admin-layout">
