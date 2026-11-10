@@ -510,7 +510,22 @@ a.admin-kpi:hover { box-shadow: 0 4px 20px -4px rgba(0,0,0,0.14), 0 1px 3px rgba
 
 /* Module list panel */
 .my-modules-panel { background: var(--mantle-color-surface); border: 1px solid var(--mantle-color-border); border-radius: var(--mantle-radius-lg); padding: 16px 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-.my-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+.my-modules-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+.my-modules-header .my-tabs { margin-bottom: 0; }
+.my-view-toggle { display: flex; border: 1px solid var(--mantle-color-border); border-radius: var(--mantle-radius-md); overflow: hidden; flex-shrink: 0; }
+.my-view-btn { display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; background: var(--mantle-color-surface); border: none; cursor: pointer; color: var(--mantle-color-text_muted); transition: background 0.12s, color 0.12s; }
+.my-view-btn + .my-view-btn { border-left: 1px solid var(--mantle-color-border); }
+.my-view-btn:hover { background: var(--mantle-color-background); color: var(--mantle-color-text); }
+.my-view-btn.active { background: var(--mantle-color-primary); color: #fff; }
+.my-module-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+.my-module-card { background: var(--mantle-color-background); border: 1px solid var(--mantle-color-border); border-radius: var(--mantle-radius-lg); padding: 18px 16px; display: flex; flex-direction: column; gap: 10px; transition: box-shadow 0.15s; }
+.my-module-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+.my-module-card-icon { width: 44px; height: 44px; border-radius: var(--mantle-radius-md); background: var(--mantle-color-primary_tint); display: flex; align-items: center; justify-content: center; color: var(--mantle-color-primary); flex-shrink: 0; }
+.my-module-card-body { flex: 1; min-width: 0; }
+.my-module-card-title { font-size: 14px; font-weight: 700; line-height: 1.4; margin: 0; }
+.my-module-card-meta { font-size: 12px; color: var(--mantle-color-text_muted); margin: 3px 0 0; }
+.my-module-card-progress { margin-top: 2px; }
+.my-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
 .my-tab { padding: 8px 16px; border-radius: var(--mantle-radius-md); border: 1px solid var(--mantle-color-border); background: var(--mantle-color-surface); font-size: 13px; font-weight: 600; color: var(--mantle-color-text); text-decoration: none; white-space: nowrap; transition: background 0.12s, border-color 0.12s; }
 .my-tab:hover { background: var(--mantle-color-background); }
 .my-tab[aria-current="true"] { background: var(--mantle-color-primary); border-color: var(--mantle-color-primary); color: #fff; }
