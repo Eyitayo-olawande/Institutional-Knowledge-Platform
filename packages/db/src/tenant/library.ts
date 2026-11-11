@@ -141,7 +141,7 @@ export interface ListOptions {
 }
 
 export async function listLibraryItems(db: TenantDb, options: ListOptions) {
-  const where: (SQL | undefined)[] = [areaIdsOrAll(options.areas), ne(libraryItems.status, "retired")];
+  const where: (SQL | undefined)[] = [areaIdsOrAll(options.areas), ne(libraryItems.status, "retired"), eq(libraryItems.assessmentOnly, false)];
   if (options.areaId) where.push(eq(libraryItems.areaId, options.areaId));
   if (options.contentTypeId) where.push(eq(libraryItems.contentTypeId, options.contentTypeId));
   const rows = await db

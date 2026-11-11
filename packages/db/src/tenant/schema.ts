@@ -286,6 +286,10 @@ export const libraryItems = pgTable("library_items", {
   needsAreaReview: boolean("needs_area_review").notNull().default(false),
   // Optional YouTube/Vimeo embed URL shown above the body text in the viewer.
   videoUrl: text("video_url"),
+  // True for items that are only used as knowledge-check gates inside a module;
+  // they are excluded from library listings and search, and direct access
+  // without a moduleId returns 404 for non-editors.
+  assessmentOnly: boolean("assessment_only").notNull().default(false),
   ...auditColumns,
 });
 

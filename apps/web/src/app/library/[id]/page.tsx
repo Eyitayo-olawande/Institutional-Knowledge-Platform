@@ -49,7 +49,13 @@ export default async function Item({
   const editor = can(roles, "library.edit");
   const visible = await viewerAreas(ctx);
   // An item in an area the viewer cannot see does not exist for them.
-  if (!found || !canSeeArea(visible, found.item.areaId) || (!editor && !found.published) || (!editor && found.item.status === "retired")) notFound();
+  if (
+    !found ||
+    !canSeeArea(visible, found.item.areaId) ||
+    (!editor && !found.published) ||
+    (!editor && found.item.status === "retired") ||
+    (!editor && found.item.assessmentOnly && !moduleId)
+  ) notFound();
   const { item, draft, versions } = found;
   const { areas, types } = await areaChoices(db, visible);
   const area = areas.find((a) => a.id === item.areaId);
