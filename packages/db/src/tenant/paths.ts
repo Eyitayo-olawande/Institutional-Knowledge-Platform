@@ -1,7 +1,7 @@
 import { and, asc, eq, inArray, sql } from "drizzle-orm";
 import { recordActivity } from "./activity.ts";
 import type { TenantDb } from "./client.ts";
-import { assignmentRules, assignments, libraryItems, moduleItems, modules, moduleProgress, pathStages, paths, stageModules } from "./schema.ts";
+import { assignmentRules, assignments, certificates, libraryItems, moduleItems, modules, moduleProgress, pathStages, paths, people, stageModules } from "./schema.ts";
 
 // Learning paths (work package E8, Blueprint v3.1 section 5). A path has
 // four fixed stages; a module sits in one or more stages across one or
@@ -309,7 +309,107 @@ export async function completeModule(db: TenantDb, personId: string, moduleId: s
     .values({ personId, moduleId, completedAt: now, changedBy: actor })
     .onConflictDoUpdate({ target: [moduleProgress.personId, moduleProgress.moduleId], set: { completedAt: now, updatedAt: now, changedBy: actor } });
   await recordActivity(db, { actor, action: "paths.module_completed", entityType: "module", entityId: moduleId, details: { person_id: personId } });
+
+  // After recording progress, check if any stage is now fully complete and
+  // issue a certificate for it (idempotent via the unique constraint).
+  await issueStageCertificatesIfEarned(db, personId, actor);
+
   return true;
+}
+
+// Checks all assigned paths for the person; for each stage that is now
+// complete, inserts a certificate row if one does not already exist.
+async function issueStageCertificatesIfEarned(db: TenantDb, personId: string, actor: string): Promise<void> {
+  const views = await personAssignments(db, personId);
+  for (const assignment of views) {
+    for (const stage of assignment.stages) {
+      if (!stage.complete || stage.modules.length === 0) continue;
+      const existing = await db
+        .select({ id: certificates.id })
+        .from(certificates)
+        .where(and(eq(certificates.personId, personId), eq(certificates.pathId, assignment.pathId), eq(certificates.stageKind, stage.kind)))
+        .limit(1);
+      if (existing.length > 0) continue;
+      const moduleIds = stage.modules.map((m) => m.id);
+      const reference = await nextCertificateReference(db);
+      await db.insert(certificates).values({
+        personId,
+        pathId: assignment.pathId,
+        stageKind: stage.kind,
+        moduleIds,
+        issuedAt: new Date(),
+        reference,
+        changedBy: actor,
+      });
+      await recordActivity(db, {
+        actor,
+        action: "certificates.issued",
+        entityType: "certificate",
+        entityId: reference,
+        details: { person_id: personId, path_id: assignment.pathId, stage: stage.kind },
+      });
+    }
+  }
+}
+
+async function nextCertificateReference(db: TenantDb): Promise<string> {
+  const year = new Date().getFullYear();
+  const prefix = `CERT-${year}-`;
+  const [row] = await db
+    .select({ maxRef: sql<string | null>`MAX(reference)` })
+    .from(certificates)
+    .where(sql`reference LIKE ${prefix + "%"}`);
+  const maxRef = row?.maxRef;
+  const seq = maxRef ? Number(maxRef.slice(prefix.length)) + 1 : 1;
+  return `${prefix}${String(seq).padStart(5, "0")}`;
+}
+
+export interface CertificateView {
+  readonly id: string;
+  readonly reference: string;
+  readonly pathId: string;
+  readonly pathName: string;
+  readonly stageKind: string;
+  readonly issuedAt: Date;
+  readonly personFullName: string;
+}
+
+export async function certificatesForPerson(db: TenantDb, personId: string): Promise<CertificateView[]> {
+  const rows = await db
+    .select({
+      id: certificates.id,
+      reference: certificates.reference,
+      pathId: certificates.pathId,
+      pathName: paths.name,
+      stageKind: certificates.stageKind,
+      issuedAt: certificates.issuedAt,
+      personFullName: people.fullName,
+    })
+    .from(certificates)
+    .innerJoin(paths, eq(certificates.pathId, paths.id))
+    .innerJoin(people, eq(certificates.personId, people.id))
+    .where(eq(certificates.personId, personId))
+    .orderBy(asc(certificates.issuedAt));
+  return rows;
+}
+
+export async function certificateByReference(db: TenantDb, reference: string): Promise<CertificateView | null> {
+  const [row] = await db
+    .select({
+      id: certificates.id,
+      reference: certificates.reference,
+      pathId: certificates.pathId,
+      pathName: paths.name,
+      stageKind: certificates.stageKind,
+      issuedAt: certificates.issuedAt,
+      personFullName: people.fullName,
+    })
+    .from(certificates)
+    .innerJoin(paths, eq(certificates.pathId, paths.id))
+    .innerJoin(people, eq(certificates.personId, people.id))
+    .where(eq(certificates.reference, reference))
+    .limit(1);
+  return row ?? null;
 }
 
 export interface MyLearningSummary {

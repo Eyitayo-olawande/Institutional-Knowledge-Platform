@@ -417,7 +417,21 @@
     "stage_cert_soon": "Coming soon",
     "module_detail": "Module {n} of {total} · {stage}",
     "keep_going_heading": "Keep going!",
-    "keep_going_body": "Complete the remaining modules to meet your role requirements."
+    "keep_going_body": "Complete the remaining modules to meet your role requirements.",
+    "certs_stage_label": "Stage Certificate",
+    "certs_issued": "Issued {date}"
+  },
+  "certificate": {
+    "eyebrow": "Certificate of Completion",
+    "heading_1": "Certificate of",
+    "heading_2": "Completion",
+    "awarded_to": "Awarded to",
+    "for_completing": "For completing",
+    "stage_of": "stage of",
+    "issued_on": "Issued on",
+    "path": "Learning path",
+    "reference": "Reference",
+    "verify_hint": "This certificate can be verified by opening this page in a browser."
   },
   "paths": {
     "banner_heading": "Learning Paths",

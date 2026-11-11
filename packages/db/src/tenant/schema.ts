@@ -567,3 +567,25 @@ export const assessmentResponses = pgTable("assessment_responses", {
   isCorrect: boolean("is_correct").notNull().default(false),
   ...auditColumns,
 });
+
+// Certificates (work package E9-a): issued when a person completes all
+// modules in a path stage. One per person per path per stage; idempotent.
+export const certificates = pgTable(
+  "certificates",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    personId: uuid("person_id").notNull().references(() => people.id),
+    pathId: uuid("path_id").notNull().references(() => paths.id),
+    stageKind: pathStageKind("stage_kind").notNull(),
+    // The module ids that satisfied the stage at the time of issue.
+    moduleIds: text("module_ids").array().notNull().default(sql`'{}'::text[]`),
+    issuedAt: timestamp("issued_at", { withTimezone: true }).notNull().defaultNow(),
+    // Human-readable verifiable code, e.g. CERT-2026-00001.
+    reference: text("reference").notNull().unique(),
+    ...auditColumns,
+  },
+  (t) => [
+    uniqueIndex("certificates_person_path_stage_unique").on(t.personId, t.pathId, t.stageKind),
+    index("certificates_reference_idx").on(t.reference),
+  ],
+);

@@ -1,4 +1,4 @@
-import { listModuleItems, myLearning, personByUserId, type AssignmentStageView, STAGE_ORDER } from "@mantle/db/tenant";
+import { certificatesForPerson, listModuleItems, myLearning, personByUserId, type AssignmentStageView, STAGE_ORDER } from "@mantle/db/tenant";
 import Link from "next/link";
 import { t } from "../../i18n.ts";
 import { requireFeature, requirePermission } from "../../server/session.ts";
@@ -57,6 +57,7 @@ export default async function MyLearning({
   }
 
   const data = await myLearning(db, person.id);
+  const certs = await certificatesForPerson(db, person.id);
 
   if (data.pathsEnrolled === 0) {
     return (
@@ -244,20 +245,43 @@ export default async function MyLearning({
           {/* Certificates */}
           <div className="my-panel">
             <h2>{t("learning.certs_heading")}</h2>
-            <div className="my-certs-row">
-              <div className="my-certs-icon" aria-hidden>
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                  <rect x="5" y="9" width="10" height="8" rx="2" stroke="currentColor" strokeWidth="1.5" />
-                  <path d="M6 9V7a4 4 0 0 1 8 0v2" stroke="currentColor" strokeWidth="1.5" />
-                </svg>
+            {certs.length === 0 ? (
+              <div className="my-certs-row">
+                <div className="my-certs-icon" aria-hidden>
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <rect x="5" y="9" width="10" height="8" rx="2" stroke="currentColor" strokeWidth="1.5" />
+                    <path d="M6 9V7a4 4 0 0 1 8 0v2" stroke="currentColor" strokeWidth="1.5" />
+                  </svg>
+                </div>
+                <div>
+                  <p style={{ fontSize: 13, color: "var(--mantle-color-text_muted)", margin: 0 }}>
+                    {t("learning.certs_none")}
+                  </p>
+                </div>
               </div>
-              <div>
-                <p style={{ fontWeight: 600, fontSize: 14, margin: 0 }}>{t("learning.certs_coming_soon")}</p>
-                <p style={{ fontSize: 13, color: "var(--mantle-color-text_muted)", margin: "4px 0 0" }}>
-                  {t("learning.certs_none")}
-                </p>
-              </div>
-            </div>
+            ) : (
+              <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 10 }}>
+                {certs.map((cert) => (
+                  <li key={cert.id} style={{ borderRadius: 8, border: "1px solid var(--mantle-color-border)", padding: "10px 12px" }}>
+                    <p style={{ fontWeight: 600, fontSize: 13, margin: 0 }}>
+                      {t(`paths.stages.${cert.stageKind}`)} {t("learning.certs_stage_label")}
+                    </p>
+                    <p style={{ fontSize: 12, color: "var(--mantle-color-text_muted)", margin: "2px 0 4px" }}>
+                      {cert.pathName}
+                    </p>
+                    <p style={{ fontSize: 12, margin: 0 }}>
+                      <Link href={`/certificate/${cert.reference}`} style={{ color: "var(--mantle-color-primary)" }}>
+                        {cert.reference}
+                      </Link>
+                      {" "}&middot;{" "}
+                      <span style={{ color: "var(--mantle-color-text_muted)" }}>
+                        {t("learning.certs_issued", { date: cert.issuedAt.toISOString().slice(0, 10) })}
+                      </span>
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
 
           {/* Keep going nudge */}
