@@ -38,13 +38,13 @@ export default async function Item({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ saved?: string; published?: string; error?: string; placed?: string; file_added?: string; file_error?: string; file_removed?: string; file?: string; moduleId?: string; attempt?: string }>;
+  searchParams: Promise<{ saved?: string; published?: string; error?: string; placed?: string; file_added?: string; file_error?: string; file_removed?: string; file?: string; moduleId?: string; attempt?: string; completed?: string }>;
 }) {
   const ctx = await requirePermission("library.view");
   const { tenant, db, roles } = ctx;
   await requireFeature(tenant, "knowledge_library");
   const { id } = await params;
-  const { saved, published, error, placed, file_added: fileAdded, file_error: fileError, file_removed: fileRemoved, file: fileParam, moduleId, attempt: attemptId } = await searchParams;
+  const { saved, published, error, placed, file_added: fileAdded, file_error: fileError, file_removed: fileRemoved, file: fileParam, moduleId, attempt: attemptId, completed } = await searchParams;
   const found = /^[0-9a-f-]{36}$/.test(id) ? await getLibraryItem(db, id) : null;
   const editor = can(roles, "library.edit");
   const visible = await viewerAreas(ctx);
@@ -173,6 +173,8 @@ export default async function Item({
                     <p className="quiz-results-retry-hint">{t("learning.quiz_retry_hint", { score: String(assessment.passingScore) })}</p>
                   ) : !attemptResults.gate1Satisfied ? (
                     <p className="quiz-results-retry-hint">{t("learning.quiz_gate1_pending")}</p>
+                  ) : completed ? (
+                    <Link href="/my-learning?completed=1" className="quiz-continue-btn">{t("learning.quiz_continue")}</Link>
                   ) : null}
                   <div className="quiz-review">
                     {attemptResults.responses.map((r, i) => (

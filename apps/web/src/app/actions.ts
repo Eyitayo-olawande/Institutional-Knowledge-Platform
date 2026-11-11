@@ -108,7 +108,7 @@ export async function submitAssessmentAction(form: FormData): Promise<void> {
 
   if (result.passed && result.gate1Satisfied) {
     await completeModule(db, person.id, moduleId, `system:assessment:${result.attemptId}`);
-    redirect("/my-learning?completed=1");
+    redirect(`/library/${itemId}?moduleId=${moduleId}&attempt=${result.attemptId}&completed=1`);
   }
 
   redirect(`/library/${itemId}?moduleId=${moduleId}&attempt=${result.attemptId}`);
