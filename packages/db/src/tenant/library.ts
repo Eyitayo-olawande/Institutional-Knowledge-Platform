@@ -243,6 +243,28 @@ export async function itemFiles(db: TenantDb, itemId: string) {
     .orderBy(files.name);
 }
 
+// Removes a file from an item. Returns the storage keys so the caller can
+// delete the blobs from the file store after the DB transaction commits.
+export async function detachFileFromItem(
+  db: TenantDb,
+  itemId: string,
+  fileId: string,
+  actor: string,
+): Promise<{ storageKey: string; renditionKey: string | null }> {
+  return db.transaction(async (tx) => {
+    const [row] = await tx
+      .select({ storageKey: files.storageKey, renditionKey: files.renditionKey })
+      .from(files)
+      .innerJoin(libraryItemFiles, eq(libraryItemFiles.fileId, files.id))
+      .where(and(eq(files.id, fileId), eq(libraryItemFiles.itemId, itemId)));
+    if (!row) throw new Error("File not found on this item.");
+    await tx.delete(libraryItemFiles).where(and(eq(libraryItemFiles.itemId, itemId), eq(libraryItemFiles.fileId, fileId)));
+    await tx.delete(files).where(eq(files.id, fileId));
+    await recordActivity(tx, { actor, action: "library.file_removed", entityType: "library_item", entityId: itemId, details: { file_id: fileId } });
+    return { storageKey: row.storageKey, renditionKey: row.renditionKey };
+  });
+}
+
 // A file with the item it belongs to, so callers can check who may open it.
 export async function fileWithItem(db: TenantDb, fileId: string) {
   const [row] = await db

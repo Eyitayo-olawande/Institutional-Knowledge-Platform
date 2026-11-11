@@ -208,6 +208,8 @@
       "add": "Attach files (PDF, Word, Excel, PowerPoint, image or MP4; up to 10 files of 25 MB each)",
       "upload": "Upload files",
       "added": "Files attached: {count}.",
+      "remove": "Remove",
+      "removed": "File removed.",
       "size": "{kb} KB",
       "failed": "This file could not be prepared for viewing. Remove it and upload it again.",
       "original": "Download original",

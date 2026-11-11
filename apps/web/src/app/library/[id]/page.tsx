@@ -9,7 +9,7 @@ import { t } from "../../../i18n.ts";
 import { requireFeature, requirePermission, viewerAreas } from "../../../server/session.ts";
 import { AppShell } from "../../_components/AppShell.tsx";
 import { completeModuleAction, submitAssessmentAction } from "../../actions.ts";
-import { placeLibraryItem, publishItem, saveItemDraft, uploadItemFile } from "../actions.ts";
+import { deleteItemFile, placeLibraryItem, publishItem, saveItemDraft, uploadItemFile } from "../actions.ts";
 import { areaChoices, areaName } from "../areas.ts";
 import { PlacementFields } from "../PlacementFields.tsx";
 import { ViewerActionsClient } from "../ViewerActionsClient.tsx";
@@ -38,13 +38,13 @@ export default async function Item({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ saved?: string; published?: string; error?: string; placed?: string; file_added?: string; file_error?: string; file?: string; moduleId?: string; attempt?: string }>;
+  searchParams: Promise<{ saved?: string; published?: string; error?: string; placed?: string; file_added?: string; file_error?: string; file_removed?: string; file?: string; moduleId?: string; attempt?: string }>;
 }) {
   const ctx = await requirePermission("library.view");
   const { tenant, db, roles } = ctx;
   await requireFeature(tenant, "knowledge_library");
   const { id } = await params;
-  const { saved, published, error, placed, file_added: fileAdded, file_error: fileError, file: fileParam, moduleId, attempt: attemptId } = await searchParams;
+  const { saved, published, error, placed, file_added: fileAdded, file_error: fileError, file_removed: fileRemoved, file: fileParam, moduleId, attempt: attemptId } = await searchParams;
   const found = /^[0-9a-f-]{36}$/.test(id) ? await getLibraryItem(db, id) : null;
   const editor = can(roles, "library.edit");
   const visible = await viewerAreas(ctx);
@@ -134,6 +134,7 @@ export default async function Item({
       ) : null}
       {editor && item.needsAreaReview ? <div className="alert alert-info" role="status"><p>{t("library.areas.review_prompt")}</p></div> : null}
       {fileAdded ? <div className="alert alert-success" role="status"><p>{t("library.files.added", { count: Number(fileAdded) || 1 })}</p></div> : null}
+      {fileRemoved ? <div className="alert alert-success" role="status"><p>{t("library.files.removed")}</p></div> : null}
       {fileError && FILE_ERRORS.has(fileError) ? (
         <div className="alert alert-danger" role="alert"><p>{t(`library.files.errors.${fileError}`)}</p></div>
       ) : null}
@@ -417,6 +418,26 @@ export default async function Item({
           </Card>
           <Card>
             <h2>{t("library.files.heading")}</h2>
+            {attachments.length > 0 ? (
+              <div style={{ marginBottom: 16 }}>
+                {attachments.map((f) => (
+                  <div key={f.id} className="lib-item-file-row" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <div className="lib-item-file-icon">{fileTypeAbbr(f.contentType)}</div>
+                    <div className="lib-item-file-info" style={{ flex: 1 }}>
+                      <div className="lib-item-file-name">{f.name}</div>
+                      <div className="lib-item-file-size">{t("library.files.size", { kb: Math.max(1, Math.round(f.size / 1024)) })}</div>
+                    </div>
+                    <form action={deleteItemFile}>
+                      <input type="hidden" name="id" value={item.id} />
+                      <input type="hidden" name="fileId" value={f.id} />
+                      <button type="submit" className="btn-link btn-link--danger" style={{ fontSize: 12 }}>
+                        {t("library.files.remove")}
+                      </button>
+                    </form>
+                  </div>
+                ))}
+              </div>
+            ) : null}
             <form action={uploadItemFile}>
               <input type="hidden" name="id" value={item.id} />
               <label className="field">

@@ -6,6 +6,7 @@ export { isWordingKey, setWording, wording, WORDING_DEFAULTS, type Wording, type
 export {
   attachFileToItem,
   createLibraryItem,
+  detachFileFromItem,
   fileWithItem,
   getLibraryItem,
   itemFiles,
