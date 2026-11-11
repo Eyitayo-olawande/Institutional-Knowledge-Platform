@@ -81,14 +81,14 @@ export async function placeItem(db: TenantDb, itemId: string, placement: { areaI
 export async function saveDraft(
   db: TenantDb,
   itemId: string,
-  change: { title: string; body: string; changeNote: string | null; ownerUserId: string | null; reviewDate: string | null },
+  change: { title: string; body: string; changeNote: string | null; ownerUserId: string | null; reviewDate: string | null; videoUrl?: string | null },
   actor: string,
 ): Promise<number> {
   return db.transaction(async (tx) => {
     const now = new Date();
     await tx
       .update(libraryItems)
-      .set({ title: change.title, ownerUserId: change.ownerUserId, reviewDate: change.reviewDate, updatedAt: now, changedBy: actor })
+      .set({ title: change.title, ownerUserId: change.ownerUserId, reviewDate: change.reviewDate, ...(change.videoUrl !== undefined ? { videoUrl: change.videoUrl } : {}), updatedAt: now, changedBy: actor })
       .where(eq(libraryItems.id, itemId));
     const [draft] = await tx
       .select({ id: libraryItemVersions.id, version: libraryItemVersions.version })

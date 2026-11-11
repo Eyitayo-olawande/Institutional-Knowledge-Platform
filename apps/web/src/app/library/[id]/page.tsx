@@ -387,6 +387,10 @@ export default async function Item({
                 <textarea className="input" name="body" defaultValue={current.body} required rows={12} />
               </label>
               <label className="field">
+                {t("library.fields.video_url")}
+                <input className="input" name="videoUrl" type="url" defaultValue={item.videoUrl ?? ""} placeholder="https://www.youtube.com/watch?v=..." />
+              </label>
+              <label className="field">
                 {t("library.fields.change_note")}
                 <input className="input" name="changeNote" defaultValue={draft?.changeNote ?? ""} />
               </label>

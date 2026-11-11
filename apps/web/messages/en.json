@@ -163,6 +163,7 @@
     "fields": {
       "title": "Title",
       "body": "Content",
+      "video_url": "Video URL (YouTube)",
       "review_date": "Review by",
       "change_note": "What changed",
       "area": "Learning area",

@@ -27,6 +27,10 @@ export default async function NewItem({ searchParams }: { searchParams: Promise<
             {t("library.fields.body")}
             <textarea className="input" name="body" required rows={12} />
           </label>
+          <label className="field">
+            {t("library.fields.video_url")}
+            <input className="input" name="videoUrl" type="url" placeholder="https://www.youtube.com/watch?v=..." />
+          </label>
           <PlacementFields areas={areas} types={types} />
           <label className="field">
             {t("library.fields.review_date")}

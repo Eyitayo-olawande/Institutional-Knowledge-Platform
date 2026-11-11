@@ -43,18 +43,18 @@ async function seedCourse(spec: CourseSpec): Promise<void> {
 
   // Find department
   const [dept] = await db.select({ id: departments.id }).from(departments).where(eq(departments.name, spec.deptName));
-  if (!dept) { console.warn(`  Department "${spec.deptName}" not found — skipping.`); return; }
+  if (!dept) { console.warn(`  Department "${spec.deptName}" not found, skipping.`); return; }
 
   // Get area and content type
   const areaId = await departmentArea(db, dept.id);
-  if (!areaId) { console.warn(`  No area for department "${spec.deptName}" — skipping.`); return; }
+  if (!areaId) { console.warn(`  No area for department "${spec.deptName}", skipping.`); return; }
   const contentTypeId = await contentTypeByKey(db, "department", "training");
   if (!contentTypeId) throw new Error("Content type 'department/training' not found");
 
   // Create or find library item
   const existing = await db.select({ id: libraryItems.id }).from(libraryItems).where(eq(libraryItems.title, spec.title));
   if (existing.length > 0) {
-    console.log(`  Already seeded — skipping.`);
+    console.log(`  Already seeded, skipping.`);
     return;
   }
 
@@ -102,29 +102,29 @@ const CLAIMS: CourseSpec = {
   body: `CLAIMS HANDLING BEST PRACTICES
 A practical guide to managing insurance claims with accuracy, speed and customer empathy.
 
-MODULE 1 — THE CLAIMS PROCESS
+MODULE 1, THE CLAIMS PROCESS
 A claim is a request by a policyholder for compensation after a covered loss. Handling it well protects the customer and the company alike.
 
-First notification of loss (FNOL): The process begins when a customer reports an incident. Record every detail accurately — date, time, location, parties involved and the nature of the loss. Incomplete FNOL leads to delays and disputes.
+First notification of loss (FNOL): The process begins when a customer reports an incident. Record every detail accurately, date, time, location, parties involved and the nature of the loss. Incomplete FNOL leads to delays and disputes.
 
 Coverage verification: Before any payment, confirm that the policy was active on the date of loss, that the type of loss falls within the policy terms, and that no exclusion applies. Skipping this step creates liability.
 
-Investigation: Gather evidence — photographs, police reports, witness statements, repair estimates. The goal is an objective picture of what happened, not to approve or deny before the facts are known.
+Investigation: Gather evidence, photographs, police reports, witness statements, repair estimates. The goal is an objective picture of what happened, not to approve or deny before the facts are known.
 
-Reserve setting: Once the scope of the loss is clear, set an accurate reserve — the amount the company expects to pay. Underreserving creates solvency risk; overreserving distorts financial reporting.
+Reserve setting: Once the scope of the loss is clear, set an accurate reserve, the amount the company expects to pay. Underreserving creates solvency risk; overreserving distorts financial reporting.
 
-MODULE 2 — DOCUMENTATION AND DECISION-MAKING
+MODULE 2, DOCUMENTATION AND DECISION-MAKING
 Every decision in a claim must be documented. If it was not written down, it did not happen.
 
-Documentation standards: Record every conversation, every document received, and every action taken with a date and time stamp. Use plain, factual language — avoid speculation and personal opinion.
+Documentation standards: Record every conversation, every document received, and every action taken with a date and time stamp. Use plain, factual language, avoid speculation and personal opinion.
 
 Making the coverage decision: The decision to approve, partially approve or deny a claim must be based on the policy wording and the evidence gathered. Document your reasoning in full. Decisions based on inadequate investigation expose the company to bad-faith allegations.
 
-Salvage and subrogation: After paying a claim, the insurer may recover value from salvage (what remains of the damaged item) or through subrogation (seeking recovery from a third party at fault). Identify these opportunities early — they reduce net loss costs.
+Salvage and subrogation: After paying a claim, the insurer may recover value from salvage (what remains of the damaged item) or through subrogation (seeking recovery from a third party at fault). Identify these opportunities early, they reduce net loss costs.
 
-Fraud indicators: Be alert to inconsistencies — claims filed shortly after policy inception, vague or shifting accounts of the incident, prior claims history, or repair estimates that far exceed market rates. Refer suspected fraud to the appropriate team; never accuse a claimant directly.
+Fraud indicators: Be alert to inconsistencies, claims filed shortly after policy inception, vague or shifting accounts of the incident, prior claims history, or repair estimates that far exceed market rates. Refer suspected fraud to the appropriate team; never accuse a claimant directly.
 
-MODULE 3 — CUSTOMER COMMUNICATION IN CLAIMS
+MODULE 3, CUSTOMER COMMUNICATION IN CLAIMS
 A customer filing a claim is often in distress. How you communicate shapes their experience of the company.
 
 Acknowledge promptly: Contact the customer within 24 hours of FNOL. Acknowledge receipt of the claim and explain what happens next. Silence breeds anxiety and distrust.
@@ -148,7 +148,7 @@ Handle disputes professionally: If a customer disputes a decision, listen to the
     { text: "When a customer disputes a claims decision, the correct first step is to:", options: [{ text: "Immediately refer the dispute to legal", correct: false }, { text: "Listen to the concern and review the file before responding in writing", correct: true }, { text: "Confirm the original decision without further review", correct: false }, { text: "Ask the customer to lodge a formal court complaint", correct: false }] },
     { text: "The investigation phase of a claim aims to:", options: [{ text: "Build a case to minimise payment", correct: false }, { text: "Find grounds to deny the claim", correct: false }, { text: "Gather an objective picture of what happened before making a decision", correct: true }, { text: "Approve the claim as quickly as possible", correct: false }] },
     { text: "Why should a claims handler avoid speculating in written documentation?", options: [{ text: "Speculation is not required by regulators", correct: false }, { text: "Speculation and personal opinion can be used against the company in a dispute", correct: true }, { text: "Customers prefer factual language in all communications", correct: false }, { text: "Speculation slows the claims process", correct: false }] },
-    { text: "Coverage verification must be done before payment because:", options: [{ text: "It is required by the customer", correct: false }, { text: "Skipping it creates liability — the company may pay claims it is not obligated to pay", correct: true }, { text: "It speeds up reserve setting", correct: false }, { text: "Payment must always precede investigation", correct: false }] },
+    { text: "Coverage verification must be done before payment because:", options: [{ text: "It is required by the customer", correct: false }, { text: "Skipping it creates liability, the company may pay claims it is not obligated to pay", correct: true }, { text: "It speeds up reserve setting", correct: false }, { text: "Payment must always precede investigation", correct: false }] },
     { text: "Setting clear expectations with a claimant means:", options: [{ text: "Promising a decision within 24 hours regardless of complexity", correct: false }, { text: "Telling them what documents you need, the timeline, and when they will next hear from you", correct: true }, { text: "Explaining all policy exclusions upfront", correct: false }, { text: "Asking them to contact their broker for updates", correct: false }] },
   ],
 };
@@ -162,26 +162,26 @@ const COMPLIANCE: CourseSpec = {
   body: `AML/CFT & REGULATORY COMPLIANCE FUNDAMENTALS
 Understanding anti-money laundering, countering the financing of terrorism, and your regulatory obligations in the insurance sector.
 
-MODULE 1 — WHAT IS MONEY LAUNDERING AND WHY IT MATTERS
+MODULE 1, WHAT IS MONEY LAUNDERING AND WHY IT MATTERS
 Money laundering is the process of making illegally obtained funds appear legitimate. It typically involves three stages: placement (introducing illicit funds into the financial system), layering (disguising the trail through complex transactions) and integration (returning the now-cleaned money into the legitimate economy).
 
 Why insurers are targeted: Insurance products can be misused. Single-premium policies, early surrenders with a loss, and over-payments followed by refund requests are all patterns that money launderers exploit. The insurance sector is therefore subject to the same AML/CFT obligations as banks and other financial institutions.
 
 The regulatory framework in Nigeria: The Central Bank of Nigeria, the NAICOM, and the EFCC set the rules. SUNU Assurances Nigeria operates under these frameworks and is required to maintain a robust AML/CFT programme. Non-compliance carries severe penalties including fines, licence suspension and criminal prosecution.
 
-MODULE 2 — KNOW YOUR CUSTOMER AND RED FLAGS
+MODULE 2, KNOW YOUR CUSTOMER AND RED FLAGS
 KYC (Know Your Customer) is the foundation of AML compliance. It means verifying the identity of every customer before or immediately after a business relationship begins.
 
-Customer due diligence (CDD): Collect and verify: full name, date of birth, address, occupation, source of funds and the nature of the intended transaction. For higher-risk customers — politically exposed persons (PEPs), non-residents, cash-intensive businesses — enhanced due diligence (EDD) applies.
+Customer due diligence (CDD): Collect and verify: full name, date of birth, address, occupation, source of funds and the nature of the intended transaction. For higher-risk customers (politically exposed persons (PEPs), non-residents, cash-intensive businesses) enhanced due diligence (EDD) applies.
 
 Red flags to watch for: unusually large single premiums paid in cash; multiple policies purchased for no apparent economic reason; a customer who is reluctant to provide identification; a beneficiary who is unrelated to the insured; early policy cancellation with a request to refund to a different account; and transactions that do not match the customer's known income or occupation.
 
 Politically exposed persons (PEPs): PEPs hold or have held prominent public positions. They carry a higher corruption risk and must be subject to EDD regardless of the value of the transaction.
 
-MODULE 3 — REPORTING OBLIGATIONS AND YOUR PERSONAL DUTY
+MODULE 3, REPORTING OBLIGATIONS AND YOUR PERSONAL DUTY
 Every employee has a personal, legal obligation to report suspicious activity. Failing to do so is itself a criminal offence.
 
-Suspicious activity reports (SARs): If you suspect that a transaction involves the proceeds of crime or the financing of terrorism, you must file an internal SAR with the designated Compliance Officer. The report should be factual and confidential — do not tip off the customer that a report has been made.
+Suspicious activity reports (SARs): If you suspect that a transaction involves the proceeds of crime or the financing of terrorism, you must file an internal SAR with the designated Compliance Officer. The report should be factual and confidential, do not tip off the customer that a report has been made.
 
 Tipping off: Telling a customer or any third party that you have filed or are about to file a SAR is a criminal offence known as "tipping off." Once a report is submitted, continue to handle the customer normally.
 
@@ -196,7 +196,7 @@ Your personal liability: Ignorance is not a defence. Every employee is responsib
     { text: "Which of the following is a red flag for money laundering?", options: [{ text: "A customer who provides all required identity documents promptly", correct: false }, { text: "Early policy cancellation with a request to refund to a different account", correct: true }, { text: "A premium that matches the customer's known income level", correct: false }, { text: "A beneficiary who is the customer's immediate family member", correct: false }] },
     { text: "A politically exposed person (PEP) is:", options: [{ text: "Any customer with a government job", correct: false }, { text: "A person who holds or has held a prominent public position, carrying higher corruption risk", correct: true }, { text: "A person who has been investigated by regulators", correct: false }, { text: "A customer with political views that differ from company policy", correct: false }] },
     { text: "An internal suspicious activity report (SAR) should be filed when:", options: [{ text: "A customer complains about the service", correct: false }, { text: "You suspect a transaction involves proceeds of crime or terrorism financing", correct: true }, { text: "A customer requests an unusually early claim settlement", correct: false }, { text: "A transaction is processed outside normal business hours", correct: false }] },
-    { text: "\"Tipping off\" means:", options: [{ text: "Giving a customer advance notice of a premium increase", correct: false }, { text: "Informing a customer or third party that a SAR has been or will be filed — a criminal offence", correct: true }, { text: "Alerting your manager to a large transaction", correct: false }, { text: "Advising a customer to seek independent financial advice", correct: false }] },
+    { text: "\"Tipping off\" means:", options: [{ text: "Giving a customer advance notice of a premium increase", correct: false }, { text: "Informing a customer or third party that a SAR has been or will be filed, a criminal offence", correct: true }, { text: "Alerting your manager to a large transaction", correct: false }, { text: "Advising a customer to seek independent financial advice", correct: false }] },
     { text: "AML/CFT records must be retained for a minimum of:", options: [{ text: "One year", correct: false }, { text: "Three years", correct: false }, { text: "Five years", correct: true }, { text: "Ten years", correct: false }] },
     { text: "If you fail to report suspicious activity, you:", options: [{ text: "May receive a verbal warning from your manager", correct: false }, { text: "Are personally committing a criminal offence", correct: true }, { text: "Will only face consequences if the transaction turns out to be criminal", correct: false }, { text: "Are not at risk as long as your manager is aware", correct: false }] },
     { text: "\"Layering\" in money laundering refers to:", options: [{ text: "Introducing cash into the financial system", correct: false }, { text: "Disguising the trail of illicit funds through complex transactions", correct: true }, { text: "Returning cleaned money to the legitimate economy", correct: false }, { text: "Opening multiple accounts at the same institution", correct: false }] },
@@ -216,27 +216,27 @@ const CUSTOMER_SERVICE: CourseSpec = {
   body: `CUSTOMER SERVICE EXCELLENCE IN FINANCIAL SERVICES
 How to deliver consistently outstanding service to customers in an insurance and financial services environment.
 
-MODULE 1 — THE SERVICE STANDARD
-Customer service is not a department — it is everyone's responsibility. Every interaction a customer has with SUNU Assurances Nigeria shapes their view of the company and influences whether they renew, recommend us or leave.
+MODULE 1, THE SERVICE STANDARD
+Customer service is not a department, it is everyone's responsibility. Every interaction a customer has with SUNU Assurances Nigeria shapes their view of the company and influences whether they renew, recommend us or leave.
 
 What customers expect: Customers want to be heard, to receive accurate information quickly, and to feel that their business matters. In financial services, they also expect confidentiality, professionalism and competence. Meeting these expectations builds loyalty; failing them creates complaints and churn.
 
-The first impression: Greet customers professionally and promptly — by name if you know it. State your name and role. Set a confident, calm tone from the first sentence. First impressions are formed within seconds and are very difficult to reverse.
+The first impression: Greet customers professionally and promptly, by name if you know it. State your name and role. Set a confident, calm tone from the first sentence. First impressions are formed within seconds and are very difficult to reverse.
 
 Active listening: Give the customer your full attention. Do not interrupt. Take notes. Paraphrase what they said before responding: "So what I am hearing is..." This confirms understanding and shows the customer they have been listened to.
 
-MODULE 2 — HANDLING COMPLAINTS AND DIFFICULT CONVERSATIONS
-A complaint is a gift — it tells you exactly where service has fallen short and gives you an opportunity to recover the relationship.
+MODULE 2, HANDLING COMPLAINTS AND DIFFICULT CONVERSATIONS
+A complaint is a gift, it tells you exactly where service has fallen short and gives you an opportunity to recover the relationship.
 
 The recovery sequence: Acknowledge → Apologise → Act.
 Acknowledge: "I understand why that is frustrating." Never minimise the customer's concern.
-Apologise: Apologise for the experience, even if the fault was not yours. "I am sorry you experienced this" is not an admission of liability — it is empathy.
+Apologise: Apologise for the experience, even if the fault was not yours. "I am sorry you experienced this" is not an admission of liability, it is empathy.
 Act: Tell the customer what you will do and by when. Keep that commitment. If you cannot resolve the issue on the first contact, give a clear escalation path.
 
-Staying calm under pressure: If a customer is angry, lower your own voice — do not match their volume. Use their name. Avoid defensive language such as "our policy says..." and replace it with "here is what I can do for you." You cannot control the customer's behaviour; you can control your response.
+Staying calm under pressure: If a customer is angry, lower your own voice, do not match their volume. Use their name. Avoid defensive language such as "our policy says..." and replace it with "here is what I can do for you." You cannot control the customer's behaviour; you can control your response.
 
-MODULE 3 — BUILDING LASTING CUSTOMER RELATIONSHIPS
-Great service goes beyond resolving the immediate issue — it builds relationships that last.
+MODULE 3, BUILDING LASTING CUSTOMER RELATIONSHIPS
+Great service goes beyond resolving the immediate issue, it builds relationships that last.
 
 Follow through: If you promised a callback, make it even if you have nothing new to report. "I wanted to let you know I am still working on this" is better than silence. Customers who feel forgotten escalate and churn.
 
@@ -244,7 +244,7 @@ Personalisation: Use the customer's name. Reference their policy or previous int
 
 Feedback and improvement: Invite customers to tell you how the service could be better. Treat negative feedback as useful data, not personal criticism. Share patterns you observe with your team and your manager.
 
-Representing the brand: Every team member is a brand ambassador. The language you use, the tone of your emails, how quickly you respond — all of these form the customer's picture of SUNU Assurances Nigeria. Act as if the most important person in the company is reading every message you send.`,
+Representing the brand: Every team member is a brand ambassador. The language you use, the tone of your emails, how quickly you respond, all of these form the customer's picture of SUNU Assurances Nigeria. Act as if the most important person in the company is reading every message you send.`,
   questions: [
     { text: "Who is responsible for customer service at SUNU Assurances Nigeria?", options: [{ text: "The Customer Service department only", correct: false }, { text: "Front-line staff only", correct: false }, { text: "Everyone in the organisation", correct: true }, { text: "The complaints team only", correct: false }] },
     { text: "What do customers in financial services primarily expect?", options: [{ text: "Gifts and rewards for loyalty", correct: false }, { text: "To be heard, receive accurate information quickly, and feel that their business matters", correct: true }, { text: "The lowest possible price at all times", correct: false }, { text: "A personal relationship with senior management", correct: false }] },
@@ -273,44 +273,44 @@ const FINANCE: CourseSpec = {
   body: `FINANCIAL MANAGEMENT & BUDGETING BASICS
 Core financial concepts, budgeting principles and financial controls for insurance professionals.
 
-MODULE 1 — CORE FINANCIAL CONCEPTS
-Sound financial management is the backbone of a healthy insurance company. Every department's decisions have a financial dimension — understanding the fundamentals makes you a better contributor.
+MODULE 1, CORE FINANCIAL CONCEPTS
+Sound financial management is the backbone of a healthy insurance company. Every department's decisions have a financial dimension, understanding the fundamentals makes you a better contributor.
 
 The income statement: Shows revenues earned and expenses incurred over a period. For an insurer, revenue includes gross written premium, investment income and fee income. Key expenses include claims incurred, operating costs and commission. The difference is profit or loss.
 
-The balance sheet: A snapshot of what the company owns (assets), what it owes (liabilities) and the difference (equity or net worth). For an insurer, technical reserves — the funds set aside to pay future claims — are the dominant liability. Maintaining adequate reserves is a regulatory requirement.
+The balance sheet: A snapshot of what the company owns (assets), what it owes (liabilities) and the difference (equity or net worth). For an insurer, technical reserves (the funds set aside to pay future claims) are the dominant liability. Maintaining adequate reserves is a regulatory requirement.
 
 Liquidity: The ability to meet obligations as they fall due. An insurer must always be able to pay claims when they arise. Holding too much liquidity in cash is inefficient; holding too little creates solvency risk.
 
 The time value of money: A naira received today is worth more than a naira received in a year because today's naira can be invested. This principle underpins premium pricing, reserve discounting and investment decisions.
 
-MODULE 2 — BUDGETING AND PLANNING
+MODULE 2, BUDGETING AND PLANNING
 A budget is a financial plan. It converts strategy into numbers and gives managers a baseline against which to measure performance.
 
 The budget cycle: Budgets are typically set annually, often quarterly reviewed. The process starts with strategic objectives, moves to revenue and volume assumptions, then to expense planning, and ends with an approved plan signed off by the board.
 
 Variance analysis: Comparing actual results to budget reveals where the business is performing ahead of plan and where it is falling behind. A favourable variance (better than budget) in revenue or an adverse variance in expenses requires explanation. Understanding why a variance occurred is as important as the number itself.
 
-Cost control: Every team must understand its own cost drivers — the activities or volumes that cause costs to increase. Approving expenditure within delegated authority limits, challenging discretionary spend and renegotiating supplier contracts are all part of cost management.
+Cost control: Every team must understand its own cost drivers, the activities or volumes that cause costs to increase. Approving expenditure within delegated authority limits, challenging discretionary spend and renegotiating supplier contracts are all part of cost management.
 
-MODULE 3 — FINANCIAL CONTROLS AND COMPLIANCE
+MODULE 3, FINANCIAL CONTROLS AND COMPLIANCE
 Financial controls exist to protect assets, ensure accurate reporting and prevent fraud.
 
 Segregation of duties: No single person should both authorise a transaction and process it. Separating these roles creates a check that prevents both errors and fraud.
 
-Delegation of authority: Every organisation has limits — specific amounts beyond which a more senior approver is required. Respecting these limits is not bureaucracy; it is risk management.
+Delegation of authority: Every organisation has limits, specific amounts beyond which a more senior approver is required. Respecting these limits is not bureaucracy; it is risk management.
 
 Expense claims: Expenses must be supported by receipts, comply with company policy, and be submitted promptly. Inflating expense claims is theft and grounds for dismissal.
 
-Internal audit: The internal audit function provides independent assurance that controls are working. Cooperate fully with audit reviews — their findings protect the business and your department.`,
+Internal audit: The internal audit function provides independent assurance that controls are working. Cooperate fully with audit reviews, their findings protect the business and your department.`,
   questions: [
     { text: "The income statement shows:", options: [{ text: "What the company owns and owes at a point in time", correct: false }, { text: "Revenues earned and expenses incurred over a period", correct: true }, { text: "The company's investment portfolio", correct: false }, { text: "Only the company's claims payments", correct: false }] },
-    { text: "For an insurer, technical reserves represent:", options: [{ text: "Cash held in the bank for daily operations", correct: false }, { text: "Funds set aside to pay future claims — the dominant liability on the balance sheet", correct: true }, { text: "Investments in shares and bonds", correct: false }, { text: "The company's retained profit", correct: false }] },
+    { text: "For an insurer, technical reserves represent:", options: [{ text: "Cash held in the bank for daily operations", correct: false }, { text: "Funds set aside to pay future claims, the dominant liability on the balance sheet", correct: true }, { text: "Investments in shares and bonds", correct: false }, { text: "The company's retained profit", correct: false }] },
     { text: "Liquidity in an insurance context means:", options: [{ text: "How profitable the company is", correct: false }, { text: "The company's ability to meet obligations (pay claims) as they fall due", correct: true }, { text: "The ratio of equity to debt", correct: false }, { text: "The speed at which premiums are collected", correct: false }] },
     { text: "The time value of money states that:", options: [{ text: "Money loses value over time due to inflation only", correct: false }, { text: "A naira today is worth more than a naira in the future because today's naira can be invested", correct: true }, { text: "Future money is worth more because interest has been added", correct: false }, { text: "Time has no effect on the value of money", correct: false }] },
     { text: "A budget is best described as:", options: [{ text: "A historical record of past performance", correct: false }, { text: "A financial plan that converts strategy into numbers", correct: true }, { text: "A tool used only by the Finance department", correct: false }, { text: "A list of company assets and liabilities", correct: false }] },
     { text: "Variance analysis involves:", options: [{ text: "Calculating the probability of future losses", correct: false }, { text: "Comparing actual results to budget to understand performance", correct: true }, { text: "Analysing differences between employees' salaries", correct: false }, { text: "Reviewing the statistical variation in claims data", correct: false }] },
-    { text: "An adverse variance means:", options: [{ text: "Revenue is better than budget", correct: false }, { text: "The result is worse than budget — revenue below plan or expenses above plan", correct: true }, { text: "The budget was set incorrectly", correct: false }, { text: "The company made a loss", correct: false }] },
+    { text: "An adverse variance means:", options: [{ text: "Revenue is better than budget", correct: false }, { text: "The result is worse than budget, revenue below plan or expenses above plan", correct: true }, { text: "The budget was set incorrectly", correct: false }, { text: "The company made a loss", correct: false }] },
     { text: "Segregation of duties means:", options: [{ text: "Separating finance from other departments", correct: false }, { text: "No single person should both authorise and process the same transaction", correct: true }, { text: "Keeping financial records confidential from non-finance staff", correct: false }, { text: "Rotating staff between departments annually", correct: false }] },
     { text: "Delegation of authority limits exist to:", options: [{ text: "Slow down decision-making to prevent errors", correct: false }, { text: "Restrict financial authority to qualified accountants", correct: false }, { text: "Ensure significant financial commitments receive appropriate senior approval", correct: true }, { text: "Comply with IFRS standards", correct: false }] },
     { text: "Inflating an expense claim is:", options: [{ text: "Acceptable if the total is below the company policy limit", correct: false }, { text: "Theft and grounds for dismissal", correct: true }, { text: "A minor procedural infraction", correct: false }, { text: "Only a problem if the company is making a loss", correct: false }] },
@@ -318,7 +318,7 @@ Internal audit: The internal audit function provides independent assurance that 
     { text: "The balance sheet shows:", options: [{ text: "Revenue and expenses for the year", correct: false }, { text: "A snapshot of assets, liabilities and equity at a point in time", correct: true }, { text: "Cash flows into and out of the business", correct: false }, { text: "The budget for the next financial year", correct: false }] },
     { text: "The internal audit function provides:", options: [{ text: "Legal advice to the board", correct: false }, { text: "Independent assurance that financial controls are working", correct: true }, { text: "External compliance certification", correct: false }, { text: "Tax planning services", correct: false }] },
     { text: "Which of the following is an example of sound cost control?", options: [{ text: "Approving all expenditure requests to avoid delays", correct: false }, { text: "Challenging discretionary spend and respecting delegated authority limits", correct: true }, { text: "Reducing claims payments to cut costs", correct: false }, { text: "Deferring expense claims to future periods", correct: false }] },
-    { text: "An insurer holds too much liquidity in cash because:", options: [{ text: "It is a regulatory requirement", correct: false }, { text: "Claims must be paid the same day they are received", correct: false }, { text: "Excessive cash is inefficient — it forgoes investment returns", correct: true }, { text: "Cash earns the highest return in a stable economy", correct: false }] },
+    { text: "An insurer holds too much liquidity in cash because:", options: [{ text: "It is a regulatory requirement", correct: false }, { text: "Claims must be paid the same day they are received", correct: false }, { text: "Excessive cash is inefficient, it forgoes investment returns", correct: true }, { text: "Cash earns the highest return in a stable economy", correct: false }] },
   ],
 };
 
@@ -331,34 +331,34 @@ const HR: CourseSpec = {
   body: `HR FUNDAMENTALS: PEOPLE, POLICY & PERFORMANCE
 Core human resources principles for managers and employees at SUNU Assurances Nigeria.
 
-MODULE 1 — RECRUITMENT AND ONBOARDING
+MODULE 1, RECRUITMENT AND ONBOARDING
 Getting the right people into the right roles is the foundation of organisational performance.
 
 Job design: A good job description defines outcomes, not just tasks. It describes what success looks like in the role and the competencies needed to achieve it. Vague job descriptions attract misaligned candidates and set new hires up to fail.
 
-Structured selection: Use a consistent, structured interview process — the same questions asked to every candidate for the same role. This reduces bias and makes comparisons fair. Decisions should be based on evidence from the interview and any assessment, not on "fit" impressions that mask unconscious bias.
+Structured selection: Use a consistent, structured interview process, the same questions asked to every candidate for the same role. This reduces bias and makes comparisons fair. Decisions should be based on evidence from the interview and any assessment, not on "fit" impressions that mask unconscious bias.
 
-Onboarding: The first 90 days are critical. A new employee who is well-oriented — who knows their responsibilities, their team, the systems and the company's values — becomes productive faster and is less likely to leave. Assign a buddy, complete required training, and schedule regular check-ins with the line manager.
+Onboarding: The first 90 days are critical. A new employee who is well-oriented (who knows their responsibilities, their team, the systems and the company's values) becomes productive faster and is less likely to leave. Assign a buddy, complete required training, and schedule regular check-ins with the line manager.
 
-MODULE 2 — PERFORMANCE MANAGEMENT
+MODULE 2, PERFORMANCE MANAGEMENT
 Performance management is a continuous conversation, not an annual event.
 
-Goal setting: Goals should be SMART — Specific, Measurable, Achievable, Relevant and Time-bound. Goals that are vague or unrealistic demotivate rather than focus. Review them at least quarterly and update them when priorities change.
+Goal setting: Goals should be SMART, Specific, Measurable, Achievable, Relevant and Time-bound. Goals that are vague or unrealistic demotivate rather than focus. Review them at least quarterly and update them when priorities change.
 
-Feedback: Regular feedback — both positive and developmental — is the manager's most important tool. Feedback that is specific, timely and focused on behaviour (not character) is absorbed and acted upon. "You handled that client call well because you stayed calm and found a solution" is useful; "you're good at calls" is not.
+Feedback: Regular feedback (both positive and developmental) is the manager's most important tool. Feedback that is specific, timely and focused on behaviour (not character) is absorbed and acted upon. "You handled that client call well because you stayed calm and found a solution" is useful; "you're good at calls" is not.
 
-Managing underperformance: When an employee is not meeting expectations, address it early. The longer underperformance goes unaddressed, the harder it is to resolve. Understand the root cause — is it skill (training), will (motivation), or circumstance (personal issue)? Respond with the right intervention, not a one-size-fits-all warning.
+Managing underperformance: When an employee is not meeting expectations, address it early. The longer underperformance goes unaddressed, the harder it is to resolve. Understand the root cause, is it skill (training), will (motivation), or circumstance (personal issue)? Respond with the right intervention, not a one-size-fits-all warning.
 
-MODULE 3 — EMPLOYEE RELATIONS AND CONDUCT
+MODULE 3, EMPLOYEE RELATIONS AND CONDUCT
 A respectful, fair and consistent approach to employee relations builds trust and reduces conflict.
 
-Disciplinary process: Discipline exists to correct behaviour, not to punish. The standard process — verbal warning, written warning, final written warning, dismissal — should be followed consistently. Skipping steps or applying the process inconsistently exposes the company to legal challenge.
+Disciplinary process: Discipline exists to correct behaviour, not to punish. The standard process (verbal warning, written warning, final written warning, dismissal) should be followed consistently. Skipping steps or applying the process inconsistently exposes the company to legal challenge.
 
 Grievances: Every employee has the right to raise a grievance. Grievances must be taken seriously, investigated fairly and resolved promptly. The investigating manager should not be the subject of the grievance.
 
 Equality and diversity: Decisions about hiring, promotion, pay and discipline must be based on merit and conduct, never on gender, ethnicity, religion, age, disability or any other protected characteristic. Discriminatory behaviour is both unlawful and contrary to the company's values.
 
-Confidentiality: HR information — salaries, disciplinary records, medical details — is strictly confidential. Access is restricted to those with a legitimate need.`,
+Confidentiality: HR information (salaries, disciplinary records, medical details) is strictly confidential. Access is restricted to those with a legitimate need.`,
   questions: [
     { text: "A good job description should focus on:", options: [{ text: "A detailed list of daily tasks", correct: false }, { text: "Outcomes and the competencies needed to achieve them", correct: true }, { text: "The salary range and benefits", correct: false }, { text: "The reporting line only", correct: false }] },
     { text: "Structured selection interviews require:", options: [{ text: "Different questions for each candidate based on their CV", correct: false }, { text: "The same questions asked to every candidate for the same role", correct: true }, { text: "Panel interviews for all positions", correct: false }, { text: "Only technical questions relevant to the job", correct: false }] },
@@ -387,45 +387,45 @@ const IT: CourseSpec = {
   body: `CYBERSECURITY AWARENESS & DIGITAL SAFETY
 Practical guidance for every SUNU Assurances Nigeria employee on protecting company and customer data.
 
-MODULE 1 — THE THREAT LANDSCAPE
+MODULE 1, THE THREAT LANDSCAPE
 Cyber threats are not only a problem for technology companies. Insurance firms hold vast amounts of sensitive personal and financial data, making them high-value targets.
 
-Phishing: The most common attack vector. An attacker sends an email that appears to come from a trusted source — a colleague, a bank, a regulator — to trick you into revealing credentials or clicking a malicious link. Signs: urgency ("act now or your account will be closed"), unexpected sender, misspelled domain names, links that do not match the display text.
+Phishing: The most common attack vector. An attacker sends an email that appears to come from a trusted source (a colleague, a bank, a regulator) to trick you into revealing credentials or clicking a malicious link. Signs: urgency ("act now or your account will be closed"), unexpected sender, misspelled domain names, links that do not match the display text.
 
 Malware: Malicious software installed on a device, often via a phishing email or infected USB drive. Types include ransomware (encrypts your files and demands payment), spyware (monitors your activity) and keyloggers (capture what you type).
 
-Social engineering: Attackers manipulate people, not systems. A caller who claims to be from IT support and asks for your password, a visitor who tailgates into a secure area, or a colleague who asks you to bypass a security step — all are social engineering attacks.
+Social engineering: Attackers manipulate people, not systems. A caller who claims to be from IT support and asks for your password, a visitor who tailgates into a secure area, or a colleague who asks you to bypass a security step, all are social engineering attacks.
 
 Insider threats: Not all threats come from outside. Disgruntled employees, careless handling of data, and accidental disclosure are as damaging as external attacks. This is why access controls and clear data handling policies exist.
 
-MODULE 2 — SAFE PRACTICES AT WORK
+MODULE 2, SAFE PRACTICES AT WORK
 Most breaches are caused not by sophisticated hackers but by predictable human behaviour.
 
-Passwords: Use long, unique passwords for every account. Never share passwords. Use a passphrase — three or four unrelated words joined by symbols — rather than a short complex password. Enable multi-factor authentication (MFA) wherever it is available.
+Passwords: Use long, unique passwords for every account. Never share passwords. Use a passphrase (three or four unrelated words joined by symbols) rather than a short complex password. Enable multi-factor authentication (MFA) wherever it is available.
 
-Email discipline: Do not click links or open attachments from unknown senders. Verify unusual requests by calling the sender directly — not by replying to the suspicious email. If in doubt, report to IT before clicking.
+Email discipline: Do not click links or open attachments from unknown senders. Verify unusual requests by calling the sender directly, not by replying to the suspicious email. If in doubt, report to IT before clicking.
 
-Device security: Lock your screen whenever you leave your workstation, even briefly. Keep software and operating systems up to date — updates contain security patches. Never plug personal USB drives into company equipment.
+Device security: Lock your screen whenever you leave your workstation, even briefly. Keep software and operating systems up to date, updates contain security patches. Never plug personal USB drives into company equipment.
 
-Data handling: Store data only in approved company systems. Do not send customer or company data to personal email addresses. Dispose of physical documents securely — shred, do not bin.
+Data handling: Store data only in approved company systems. Do not send customer or company data to personal email addresses. Dispose of physical documents securely, shred, do not bin.
 
-MODULE 3 — INCIDENT RESPONSE
+MODULE 3, INCIDENT RESPONSE
 Knowing how to respond quickly limits the damage when a security incident occurs.
 
 Recognising an incident: Signs include: being unable to access files you could previously open, unexpected password change notices, computer behaving unusually, an email sent from your account that you did not write, or a request for a large unusual transfer.
 
-What to do: Stop using the affected device immediately. Do not try to fix it yourself. Report to IT immediately with as much detail as possible — what you saw, what you clicked, when it happened. The faster you report, the faster the damage can be contained.
+What to do: Stop using the affected device immediately. Do not try to fix it yourself. Report to IT immediately with as much detail as possible, what you saw, what you clicked, when it happened. The faster you report, the faster the damage can be contained.
 
 Your obligation: Delay in reporting a cyber incident can convert a manageable problem into a data breach affecting thousands of customers, with regulatory and reputational consequences. Every employee has a duty to report immediately and honestly.`,
   questions: [
     { text: "What is phishing?", options: [{ text: "A type of malware that encrypts your files", correct: false }, { text: "An attack using deceptive emails to trick you into revealing credentials or clicking malicious links", correct: true }, { text: "A tool used by IT to test network security", correct: false }, { text: "A method of stealing data via USB drives", correct: false }] },
     { text: "Which of the following is a sign of a phishing email?", options: [{ text: "An email from a known sender that you expected", correct: false }, { text: "A link in the email that matches the display text", correct: false }, { text: "Urgent language and a sender domain that is slightly misspelled", correct: true }, { text: "A message without any attachments", correct: false }] },
     { text: "Ransomware:", options: [{ text: "Monitors your keystrokes and sends them to an attacker", correct: false }, { text: "Encrypts your files and demands payment to restore access", correct: true }, { text: "Sends spam emails from your account", correct: false }, { text: "Slows down your computer without causing data loss", correct: false }] },
-    { text: "Social engineering attacks target:", options: [{ text: "Firewalls and network infrastructure", correct: false }, { text: "People — exploiting trust, urgency or authority to bypass security", correct: true }, { text: "Outdated operating systems only", correct: false }, { text: "Database servers", correct: false }] },
+    { text: "Social engineering attacks target:", options: [{ text: "Firewalls and network infrastructure", correct: false }, { text: "People, exploiting trust, urgency or authority to bypass security", correct: true }, { text: "Outdated operating systems only", correct: false }, { text: "Database servers", correct: false }] },
     { text: "The best password strategy is:", options: [{ text: "A single complex password for all accounts so it is easy to remember", correct: false }, { text: "A unique passphrase for each account, with multi-factor authentication enabled", correct: true }, { text: "Changing your password every week to confuse attackers", correct: false }, { text: "Using your name and date of birth as the basis for all passwords", correct: false }] },
     { text: "If you receive a suspicious email attachment, you should:", options: [{ text: "Open it to check if it is harmless", correct: false }, { text: "Forward it to colleagues to see if they received it too", correct: false }, { text: "Report it to IT before clicking or opening anything", correct: true }, { text: "Delete it and not report it", correct: false }] },
     { text: "Multi-factor authentication (MFA) means:", options: [{ text: "Using a different password for each system", correct: false }, { text: "Verifying identity through a second factor (such as an SMS code) in addition to a password", correct: true }, { text: "Having multiple people approve access to sensitive systems", correct: false }, { text: "Logging in with a fingerprint instead of a password", correct: false }] },
-    { text: "An insider threat refers to:", options: [{ text: "An external hacker who has infiltrated the company network", correct: false }, { text: "A risk arising from employees or others with authorised access — through carelessness or malice", correct: true }, { text: "Threats originating from partner companies", correct: false }, { text: "A type of phishing attack targeting senior management", correct: false }] },
+    { text: "An insider threat refers to:", options: [{ text: "An external hacker who has infiltrated the company network", correct: false }, { text: "A risk arising from employees or others with authorised access, through carelessness or malice", correct: true }, { text: "Threats originating from partner companies", correct: false }, { text: "A type of phishing attack targeting senior management", correct: false }] },
     { text: "When you receive an unusual financial transfer request by email, you should:", options: [{ text: "Process it quickly to meet the sender's deadline", correct: false }, { text: "Reply to the email to confirm the details", correct: false }, { text: "Call the apparent sender directly to verify the request independently", correct: true }, { text: "Forward it to Finance for processing", correct: false }] },
     { text: "Customer data should be stored:", options: [{ text: "In any convenient location including personal email", correct: false }, { text: "Only in approved company systems", correct: true }, { text: "On personal USB drives for backup purposes", correct: false }, { text: "In spreadsheets shared by email for easy access", correct: false }] },
     { text: "When you notice your computer is behaving unusually, you should:", options: [{ text: "Restart the computer and continue working", correct: false }, { text: "Try to fix the issue yourself first", correct: false }, { text: "Stop using the device immediately and report to IT", correct: true }, { text: "Save all open documents before doing anything else", correct: false }] },
@@ -445,38 +445,38 @@ const INTERNAL_CONTROL: CourseSpec = {
   body: `INTERNAL CONTROLS & RISK MANAGEMENT
 How internal controls work, why they matter in insurance, and how every employee contributes to a sound control environment.
 
-MODULE 1 — WHAT ARE INTERNAL CONTROLS?
+MODULE 1, WHAT ARE INTERNAL CONTROLS?
 Internal controls are the policies, procedures and behaviours that an organisation puts in place to achieve its objectives reliably, protect its assets, and ensure accurate reporting.
 
 The COSO framework: The most widely used internal control framework identifies five components: Control Environment (the tone set by management), Risk Assessment (identifying and evaluating risks), Control Activities (the specific policies and procedures that address risks), Information & Communication (ensuring the right information reaches the right people), and Monitoring Activities (ongoing assessment of whether controls are working).
 
-Why they matter in insurance: Insurers hold premium funds in trust for policyholders. A failure of internal controls — an undetected error, a fraudulent transaction, an overridden approval — can result in regulatory sanctions, financial loss and reputational damage. Internal controls are the last line of defence.
+Why they matter in insurance: Insurers hold premium funds in trust for policyholders. A failure of internal controls (an undetected error, a fraudulent transaction, an overridden approval) can result in regulatory sanctions, financial loss and reputational damage. Internal controls are the last line of defence.
 
 Types of controls:
 - Preventive controls stop errors or fraud before they occur (e.g., requiring two signatures on a payment).
 - Detective controls identify errors or fraud after the fact (e.g., monthly bank reconciliations).
 - Corrective controls address identified problems (e.g., reversing a wrongly posted journal entry).
 
-MODULE 2 — IDENTIFYING AND MANAGING RISK
+MODULE 2, IDENTIFYING AND MANAGING RISK
 Risk is the possibility that an event will occur and adversely affect the achievement of objectives.
 
 The risk register: A structured record of identified risks, their likelihood, potential impact, the controls in place to manage them, and the residual risk that remains after controls. Every department contributes to the risk register.
 
-Risk appetite: The level of risk an organisation is prepared to accept in pursuit of its objectives. Some risk is unavoidable in insurance — the company takes on risk as its business. The question is whether the risk is priced, understood and controlled.
+Risk appetite: The level of risk an organisation is prepared to accept in pursuit of its objectives. Some risk is unavoidable in insurance, the company takes on risk as its business. The question is whether the risk is priced, understood and controlled.
 
 The three lines of defence:
 - First line: Business operations (every employee managing risks in their daily work).
 - Second line: Risk and compliance functions (oversight and frameworks).
 - Third line: Internal audit (independent assurance).
 
-MODULE 3 — TESTING AND MONITORING CONTROLS
+MODULE 3, TESTING AND MONITORING CONTROLS
 Controls that are not monitored degrade over time. People find workarounds; volumes increase; risks change. Continuous monitoring keeps the control environment effective.
 
 Control testing: Periodically verifying that a control operates as designed. For example, testing whether expense approvals are always obtained before payment. Testing may be done by the control owner (self-assessment) or by Internal Audit.
 
-Key control indicators (KCIs): Metrics that signal whether controls are working — reconciliation completion rates, approval turnaround times, number of overrides. A KCI that deteriorates is an early warning that a control is breaking down.
+Key control indicators (KCIs): Metrics that signal whether controls are working, reconciliation completion rates, approval turnaround times, number of overrides. A KCI that deteriorates is an early warning that a control is breaking down.
 
-Your responsibility: Every employee is part of the control environment. If you identify a control that is not working — a step being skipped, a system error, a process that creates a risk — you are expected to escalate it. Silence when you see a problem is a failure of the control environment too.`,
+Your responsibility: Every employee is part of the control environment. If you identify a control that is not working (a step being skipped, a system error, a process that creates a risk) you are expected to escalate it. Silence when you see a problem is a failure of the control environment too.`,
   questions: [
     { text: "Internal controls are designed to:", options: [{ text: "Restrict employee autonomy", correct: false }, { text: "Achieve objectives reliably, protect assets and ensure accurate reporting", correct: true }, { text: "Satisfy regulatory requirements only", correct: false }, { text: "Replace the need for external audit", correct: false }] },
     { text: "The five components of the COSO framework include:", options: [{ text: "Planning, Organising, Leading, Controlling, Reporting", correct: false }, { text: "Control Environment, Risk Assessment, Control Activities, Information & Communication, Monitoring", correct: true }, { text: "Prevention, Detection, Correction, Oversight, Reporting", correct: false }, { text: "Strategy, Operations, Compliance, Reporting, Technology", correct: false }] },
@@ -484,14 +484,14 @@ Your responsibility: Every employee is part of the control environment. If you i
     { text: "A detective control is best illustrated by:", options: [{ text: "Requiring two signatures before a payment is made", correct: false }, { text: "Monthly bank reconciliations that identify unmatched transactions", correct: true }, { text: "Restricting system access to authorised users only", correct: false }, { text: "Mandatory anti-fraud training for all staff", correct: false }] },
     { text: "The risk register records:", options: [{ text: "Claims paid in the current period", correct: false }, { text: "Identified risks, their likelihood and impact, controls in place, and residual risk", correct: true }, { text: "Past incidents only", correct: false }, { text: "The company's insurance policies", correct: false }] },
     { text: "Risk appetite refers to:", options: [{ text: "The level of risk the company will never accept", correct: false }, { text: "The level of risk an organisation is prepared to accept in pursuit of its objectives", correct: true }, { text: "The maximum claim amount the company will pay", correct: false }, { text: "The number of risk events expected in a year", correct: false }] },
-    { text: "The first line of defence is:", options: [{ text: "Internal Audit", correct: false }, { text: "The Risk and Compliance function", correct: false }, { text: "Business operations — every employee managing risks in their daily work", correct: true }, { text: "The board of directors", correct: false }] },
+    { text: "The first line of defence is:", options: [{ text: "Internal Audit", correct: false }, { text: "The Risk and Compliance function", correct: false }, { text: "Business operations, every employee managing risks in their daily work", correct: true }, { text: "The board of directors", correct: false }] },
     { text: "The third line of defence is:", options: [{ text: "Business operations", correct: false }, { text: "Risk and Compliance oversight", correct: false }, { text: "Internal Audit providing independent assurance", correct: true }, { text: "External regulators", correct: false }] },
     { text: "Control testing verifies that:", options: [{ text: "Employees understand the company's risk appetite", correct: false }, { text: "A control operates as it was designed to operate", correct: true }, { text: "The risk register is up to date", correct: false }, { text: "Regulatory reports have been submitted on time", correct: false }] },
     { text: "Key control indicators (KCIs) are:", options: [{ text: "Annual targets set during the budgeting process", correct: false }, { text: "Metrics that signal whether controls are working and may flag early deterioration", correct: true }, { text: "Legal requirements issued by regulators", correct: false }, { text: "Scores given to employees after a control audit", correct: false }] },
     { text: "If you identify a control that is not working, you should:", options: [{ text: "Fix it yourself without informing anyone", correct: false }, { text: "Ignore it if it has not caused a problem yet", correct: false }, { text: "Escalate it to your manager or the Internal Control team", correct: true }, { text: "Document it in your personal notes for future reference", correct: false }] },
     { text: "An undetected control failure in an insurance company can result in:", options: [{ text: "Faster claims processing", correct: false }, { text: "Regulatory sanctions, financial loss and reputational damage", correct: true }, { text: "Improved profitability due to reduced compliance costs", correct: false }, { text: "Stronger relationships with policyholders", correct: false }] },
     { text: "Why do controls degrade over time if not monitored?", options: [{ text: "Regulations change and old controls become irrelevant", correct: false }, { text: "People find workarounds, volumes change, and new risks emerge", correct: true }, { text: "Controls become more expensive to maintain over time", correct: false }, { text: "Technology upgrades automatically replace manual controls", correct: false }] },
-    { text: "The Control Environment component of COSO refers to:", options: [{ text: "The specific procedures that address individual risks", correct: false }, { text: "The systems used to record financial transactions", correct: false }, { text: "The tone set by management — the foundation on which other controls rest", correct: true }, { text: "The process for identifying and assessing risks", correct: false }] },
+    { text: "The Control Environment component of COSO refers to:", options: [{ text: "The specific procedures that address individual risks", correct: false }, { text: "The systems used to record financial transactions", correct: false }, { text: "The tone set by management, the foundation on which other controls rest", correct: true }, { text: "The process for identifying and assessing risks", correct: false }] },
     { text: "\"Residual risk\" is:", options: [{ text: "The total risk before any controls are applied", correct: false }, { text: "Risk that has already resulted in a loss", correct: false }, { text: "The risk that remains after controls have been applied", correct: true }, { text: "The risk that cannot be insured", correct: false }] },
   ],
 };
@@ -505,30 +505,30 @@ const LEGAL: CourseSpec = {
   body: `LEGAL COMPLIANCE & CONTRACT ESSENTIALS
 Key legal concepts that every SUNU Assurances Nigeria employee needs to understand.
 
-MODULE 1 — CONTRACTS AND LEGAL OBLIGATIONS
-A contract is a legally binding agreement between two or more parties. Insurance policies are contracts. Supplier agreements are contracts. Employment agreements are contracts. Understanding what makes a contract valid — and what can go wrong — protects the company.
+MODULE 1, CONTRACTS AND LEGAL OBLIGATIONS
+A contract is a legally binding agreement between two or more parties. Insurance policies are contracts. Supplier agreements are contracts. Employment agreements are contracts. Understanding what makes a contract valid (and what can go wrong) protects the company.
 
-Elements of a valid contract: Offer, acceptance, consideration (something of value exchanged by each side), intention to create legal relations, and capacity (both parties must be legally able to enter the contract — adults of sound mind). Missing any element means the contract may be unenforceable.
+Elements of a valid contract: Offer, acceptance, consideration (something of value exchanged by each side), intention to create legal relations, and capacity (both parties must be legally able to enter the contract, adults of sound mind). Missing any element means the contract may be unenforceable.
 
-Insurance contracts specifically: An insurance contract is based on the principle of utmost good faith (uberrimae fidei). Both parties — the insurer and the insured — are obliged to disclose all material facts. A policyholder who fails to disclose that they have a prior criminal conviction may void the policy. An insurer who misrepresents the scope of cover may be liable beyond the policy terms.
+Insurance contracts specifically: An insurance contract is based on the principle of utmost good faith (uberrimae fidei). Both parties (the insurer and the insured) are obliged to disclose all material facts. A policyholder who fails to disclose that they have a prior criminal conviction may void the policy. An insurer who misrepresents the scope of cover may be liable beyond the policy terms.
 
-Breach of contract: A breach occurs when one party fails to fulfil their contractual obligation. It may be material (going to the heart of the contract — entitling the other party to treat the contract as ended) or minor (entitling only to damages). Identifying and documenting a breach early is critical.
+Breach of contract: A breach occurs when one party fails to fulfil their contractual obligation. It may be material (going to the heart of the contract, entitling the other party to treat the contract as ended) or minor (entitling only to damages). Identifying and documenting a breach early is critical.
 
-MODULE 2 — REGULATORY COMPLIANCE IN INSURANCE
+MODULE 2, REGULATORY COMPLIANCE IN INSURANCE
 Operating as an insurer in Nigeria carries a web of regulatory obligations that cannot be delegated or ignored.
 
-The Insurance Act and NAICOM: The National Insurance Commission (NAICOM) licenses and regulates all insurance companies in Nigeria. Its directives are legally binding. Failure to comply — late regulatory returns, inadequate solvency margins, mis-selling — can result in sanctions including licence revocation.
+The Insurance Act and NAICOM: The National Insurance Commission (NAICOM) licenses and regulates all insurance companies in Nigeria. Its directives are legally binding. Failure to comply (late regulatory returns, inadequate solvency margins, mis-selling) can result in sanctions including licence revocation.
 
-Consumer protection: Policyholders are protected by both insurance regulations and broader consumer protection law. Insurance must be explained clearly; exclusions must be disclosed; claim settlement must not be unreasonably delayed. The insurer's obligation is not simply to issue a policy — it is to ensure the customer understands what they have bought.
+Consumer protection: Policyholders are protected by both insurance regulations and broader consumer protection law. Insurance must be explained clearly; exclusions must be disclosed; claim settlement must not be unreasonably delayed. The insurer's obligation is not simply to issue a policy, it is to ensure the customer understands what they have bought.
 
 Data protection: The Nigeria Data Protection Regulation (NDPR) and subsequent legislation impose obligations on how the company collects, stores and uses personal data. Customer data may only be used for the purpose for which it was collected. It must be held securely and not shared without consent.
 
-MODULE 3 — EMPLOYMENT LAW ESSENTIALS
+MODULE 3, EMPLOYMENT LAW ESSENTIALS
 Every manager and HR practitioner needs a working knowledge of employment law.
 
-The Labour Act: Sets minimum standards for employment — notice periods, termination, leave entitlements, and working hours. Contracts cannot take away statutory rights; they can only provide more generous terms.
+The Labour Act: Sets minimum standards for employment, notice periods, termination, leave entitlements, and working hours. Contracts cannot take away statutory rights; they can only provide more generous terms.
 
-Termination: Dismissal must follow a fair procedure. Unfair dismissal — removing an employee without following due process — exposes the company to claims. Even where the reason for dismissal is valid (misconduct, redundancy), the process must be fair.
+Termination: Dismissal must follow a fair procedure. Unfair dismissal (removing an employee without following due process) exposes the company to claims. Even where the reason for dismissal is valid (misconduct, redundancy), the process must be fair.
 
 Intellectual property at work: Work created by an employee in the course of employment generally belongs to the employer. Confidential business information, client lists, and processes learned on the job may not be taken to a competitor. These obligations often continue after the employment ends.`,
   questions: [
@@ -544,7 +544,7 @@ Intellectual property at work: Work created by an employee in the course of empl
     { text: "Intellectual property created by an employee during employment generally:", options: [{ text: "Belongs to the employee who created it", correct: false }, { text: "Is jointly owned by the employee and the employer", correct: false }, { text: "Belongs to the employer", correct: true }, { text: "Enters the public domain after five years", correct: false }] },
     { text: "An insurer who misrepresents the scope of cover may be:", options: [{ text: "Protected by the policy exclusion clauses", correct: false }, { text: "Liable beyond the policy terms", correct: true }, { text: "Required only to refund the premium", correct: false }, { text: "Exempt if the misrepresentation was unintentional", correct: false }] },
     { text: "Late regulatory returns to NAICOM can result in:", options: [{ text: "An informal reminder from the regulator", correct: false }, { text: "Sanctions including fines and in serious cases, licence revocation", correct: true }, { text: "A reduction in the company's solvency margin requirement", correct: false }, { text: "No consequences for the first offence", correct: false }] },
-    { text: "\"Consideration\" in a contract means:", options: [{ text: "Thinking carefully before signing", correct: false }, { text: "Something of value exchanged by each party — what each gives and receives", correct: true }, { text: "The duration of the contract period", correct: false }, { text: "The legal costs of enforcing the contract", correct: false }] },
+    { text: "\"Consideration\" in a contract means:", options: [{ text: "Thinking carefully before signing", correct: false }, { text: "Something of value exchanged by each party, what each gives and receives", correct: true }, { text: "The duration of the contract period", correct: false }, { text: "The legal costs of enforcing the contract", correct: false }] },
     { text: "Post-employment obligations regarding confidential information mean:", options: [{ text: "An employee must delete all company data before leaving", correct: false }, { text: "Confidentiality obligations end on the last day of employment", correct: false }, { text: "An employee may not use confidential business information with a competitor even after leaving", correct: true }, { text: "Client lists belong to the employee if they developed the relationships personally", correct: false }] },
     { text: "Fair dismissal requires:", options: [{ text: "A valid reason for dismissal only", correct: false }, { text: "A valid reason AND a fair procedure", correct: true }, { text: "Board approval for every dismissal", correct: false }, { text: "Written notice from Legal before any termination discussion", correct: false }] },
   ],
@@ -557,23 +557,23 @@ const UNDERWRITING: CourseSpec = {
   title: "Insurance Underwriting Principles",
   videoUrl: "https://www.youtube.com/watch?v=KLz9roBL8Go",
   body: `INSURANCE UNDERWRITING PRINCIPLES
-How insurers assess, price and accept risk — the foundations of sound underwriting practice.
+How insurers assess, price and accept risk, the foundations of sound underwriting practice.
 
-MODULE 1 — WHAT IS UNDERWRITING?
+MODULE 1, WHAT IS UNDERWRITING?
 Underwriting is the process by which an insurer evaluates a risk, decides whether to accept it, and determines the terms and premium on which it will be covered.
 
-The underwriting function: Underwriters act as the gatekeepers of an insurer's risk portfolio. Their decisions determine what risks the company carries, at what price, and on what conditions. Poor underwriting — accepting bad risks at inadequate premiums — leads to adverse claims experience and can threaten solvency.
+The underwriting function: Underwriters act as the gatekeepers of an insurer's risk portfolio. Their decisions determine what risks the company carries, at what price, and on what conditions. Poor underwriting (accepting bad risks at inadequate premiums) leads to adverse claims experience and can threaten solvency.
 
 The law of large numbers: Insurance works because of statistical predictability. By accepting many similar risks, the insurer can predict with reasonable accuracy what proportion will produce a claim and price accordingly. The more risks in the pool, the more stable the claims experience.
 
-Adverse selection: The tendency for people with higher-than-average risk to seek insurance, while those with lower risk are less motivated to buy it. Insurers manage adverse selection through underwriting — by carefully evaluating each risk rather than offering the same price to all comers.
+Adverse selection: The tendency for people with higher-than-average risk to seek insurance, while those with lower risk are less motivated to buy it. Insurers manage adverse selection through underwriting, by carefully evaluating each risk rather than offering the same price to all comers.
 
-Moral hazard: The risk that having insurance changes behaviour — a person with fully comprehensive motor cover may be less careful parking than one paying for all repairs themselves. Underwriting terms such as excesses and policy conditions are partly designed to maintain the insured's incentive to manage risk.
+Moral hazard: The risk that having insurance changes behaviour, a person with fully comprehensive motor cover may be less careful parking than one paying for all repairs themselves. Underwriting terms such as excesses and policy conditions are partly designed to maintain the insured's incentive to manage risk.
 
-MODULE 2 — RISK ASSESSMENT AND PRICING
+MODULE 2, RISK ASSESSMENT AND PRICING
 Underwriting is fundamentally about understanding risk well enough to price it fairly and sustainably.
 
-Information gathering: The underwriting decision starts with the proposal form or submission. The underwriter needs accurate, complete information about the nature of the risk — what is being insured, its value, how it is used, prior claims history, and any special features that increase or decrease risk.
+Information gathering: The underwriting decision starts with the proposal form or submission. The underwriter needs accurate, complete information about the nature of the risk, what is being insured, its value, how it is used, prior claims history, and any special features that increase or decrease risk.
 
 Rating factors: The specific variables used to calculate a premium. In motor insurance: age, vehicle type, driver history, geographic location. In property: construction type, occupancy, security measures, proximity to flood zones. Rating factors should be predictive of claims and justifiable.
 
@@ -581,14 +581,14 @@ Underwriting authorities: Most underwriters work within defined limits. Risks ab
 
 Reinsurance: Insurance for insurers. By ceding a portion of their risk to a reinsurer, an insurer limits its exposure to any single large loss. This allows the insurer to accept risks it could not otherwise carry alone.
 
-MODULE 3 — UNDERWRITING DECISIONS AND DOCUMENTATION
+MODULE 3, UNDERWRITING DECISIONS AND DOCUMENTATION
 Sound decisions, properly documented, are what separate professional underwriting from guesswork.
 
-Accepting, modifying or declining: An underwriter may accept a risk as submitted, accept it on amended terms (a higher excess, an exclusion, a warranty), or decline it. The decision should be based on the risk presented and the company's underwriting guidelines — not on who is asking.
+Accepting, modifying or declining: An underwriter may accept a risk as submitted, accept it on amended terms (a higher excess, an exclusion, a warranty), or decline it. The decision should be based on the risk presented and the company's underwriting guidelines, not on who is asking.
 
-Documentation: Every underwriting decision must be documented — the information reviewed, the factors considered, the terms offered and the rationale. If a risk produces a large claim, the file must show that the decision to accept it was made on a sound, informed basis.
+Documentation: Every underwriting decision must be documented, the information reviewed, the factors considered, the terms offered and the rationale. If a risk produces a large claim, the file must show that the decision to accept it was made on a sound, informed basis.
 
-Warranties and conditions: A warranty is a promise by the insured that a certain state of affairs is or will remain true (e.g., a burglar alarm will be maintained in working order). Breach of warranty — even if unrelated to the claim — may discharge the insurer's liability. Conditions precedent must be strictly complied with.
+Warranties and conditions: A warranty is a promise by the insured that a certain state of affairs is or will remain true (e.g., a burglar alarm will be maintained in working order). Breach of warranty (even if unrelated to the claim) may discharge the insurer's liability. Conditions precedent must be strictly complied with.
 
 Portfolio management: Individual underwriting decisions must also be considered in the context of the whole portfolio. Concentration risk (too many similar risks in one geographic area or industry) must be managed. The underwriting manager reviews the portfolio regularly for balance.`,
   questions: [
@@ -600,13 +600,13 @@ Portfolio management: Individual underwriting decisions must also be considered 
     { text: "Rating factors must be:", options: [{ text: "Applied equally to all policyholders regardless of their risk profile", correct: false }, { text: "Predictive of claims and justifiable", correct: true }, { text: "Set only by the reinsurer", correct: false }, { text: "Kept confidential from the policyholder", correct: false }] },
     { text: "An underwriting authority limit means:", options: [{ text: "The maximum premium that can be charged", correct: false }, { text: "Risks above a defined size or complexity must be referred to a senior underwriter or reinsurer", correct: true }, { text: "The underwriter's right to decline any risk", correct: false }, { text: "A limit on the number of policies that can be issued per day", correct: false }] },
     { text: "Reinsurance is:", options: [{ text: "Insurance sold to private individuals rather than businesses", correct: false }, { text: "Insurance purchased by an insurer to limit its exposure to individual large losses", correct: true }, { text: "A second insurance policy taken out by the same policyholder", correct: false }, { text: "A type of investment product offered to high-net-worth clients", correct: false }] },
-    { text: "An underwriter may respond to a submitted risk by:", options: [{ text: "Accepting, modifying terms, or declining — based on the risk and company guidelines", correct: true }, { text: "Only accepting or declining — no modifications are permitted", correct: false }, { text: "Accepting any risk as long as a premium is offered", correct: false }, { text: "Deferring to the broker's recommendation in all cases", correct: false }] },
+    { text: "An underwriter may respond to a submitted risk by:", options: [{ text: "Accepting, modifying terms, or declining (based on the risk and company guidelines", correct: true }, { text: "Only accepting or declining) no modifications are permitted", correct: false }, { text: "Accepting any risk as long as a premium is offered", correct: false }, { text: "Deferring to the broker's recommendation in all cases", correct: false }] },
     { text: "Why must underwriting decisions be documented?", options: [{ text: "To comply with NAICOM's annual filing requirements", correct: false }, { text: "To show that acceptance of a risk was made on a sound, informed basis if a large claim arises", correct: true }, { text: "Documentation is required only for declined risks", correct: false }, { text: "To measure the underwriter's productivity", correct: false }] },
     { text: "A warranty in an insurance policy is:", options: [{ text: "A guarantee by the insurer to pay all claims within a set period", correct: false }, { text: "A promise by the insured that a certain state of affairs is or will remain true", correct: true }, { text: "A special discount given to long-standing customers", correct: false }, { text: "The legal name for the policy document", correct: false }] },
     { text: "Breach of a warranty:", options: [{ text: "Automatically increases the premium for the next period", correct: false }, { text: "Is only relevant if the breach caused the claim", correct: false }, { text: "May discharge the insurer's liability even if unrelated to the claim", correct: true }, { text: "Requires the policyholder to notify the insurer within 30 days", correct: false }] },
     { text: "Concentration risk in an underwriting portfolio means:", options: [{ text: "A single underwriter handling too many risks at once", correct: false }, { text: "Too many similar risks in one geographic area or industry, increasing overall exposure", correct: true }, { text: "A risk where the insured holds too many policies", correct: false }, { text: "A portfolio that is too diverse to manage effectively", correct: false }] },
     { text: "The proposal form in underwriting provides:", options: [{ text: "The legal basis for a reinsurance treaty", correct: false }, { text: "Complete, accurate information about the risk on which the underwriting decision is based", correct: true }, { text: "A binding offer of cover from the insurer", correct: false }, { text: "The standard terms and conditions of the policy", correct: false }] },
-    { text: "Poor underwriting — accepting bad risks at inadequate premiums — leads to:", options: [{ text: "Short-term revenue growth with no long-term consequences", correct: false }, { text: "Adverse claims experience and potentially a threat to the insurer's solvency", correct: true }, { text: "Improved customer satisfaction as more risks are covered", correct: false }, { text: "Regulatory praise for inclusive insurance practices", correct: false }] },
+    { text: "Poor underwriting (accepting bad risks at inadequate premiums) leads to:", options: [{ text: "Short-term revenue growth with no long-term consequences", correct: false }, { text: "Adverse claims experience and potentially a threat to the insurer's solvency", correct: true }, { text: "Improved customer satisfaction as more risks are covered", correct: false }, { text: "Regulatory praise for inclusive insurance practices", correct: false }] },
   ],
 };
 
@@ -631,4 +631,4 @@ for (const course of COURSES) {
 }
 
 await close();
-console.log("\nDone — all department courses seeded.");
+console.log("\nDone, all department courses seeded.");

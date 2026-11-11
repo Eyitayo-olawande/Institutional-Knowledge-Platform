@@ -103,12 +103,15 @@ export function PdfViewer({ fileUrl, fileName }: Props) {
       } catch {
         return;
       }
-      const viewport = page.getViewport({ scale, rotation: rot });
+      const dpr = window.devicePixelRatio || 1;
+      const viewport = page.getViewport({ scale: scale * dpr, rotation: rot });
       const canvas = mainCanvasRef.current;
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
       canvas.width = viewport.width;
       canvas.height = viewport.height;
+      canvas.style.width = `${viewport.width / dpr}px`;
+      canvas.style.height = `${viewport.height / dpr}px`;
       const task = page.render({ canvasContext: ctx, viewport });
       renderTaskRef.current = task;
       try {

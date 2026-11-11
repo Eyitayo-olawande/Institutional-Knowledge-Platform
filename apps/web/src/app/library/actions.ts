@@ -14,7 +14,8 @@ function read(form: FormData) {
   const body = String(form.get("body") ?? "").trim();
   const reviewDate = String(form.get("reviewDate") ?? "").trim();
   const changeNote = String(form.get("changeNote") ?? "").trim();
-  return { title, body, reviewDate: DATE.test(reviewDate) ? reviewDate : null, changeNote: changeNote || null };
+  const videoUrl = String(form.get("videoUrl") ?? "").trim();
+  return { title, body, reviewDate: DATE.test(reviewDate) ? reviewDate : null, changeNote: changeNote || null, videoUrl: videoUrl || null };
 }
 
 async function editor() {
@@ -44,12 +45,12 @@ async function editableItem(ctx: Awaited<ReturnType<typeof editor>>, id: string)
 export async function createItem(form: FormData): Promise<void> {
   const ctx = await editor();
   const { db, user } = ctx;
-  const { title, body, reviewDate } = read(form);
+  const { title, body, reviewDate, videoUrl } = read(form);
   const placement = await readPlacement(ctx, form);
   if (!title || !body || !placement) redirect("/library/new?error=missing");
   let id: string;
   try {
-    id = await createLibraryItem(db, { title, body, reviewDate, ownerUserId: user.id, ...placement }, `user:${user.id}`);
+    id = await createLibraryItem(db, { title, body, reviewDate, videoUrl, ownerUserId: user.id, ...placement }, `user:${user.id}`);
   } catch (e) {
     if (e instanceof PlacementError) redirect("/library/new?error=placement");
     throw e;
@@ -77,9 +78,9 @@ export async function saveItemDraft(form: FormData): Promise<void> {
   const { db, user } = ctx;
   const id = String(form.get("id") ?? "");
   const found = await editableItem(ctx, id);
-  const { title, body, reviewDate, changeNote } = read(form);
+  const { title, body, reviewDate, changeNote, videoUrl } = read(form);
   if (!title || !body) redirect(`/library/${id}?error=missing`);
-  await saveDraft(db, id, { title, body, changeNote, reviewDate, ownerUserId: found.item.ownerUserId ?? user.id }, `user:${user.id}`);
+  await saveDraft(db, id, { title, body, changeNote, reviewDate, videoUrl, ownerUserId: found.item.ownerUserId ?? user.id }, `user:${user.id}`);
   redirect(`/library/${id}?saved=1`);
 }
 
