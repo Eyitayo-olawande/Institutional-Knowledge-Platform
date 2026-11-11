@@ -1,6 +1,6 @@
 "use server";
 
-import { attachFileToItem, canSeeArea, createLibraryItem, detachFileFromItem, getLibraryItem, PlacementError, placeItem, publishDraft, saveDraft } from "@mantle/db/tenant";
+import { attachFileToItem, canSeeArea, createLibraryItem, detachFileFromItem, getLibraryItem, PlacementError, placeItem, publishDraft, retireItem, saveDraft } from "@mantle/db/tenant";
 import { checkUpload, MAX_FILES_PER_UPLOAD } from "@mantle/platform/files";
 import { needsConversion } from "@mantle/documents/convert";
 import { converter, fileStore, scanner } from "../../server/files.ts";
@@ -136,6 +136,15 @@ export async function uploadItemFile(form: FormData): Promise<void> {
     );
   }
   redirect(`/library/${id}?file_added=${ready.length}`);
+}
+
+export async function retireLibraryItem(form: FormData): Promise<void> {
+  const ctx = await editor();
+  const { db, user } = ctx;
+  const id = String(form.get("id") ?? "");
+  await editableItem(ctx, id);
+  await retireItem(db, id, `user:${user.id}`);
+  redirect("/library?retired=1");
 }
 
 export async function deleteItemFile(form: FormData): Promise<void> {

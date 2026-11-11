@@ -9,7 +9,7 @@ import { t } from "../../../i18n.ts";
 import { requireFeature, requirePermission, viewerAreas } from "../../../server/session.ts";
 import { AppShell } from "../../_components/AppShell.tsx";
 import { completeModuleAction, submitAssessmentAction } from "../../actions.ts";
-import { deleteItemFile, placeLibraryItem, publishItem, saveItemDraft, uploadItemFile } from "../actions.ts";
+import { deleteItemFile, placeLibraryItem, publishItem, retireLibraryItem, saveItemDraft, uploadItemFile } from "../actions.ts";
 import { areaChoices, areaName } from "../areas.ts";
 import { PlacementFields } from "../PlacementFields.tsx";
 import { ViewerActionsClient } from "../ViewerActionsClient.tsx";
@@ -49,7 +49,7 @@ export default async function Item({
   const editor = can(roles, "library.edit");
   const visible = await viewerAreas(ctx);
   // An item in an area the viewer cannot see does not exist for them.
-  if (!found || !canSeeArea(visible, found.item.areaId) || (!editor && !found.published)) notFound();
+  if (!found || !canSeeArea(visible, found.item.areaId) || (!editor && !found.published) || (!editor && found.item.status === "retired")) notFound();
   const { item, draft, versions } = found;
   const { areas, types } = await areaChoices(db, visible);
   const area = areas.find((a) => a.id === item.areaId);
@@ -460,6 +460,18 @@ export default async function Item({
               ))}
             </ul>
           </Card>
+          {item.status !== "retired" ? (
+            <Card>
+              <h2>{t("library.retire.heading")}</h2>
+              <p className="sub" style={{ marginBottom: 12 }}>{t("library.retire.warning")}</p>
+              <form action={retireLibraryItem}>
+                <input type="hidden" name="id" value={item.id} />
+                <Button type="submit" variant="danger">{t("library.retire.button")}</Button>
+              </form>
+            </Card>
+          ) : (
+            <div className="alert alert-warning" role="status"><p>{t("library.retire.already_retired")}</p></div>
+          )}
           <Card>
             <h2>{t("library.assessment.heading")}</h2>
             {assessment ? (

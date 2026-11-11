@@ -11,13 +11,14 @@ import { cardThumbBg } from "./card-cover.ts";
 
 const STATUS_TONE: Record<string, BadgeTone> = { draft: "neutral", published: "success", retired: "neutral" };
 
-export default async function Library({ searchParams }: { searchParams: Promise<{ q?: string; area?: string; type?: string }> }) {
+export default async function Library({ searchParams }: { searchParams: Promise<{ q?: string; area?: string; type?: string; retired?: string }> }) {
   const ctx = await requirePermission("library.view");
   const { tenant, db, roles } = ctx;
   await requireFeature(tenant, "knowledge_library");
   const editor = can(roles, "library.edit");
   const isAdmin = can(roles, "activity.view");
   const params = await searchParams;
+  const { retired } = params;
   const q = (params.q ?? "").slice(0, 200);
   const visible = await viewerAreas(ctx);
   const { areas, types } = await areaChoices(db, visible);
@@ -61,6 +62,7 @@ export default async function Library({ searchParams }: { searchParams: Promise<
 
   return (
     <AppShell ctx={ctx} active="library">
+      {retired ? <div className="alert alert-success" role="status"><p>{t("library.retire.done")}</p></div> : null}
       {/* Hero banner */}
       <div className="lib-hero-wrap">
         <div className="lib-hero">

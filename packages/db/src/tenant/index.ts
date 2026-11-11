@@ -8,6 +8,7 @@ export {
   createLibraryItem,
   detachFileFromItem,
   fileWithItem,
+  retireItem,
   getLibraryItem,
   itemFiles,
   itemsDueForReview,

@@ -2,8 +2,8 @@ import type { ButtonHTMLAttributes, CSSProperties } from "react";
 import { colorVar, font, radius, space, touchTarget } from "./tokens.ts";
 
 // primary: the one main action on a screen (SUNU red).
-// secondary: other actions. ghost: a text link styled action.
-export type ButtonVariant = "primary" | "secondary" | "ghost";
+// secondary: other actions. ghost: a text link styled action. danger: destructive actions.
+export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
 export type ButtonSize = "md" | "sm";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -29,6 +29,7 @@ const variants: Record<ButtonVariant, CSSProperties> = {
   primary: { background: colorVar("primary"), color: colorVar("primaryText"), border: "1px solid transparent" },
   secondary: { background: colorVar("surface"), color: colorVar("text"), border: `1px solid ${colorVar("border")}` },
   ghost: { background: "transparent", color: colorVar("primary"), border: "1px solid transparent", padding: `0 ${space.sm}` },
+  danger: { background: colorVar("surface"), color: "var(--mantle-color-danger, #c0392b)", border: "1px solid var(--mantle-color-danger, #c0392b)" },
 };
 
 // The small size is for dense tables only; it stays at the phone touch target height.

@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, isNull, lte, max, type SQL } from "drizzle-orm";
+import { and, asc, desc, eq, isNull, lte, max, ne, type SQL } from "drizzle-orm";
 import { recordActivity } from "./activity.ts";
 import { areaIdsOrAll, checkPlacement, type VisibleAreas } from "./areas.ts";
 import type { TenantDb } from "./client.ts";
@@ -141,7 +141,7 @@ export interface ListOptions {
 }
 
 export async function listLibraryItems(db: TenantDb, options: ListOptions) {
-  const where: (SQL | undefined)[] = [areaIdsOrAll(options.areas)];
+  const where: (SQL | undefined)[] = [areaIdsOrAll(options.areas), ne(libraryItems.status, "retired")];
   if (options.areaId) where.push(eq(libraryItems.areaId, options.areaId));
   if (options.contentTypeId) where.push(eq(libraryItems.contentTypeId, options.contentTypeId));
   const rows = await db
@@ -241,6 +241,18 @@ export async function itemFiles(db: TenantDb, itemId: string) {
     .innerJoin(files, eq(libraryItemFiles.fileId, files.id))
     .where(eq(libraryItemFiles.itemId, itemId))
     .orderBy(files.name);
+}
+
+// Marks an item as retired so it no longer appears in the library or search.
+// The item and all its versions are kept for the activity log and audit trail.
+export async function retireItem(db: TenantDb, itemId: string, actor: string): Promise<void> {
+  await db.transaction(async (tx) => {
+    await tx
+      .update(libraryItems)
+      .set({ status: "retired", updatedAt: new Date(), changedBy: actor })
+      .where(eq(libraryItems.id, itemId));
+    await recordActivity(tx, { actor, action: "library.retired", entityType: "library_item", entityId: itemId, details: {} });
+  });
 }
 
 // Removes a file from an item. Returns the storage keys so the caller can

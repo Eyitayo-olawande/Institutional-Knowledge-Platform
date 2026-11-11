@@ -182,6 +182,13 @@
     "history": "Versions",
     "history_published": "Version {version}, published. {note}",
     "history_draft": "Version {version}, draft. {note}",
+    "retire": {
+      "heading": "Remove from Library",
+      "warning": "This permanently removes the item from the library. Staff will no longer be able to find or open it.",
+      "button": "Remove from library",
+      "already_retired": "This item has been removed from the library.",
+      "done": "The item has been removed from the library."
+    },
     "assessment": {
       "heading": "Knowledge Check",
       "questions_label": "Questions",
