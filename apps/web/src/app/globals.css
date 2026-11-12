@@ -563,6 +563,14 @@ a.admin-kpi:hover { box-shadow: 0 4px 20px -4px rgba(0,0,0,0.14), 0 1px 3px rgba
 .my-keep-going { background: var(--mantle-color-primary_tint); border: 1px solid color-mix(in srgb, var(--mantle-color-primary) 20%, transparent); border-radius: var(--mantle-radius-lg); padding: 20px; display: flex; gap: 12px; align-items: flex-start; }
 .my-keep-going h2 { font-size: 16px; font-weight: 700; color: var(--mantle-color-primary); margin: 0 0 4px; }
 .my-keep-going p { font-size: 13px; line-height: 1.5; margin: 0; }
+.my-next-milestone { background: var(--mantle-color-primary_tint); border: 1px solid color-mix(in srgb, var(--mantle-color-primary) 25%, transparent); border-radius: var(--mantle-radius-lg); padding: 18px 20px; }
+.my-milestone-icon { width: 44px; height: 44px; border-radius: var(--mantle-radius-md); background: var(--mantle-color-primary); color: #fff; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
+.my-milestone-body { display: flex; flex-direction: column; gap: 4px; }
+.my-milestone-label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mantle-color-primary); margin: 0; }
+.my-milestone-title { font-size: 15px; font-weight: 700; margin: 0; color: var(--mantle-color-text); }
+.my-milestone-desc { font-size: 13px; color: var(--mantle-color-text_muted); margin: 0; line-height: 1.5; }
+.my-milestone-btn { display: inline-block; margin-top: 12px; padding: 8px 18px; background: var(--mantle-color-primary); color: #fff; border-radius: var(--mantle-radius-md); font-size: 13px; font-weight: 600; text-decoration: none; transition: opacity 0.15s; }
+.my-milestone-btn:hover { opacity: 0.88; }
 @media (min-width: 1024px) {
   .my-banner-copy h1 { font-size: 30px; color: var(--mantle-color-text); }
   .my-learning-person { height: 200px; max-width: none; }

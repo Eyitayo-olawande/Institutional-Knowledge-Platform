@@ -401,7 +401,7 @@
     "action_prev": "Previous",
     "back_to_learning": "My Learning",
     "action_mark_done": "Mark as complete",
-    "module_completed_banner": "Module complete — well done!",
+    "module_completed_banner": "Module complete, well done!",
     "item_of_total": "Item {n} of {total}",
     "quiz_intro": "Answer all questions. You need {passing}% or above to pass.",
     "quiz_submit": "Submit answers",
@@ -422,6 +422,9 @@
     "module_detail": "Module {n} of {total} · {stage}",
     "keep_going_heading": "Keep going!",
     "keep_going_body": "Complete the remaining modules to meet your role requirements.",
+    "milestone_heading": "Next Milestone",
+    "milestone_body": "Complete this module by {date} to continue your learning journey.",
+    "milestone_open": "Open Module",
     "certs_stage_label": "Stage Certificate",
     "certs_issued": "Issued {date}"
   },

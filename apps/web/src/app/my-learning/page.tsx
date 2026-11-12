@@ -1,8 +1,10 @@
-import { certificatesForPerson, listModuleItems, myLearning, personByUserId, type AssignmentStageView, STAGE_ORDER } from "@mantle/db/tenant";
+import { certificatesForPerson, listLibraryItems, listModuleItems, myLearning, noticesFor, personByUserId, type AssignmentStageView, STAGE_ORDER } from "@mantle/db/tenant";
 import Link from "next/link";
 import { t } from "../../i18n.ts";
 import { requireFeature, requirePermission } from "../../server/session.ts";
 import { AppShell } from "../_components/AppShell.tsx";
+import { Icon } from "../_components/Icon.tsx";
+import { cardThumbBg } from "../library/card-cover.ts";
 import { ModulesPanel, type FlatModule } from "./ModulesPanel.tsx";
 
 type StageState = "completed" | "current" | "upcoming";
@@ -32,24 +34,33 @@ export default async function MyLearning({
   const { completed, tab: tabParam } = await searchParams;
   const tab = tabParam ?? "all";
 
+  const firstName = user.name.split(" ")[0] ?? user.name;
+
   const person = await personByUserId(db, user.id);
+
+  // Always fetch featured resources and notices for the dashboard bottom sections.
+  const [featuredItems, recentNotices] = await Promise.all([
+    listLibraryItems(db, { publishedOnly: true, areas: "all" }),
+    noticesFor(db, user.id, 4),
+  ]);
+  const featuredResources = featuredItems.slice(0, 4);
+
   if (!person) {
     return (
       <AppShell ctx={ctx} active="my_learning">
-        <div className="my-banner">
-          <div className="my-banner-bg" />
-          <div className="my-banner-shade" />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/learning-professional.png" alt="" className="my-learning-person" aria-hidden="true" />
-          <div className="my-banner-copy">
-            <p className="eyebrow">{t("learning.title").toUpperCase()}</p>
-            <h1>
-              {t("learning.title").split(" ")[0]}{" "}
-              <span>{t("learning.title").split(" ").slice(1).join(" ")}</span>
-            </h1>
-            <p className="my-banner-sub">{t("learning.banner_sub")}</p>
-            <div className="my-banner-rule" />
+        <div className="lib-hero-wrap">
+          <div className="lib-hero">
+            <div className="lib-hero-bg" style={{ backgroundImage: "url('/images/administrator-office.png')" }} />
+            <div className="lib-hero-shade" />
+            <div className="lib-hero-copy">
+              <p style={{ margin: "0 0 4px", fontSize: 14, fontWeight: 600 }}>{t("home.greeting_prefix")}</p>
+              <h1>{firstName}</h1>
+              <p>{t("home.sub", { name: tenant.name })}</p>
+              <div className="lib-hero-rule" />
+            </div>
           </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/images/Collaborative-Smiles-trans2.png" alt="" aria-hidden="true" className="lib-hero-person" />
         </div>
         <p className="sub">{t("learning.empty_body")}</p>
       </AppShell>
@@ -62,19 +73,19 @@ export default async function MyLearning({
   if (data.pathsEnrolled === 0) {
     return (
       <AppShell ctx={ctx} active="my_learning">
-        <div className="my-banner">
-          <div className="my-banner-bg" />
-          <div className="my-banner-shade" />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/learning-professional.png" alt="" className="my-learning-person" aria-hidden="true" />
-          <div className="my-banner-copy">
-            <p className="eyebrow">{t("learning.title").toUpperCase()}</p>
-            <h1>
-              My <span>Learning</span>
-            </h1>
-            <p className="my-banner-sub">{t("learning.banner_sub")}</p>
-            <div className="my-banner-rule" />
+        <div className="lib-hero-wrap">
+          <div className="lib-hero">
+            <div className="lib-hero-bg" style={{ backgroundImage: "url('/images/administrator-office.png')" }} />
+            <div className="lib-hero-shade" />
+            <div className="lib-hero-copy">
+              <p style={{ margin: "0 0 4px", fontSize: 14, fontWeight: 600 }}>{t("home.greeting_prefix")}</p>
+              <h1>{firstName}</h1>
+              <p>{t("home.sub", { name: tenant.name })}</p>
+              <div className="lib-hero-rule" />
+            </div>
           </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/images/Collaborative-Smiles-trans2.png" alt="" aria-hidden="true" className="lib-hero-person" />
         </div>
         <p className="sub">{t("learning.empty_body")}</p>
       </AppShell>
@@ -131,23 +142,24 @@ export default async function MyLearning({
   const notStartedCount = flatModules.filter((m) => !m.unlocked && !m.completed).length;
 
   const nextDue = firstAssignment.stages.find((s) => s.unlocked && !s.complete)?.dueDate;
+  const nextModule = flatModules.find((m) => m.unlocked && !m.completed);
 
   return (
     <AppShell ctx={ctx} active="my_learning">
-      {/* Hero banner */}
-      <div className="my-banner">
-        <div className="my-banner-bg" />
-        <div className="my-banner-shade" />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/images/learning-professional.png" alt="" className="my-learning-person" aria-hidden="true" />
-        <div className="my-banner-copy">
-          <p className="eyebrow">{t("learning.title").toUpperCase()}</p>
-          <h1>
-            My <span>Learning Journey</span>
-          </h1>
-          <p className="my-banner-sub">{t("learning.banner_sub")}</p>
-          <div className="my-banner-rule" />
+      {/* Welcome back banner — same style as home page */}
+      <div className="lib-hero-wrap">
+        <div className="lib-hero">
+          <div className="lib-hero-bg" style={{ backgroundImage: "url('/images/administrator-office.png')" }} />
+          <div className="lib-hero-shade" />
+          <div className="lib-hero-copy">
+            <p style={{ margin: "0 0 4px", fontSize: 14, fontWeight: 600 }}>{t("home.greeting_prefix")}</p>
+            <h1>{firstName}</h1>
+            <p>{t("home.sub", { name: tenant.name })}</p>
+            <div className="lib-hero-rule" />
+          </div>
         </div>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/images/Collaborative-Smiles-trans2.png" alt="" aria-hidden="true" className="lib-hero-person" />
       </div>
 
       {completed ? (
@@ -237,14 +249,68 @@ export default async function MyLearning({
                 </div>
               </dl>
             </div>
-            <Link href="/admin/paths" className="my-module-action-btn" style={{ display: "block", textAlign: "center", marginTop: 4 }}>
-              {t("paths.admin.title")}
-            </Link>
           </div>
+
+          {/* Next Milestone card */}
+          {nextModule && nextDue ? (
+            <div className="my-next-milestone">
+              <div className="my-milestone-icon" aria-hidden>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" />
+                  <line x1="16" y1="2" x2="16" y2="6" />
+                  <line x1="8" y1="2" x2="8" y2="6" />
+                  <line x1="3" y1="10" x2="21" y2="10" />
+                </svg>
+              </div>
+              <div className="my-milestone-body">
+                <p className="my-milestone-label">{t("learning.milestone_heading")}</p>
+                <p className="my-milestone-title">{nextModule.title}</p>
+                <p className="my-milestone-desc">
+                  {t("learning.milestone_body", { date: nextDue.toISOString().slice(0, 10) })}
+                </p>
+                {nextModule.itemId ? (
+                  <Link
+                    href={`/library/${nextModule.itemId}?moduleId=${nextModule.id}`}
+                    className="my-milestone-btn"
+                  >
+                    {t("learning.milestone_open")} →
+                  </Link>
+                ) : null}
+              </div>
+            </div>
+          ) : nextModule ? (
+            <div className="my-next-milestone">
+              <div className="my-milestone-icon" aria-hidden>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" />
+                  <line x1="16" y1="2" x2="16" y2="6" />
+                  <line x1="8" y1="2" x2="8" y2="6" />
+                  <line x1="3" y1="10" x2="21" y2="10" />
+                </svg>
+              </div>
+              <div className="my-milestone-body">
+                <p className="my-milestone-label">{t("learning.milestone_heading")}</p>
+                <p className="my-milestone-title">{nextModule.title}</p>
+                {nextModule.itemId ? (
+                  <Link
+                    href={`/library/${nextModule.itemId}?moduleId=${nextModule.id}`}
+                    className="my-milestone-btn"
+                  >
+                    {t("learning.milestone_open")} →
+                  </Link>
+                ) : null}
+              </div>
+            </div>
+          ) : null}
 
           {/* Certificates */}
           <div className="my-panel">
-            <h2>{t("learning.certs_heading")}</h2>
+            <h2 style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{ color: "var(--mantle-color-primary)" }}>
+                <Icon name="graduation_cap" size={18} />
+              </span>
+              {t("learning.certs_heading")}
+            </h2>
             {certs.length === 0 ? (
               <div className="my-certs-row">
                 <div className="my-certs-icon" aria-hidden>
@@ -283,32 +349,51 @@ export default async function MyLearning({
               </ul>
             )}
           </div>
+        </aside>
+      </div>
 
-          {/* Keep going nudge */}
-          {nextDue ? (
-            <div className="my-keep-going">
-              <div style={{ color: "var(--mantle-color-primary)", flexShrink: 0 }} aria-hidden>
-                <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-                  <circle cx="20" cy="20" r="20" fill="var(--mantle-color-primary_tint)" />
-                  <circle cx="20" cy="20" r="8" stroke="var(--mantle-color-primary)" strokeWidth="2" fill="none" />
-                  <circle cx="20" cy="20" r="3" fill="var(--mantle-color-primary)" />
-                  <line x1="20" y1="4" x2="20" y2="10" stroke="var(--mantle-color-primary)" strokeWidth="2" strokeLinecap="round" />
-                  <line x1="20" y1="30" x2="20" y2="36" stroke="var(--mantle-color-primary)" strokeWidth="2" strokeLinecap="round" />
-                  <line x1="4" y1="20" x2="10" y2="20" stroke="var(--mantle-color-primary)" strokeWidth="2" strokeLinecap="round" />
-                  <line x1="30" y1="20" x2="36" y2="20" stroke="var(--mantle-color-primary)" strokeWidth="2" strokeLinecap="round" />
-                </svg>
+      {/* Featured Resources and Recent Notices */}
+      {(featuredResources.length > 0 || recentNotices.length > 0) ? (
+        <div className="grid grid-2" style={{ gridTemplateColumns: "2fr 1fr", alignItems: "start", marginTop: 32 }}>
+          {featuredResources.length > 0 ? (
+            <div>
+              <div className="row" style={{ justifyContent: "space-between" }}>
+                <h2 style={{ margin: 0 }}>{t("home.featured_heading")}</h2>
+                <Link href="/library" className="muted">{t("home.featured_view_all")}</Link>
               </div>
-              <div>
-                <h2 style={{ color: "var(--mantle-color-primary)" }}>{t("learning.keep_going_heading")}</h2>
-                <p>{t("learning.keep_going_body")}</p>
-                <p style={{ fontSize: 12, color: "var(--mantle-color-text_muted)", marginTop: 8 }}>
-                  {t("home.my_learning.due", { date: nextDue.toISOString().slice(0, 10) })}
-                </p>
+              <div className="lib-grid" style={{ marginTop: 12, gridTemplateColumns: "repeat(2, minmax(0, 1fr))" }}>
+                {featuredResources.map((item) => (
+                  <Link key={item.id} className="lib-card" href={`/library/${item.id}`}>
+                    <div className="lib-card-thumb" style={{ background: cardThumbBg(item.title) }}>
+                      <span className="lib-card-thumb-icon"><Icon name="doc" size={28} /></span>
+                      {item.typeLabel ? <span className="lib-card-badge">{item.typeLabel}</span> : null}
+                    </div>
+                    <div className="lib-card-body">
+                      <div className="lib-card-title">{item.title}</div>
+                    </div>
+                  </Link>
+                ))}
               </div>
             </div>
           ) : null}
-        </aside>
-      </div>
+          {recentNotices.length > 0 ? (
+            <div className="my-panel">
+              <div className="row" style={{ justifyContent: "space-between" }}>
+                <h3 style={{ margin: 0 }}>{t("home.notices_heading")}</h3>
+                <Link href="/notices" className="muted">{t("home.featured_view_all")}</Link>
+              </div>
+              <ul className="list" style={{ marginTop: 10 }}>
+                {recentNotices.map((n) => (
+                  <li key={n.id}>
+                    <span className="grow">{n.subject}</span>
+                    <span className="muted">{n.createdAt.toISOString().slice(0, 10)}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
     </AppShell>
   );
 }
