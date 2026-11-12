@@ -21,6 +21,7 @@ export const users = pgTable("user", {
   roles: text("roles").notNull().default("learner"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  firstLoginAt: timestamp("first_login_at", { withTimezone: true }),
 });
 
 export const sessions = pgTable(

@@ -1,4 +1,5 @@
-import { certificatesForPerson, listLibraryItems, listModuleItems, myLearning, noticesFor, personByUserId, type AssignmentStageView, STAGE_ORDER } from "@mantle/db/tenant";
+import { certificatesForPerson, listLibraryItems, listModuleItems, myLearning, noticesFor, personByUserId, tenantSchema, type AssignmentStageView, STAGE_ORDER } from "@mantle/db/tenant";
+import { eq } from "drizzle-orm";
 import Link from "next/link";
 import { t } from "../../i18n.ts";
 import { requireFeature, requirePermission } from "../../server/session.ts";
@@ -36,6 +37,19 @@ export default async function MyLearning({
 
   const firstName = user.name.split(" ")[0] ?? user.name;
 
+  // First-login detection: null firstLoginAt means this is the first visit.
+  const [loginRow] = await db
+    .select({ firstLoginAt: tenantSchema.users.firstLoginAt })
+    .from(tenantSchema.users)
+    .where(eq(tenantSchema.users.id, user.id));
+  const isFirstLogin = !loginRow?.firstLoginAt;
+  if (isFirstLogin) {
+    await db.update(tenantSchema.users)
+      .set({ firstLoginAt: new Date() })
+      .where(eq(tenantSchema.users.id, user.id));
+  }
+  const greetingPrefix = isFirstLogin ? t("home.greeting_prefix_first") : t("home.greeting_prefix");
+
   const person = await personByUserId(db, user.id);
 
   // Always fetch featured resources and notices for the dashboard bottom sections.
@@ -53,14 +67,14 @@ export default async function MyLearning({
             <div className="lib-hero-bg" style={{ backgroundImage: "url('/images/administrator-office.png')" }} />
             <div className="lib-hero-shade" />
             <div className="lib-hero-copy">
-              <p style={{ margin: "0 0 4px", fontSize: 14, fontWeight: 600 }}>{t("home.greeting_prefix")}</p>
+              <p style={{ margin: "0 0 4px", fontSize: 14, fontWeight: 600 }}>{greetingPrefix}</p>
               <h1>{firstName}</h1>
               <p>{t("home.sub", { name: tenant.name })}</p>
               <div className="lib-hero-rule" />
             </div>
           </div>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/Collaborative-Smiles-trans2.png" alt="" aria-hidden="true" className="lib-hero-person" />
+          <img src="/images/Collaborative-Smiles-trans3.png" alt="" aria-hidden="true" className="lib-hero-person" />
         </div>
         <p className="sub">{t("learning.empty_body")}</p>
       </AppShell>
@@ -78,14 +92,14 @@ export default async function MyLearning({
             <div className="lib-hero-bg" style={{ backgroundImage: "url('/images/administrator-office.png')" }} />
             <div className="lib-hero-shade" />
             <div className="lib-hero-copy">
-              <p style={{ margin: "0 0 4px", fontSize: 14, fontWeight: 600 }}>{t("home.greeting_prefix")}</p>
+              <p style={{ margin: "0 0 4px", fontSize: 14, fontWeight: 600 }}>{greetingPrefix}</p>
               <h1>{firstName}</h1>
               <p>{t("home.sub", { name: tenant.name })}</p>
               <div className="lib-hero-rule" />
             </div>
           </div>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/Collaborative-Smiles-trans2.png" alt="" aria-hidden="true" className="lib-hero-person" />
+          <img src="/images/Collaborative-Smiles-trans3.png" alt="" aria-hidden="true" className="lib-hero-person" />
         </div>
         <p className="sub">{t("learning.empty_body")}</p>
       </AppShell>
@@ -152,14 +166,14 @@ export default async function MyLearning({
           <div className="lib-hero-bg" style={{ backgroundImage: "url('/images/administrator-office.png')" }} />
           <div className="lib-hero-shade" />
           <div className="lib-hero-copy">
-            <p style={{ margin: "0 0 4px", fontSize: 14, fontWeight: 600 }}>{t("home.greeting_prefix")}</p>
+            <p style={{ margin: "0 0 4px", fontSize: 14, fontWeight: 600 }}>{greetingPrefix}</p>
             <h1>{firstName}</h1>
             <p>{t("home.sub", { name: tenant.name })}</p>
             <div className="lib-hero-rule" />
           </div>
         </div>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/images/Collaborative-Smiles-trans2.png" alt="" aria-hidden="true" className="lib-hero-person" />
+        <img src="/images/Collaborative-Smiles-trans3.png" alt="" aria-hidden="true" className="lib-hero-person" />
       </div>
 
       {completed ? (

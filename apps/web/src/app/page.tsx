@@ -57,6 +57,9 @@ export default async function Home() {
     featureOn(resolution.tenant, "people_import"),
     featureOn(resolution.tenant, "learning_paths"),
   ]);
+  if (!isAdmin && pathsOn) {
+    redirect("/my-learning");
+  }
   const destinations = buildNav({ roles, libraryOn, peopleImportOn, pathsOn }).filter((i) => i.key !== "home");
   const mainDestinations = destinations.filter((d) => d.section === "main");
   const adminDestinations = destinations.filter((d) => d.section === "admin");

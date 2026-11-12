@@ -305,6 +305,7 @@
   "home": {
     "greeting": "Welcome, {name}",
     "greeting_prefix": "Welcome back,",
+    "greeting_prefix_first": "Welcome,",
     "sub": "Your learning, library and notices at {name}.",
     "unread": "You have {count} new notices.",
     "read_notices": "Read notices",
