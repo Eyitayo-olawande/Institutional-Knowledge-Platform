@@ -2,7 +2,7 @@ export { connectTenant, type TenantDb } from "./client.ts";
 export * as tenantSchema from "./schema.ts";
 export { addAdministrator, applyStaffImport, changeUserRoles, listActiveStaff, listPeople, listUsers, personByUserId, personDepartmentByUserId, setUserRoles, type ImportOptions, type ImportSummary, type StaffRow } from "./people.ts";
 export { recentActivity, recordActivity, type ActivityEntry } from "./activity.ts";
-export { isWordingKey, setWording, wording, WORDING_DEFAULTS, type Wording, type WordingKey } from "./wording.ts";
+export { certificateSignatory, isWordingKey, setWording, wording, WORDING_DEFAULTS, type Signatory, type Wording, type WordingKey } from "./wording.ts";
 export {
   attachFileToItem,
   createLibraryItem,

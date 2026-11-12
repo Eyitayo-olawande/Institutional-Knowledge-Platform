@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { recordActivity } from "./activity.ts";
 import type { TenantDb } from "./client.ts";
 import { wordingLabels } from "./schema.ts";
@@ -25,6 +25,29 @@ export async function wording(db: TenantDb): Promise<Wording> {
     if (isWordingKey(row.key)) result[row.key] = { singular: row.singular, plural: row.plural };
   }
   return result;
+}
+
+const SIGNATORY_KEYS = ["cert_signatory_name", "cert_signatory_title", "cert_signatory_org"] as const;
+const SIGNATORY_DEFAULTS = {
+  cert_signatory_name: "Authorised Signatory",
+  cert_signatory_title: "Learning & Development",
+  cert_signatory_org: "",
+} as const;
+
+export interface Signatory {
+  readonly name: string;
+  readonly title: string;
+  readonly org: string;
+}
+
+export async function certificateSignatory(db: TenantDb): Promise<Signatory> {
+  const rows = await db.select({ key: wordingLabels.key, singular: wordingLabels.singular }).from(wordingLabels).where(inArray(wordingLabels.key, [...SIGNATORY_KEYS]));
+  const map = new Map(rows.map((r) => [r.key, r.singular]));
+  return {
+    name: map.get("cert_signatory_name") ?? SIGNATORY_DEFAULTS.cert_signatory_name,
+    title: map.get("cert_signatory_title") ?? SIGNATORY_DEFAULTS.cert_signatory_title,
+    org: map.get("cert_signatory_org") ?? SIGNATORY_DEFAULTS.cert_signatory_org,
+  };
 }
 
 export async function setWording(
