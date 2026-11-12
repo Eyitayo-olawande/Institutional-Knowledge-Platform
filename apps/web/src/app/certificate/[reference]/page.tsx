@@ -62,7 +62,7 @@ export default async function CertificatePage({ params }: { params: Promise<{ re
           position: absolute;
           left: 15%;
           right: 15%;
-          top: 42.5%;
+          top: 45%;
           transform: translateY(-50%);
           text-align: center;
           font-family: 'Great Vibes', cursive;
@@ -79,7 +79,7 @@ export default async function CertificatePage({ params }: { params: Promise<{ re
           position: absolute;
           left: 10%;
           right: 10%;
-          top: 55%;
+          top: 62%;
           transform: translateY(-50%);
           text-align: center;
           font-family: Inter, system-ui, sans-serif;
@@ -92,7 +92,7 @@ export default async function CertificatePage({ params }: { params: Promise<{ re
         /* Three-column footer values */
         .cert-footer-val {
           position: absolute;
-          top: 63%;
+          top: 70%;
           transform: translateY(-50%);
           text-align: center;
           font-family: Inter, system-ui, sans-serif;
@@ -109,18 +109,17 @@ export default async function CertificatePage({ params }: { params: Promise<{ re
         .cert-qr {
           position: absolute;
           left: 5.5%;
-          top: 70%;
+          top: 77%;
           width: 8.5%;
           display: block;
         }
 
-        /* Certificate URL overlaid on the red underline in the template */
+        /* Certificate URL sits on the red underline below "Verify this certificate at:" */
         .cert-url {
           position: absolute;
           left: 17%;
-          top: 77%;
+          top: 86%;
           width: 23%;
-          transform: translateY(-50%);
           font-family: Inter, system-ui, sans-serif;
           font-size: clamp(6px, 0.8vw, 12px);
           color: #c0392b;
@@ -128,11 +127,11 @@ export default async function CertificatePage({ params }: { params: Promise<{ re
           line-height: 1.3;
         }
 
-        /* Signatory block, bottom-right */
+        /* Signatory block between the two horizontal template lines */
         .cert-signatory {
           position: absolute;
           right: 4%;
-          top: 74%;
+          top: 82%;
           width: 22%;
           text-align: center;
         }
