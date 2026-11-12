@@ -116,6 +116,11 @@ export async function listModules(db: TenantDb) {
   return db.select({ id: modules.id, title: modules.title }).from(modules).orderBy(asc(modules.title));
 }
 
+export async function getModule(db: TenantDb, moduleId: string): Promise<{ id: string; title: string } | null> {
+  const [row] = await db.select({ id: modules.id, title: modules.title }).from(modules).where(eq(modules.id, moduleId)).limit(1);
+  return row ?? null;
+}
+
 async function nextRank(db: TenantDb, table: typeof stageModules | typeof moduleItems, column: "stageId" | "moduleId", value: string): Promise<number> {
   const rankCol = table === stageModules ? stageModules.rank : moduleItems.rank;
   const whereCol = table === stageModules ? (column === "stageId" ? stageModules.stageId : stageModules.moduleId) : moduleItems.moduleId;
@@ -391,6 +396,18 @@ export async function certificatesForPerson(db: TenantDb, personId: string): Pro
     .where(eq(certificates.personId, personId))
     .orderBy(asc(certificates.issuedAt));
   return rows;
+}
+
+// Returns the most recently issued certificate for a person. Used to surface
+// "you just earned this" on the result page immediately after completion.
+export async function latestCertificateForPerson(db: TenantDb, personId: string): Promise<{ reference: string; issuedAt: Date } | null> {
+  const [row] = await db
+    .select({ reference: certificates.reference, issuedAt: certificates.issuedAt })
+    .from(certificates)
+    .where(eq(certificates.personId, personId))
+    .orderBy(sql`issued_at DESC`)
+    .limit(1);
+  return row ?? null;
 }
 
 export async function certificateByReference(db: TenantDb, reference: string): Promise<CertificateView | null> {

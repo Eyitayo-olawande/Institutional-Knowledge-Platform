@@ -1,4 +1,4 @@
-import { canSeeArea, getAssessmentForItem, getAttemptResults, getLibraryItem, hasViewedAllModuleItems, itemFiles, listLibraryItems, listModuleItems, personByUserId, recordItemView } from "@mantle/db/tenant";
+import { canSeeArea, getAssessmentForItem, getAttemptResults, getLibraryItem, getModule, hasViewedAllModuleItems, itemFiles, listLibraryItems, listModuleItems, personByUserId, recordItemView } from "@mantle/db/tenant";
 import { needsConversion } from "@mantle/documents/convert";
 import { ACCEPT_ATTR } from "@mantle/platform/files";
 import { can } from "@mantle/platform/identity";
@@ -38,13 +38,13 @@ export default async function Item({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ saved?: string; published?: string; error?: string; placed?: string; file_added?: string; file_error?: string; file_removed?: string; file?: string; moduleId?: string; attempt?: string; completed?: string }>;
+  searchParams: Promise<{ saved?: string; published?: string; error?: string; placed?: string; file_added?: string; file_error?: string; file_removed?: string; file?: string; moduleId?: string; attempt?: string; completed?: string; cert?: string }>;
 }) {
   const ctx = await requirePermission("library.view");
   const { tenant, db, roles } = ctx;
   await requireFeature(tenant, "knowledge_library");
   const { id } = await params;
-  const { saved, published, error, placed, file_added: fileAdded, file_error: fileError, file_removed: fileRemoved, file: fileParam, moduleId, attempt: attemptId, completed } = await searchParams;
+  const { saved, published, error, placed, file_added: fileAdded, file_error: fileError, file_removed: fileRemoved, file: fileParam, moduleId, attempt: attemptId, completed, cert } = await searchParams;
   const found = /^[0-9a-f-]{36}$/.test(id) ? await getLibraryItem(db, id) : null;
   const editor = can(roles, "library.edit");
   const visible = await viewerAreas(ctx);
@@ -93,6 +93,7 @@ export default async function Item({
   // Compute viewer's person record once; used for view recording and gate checks.
   const { user: viewer } = ctx;
   const viewerPerson = moduleId ? await personByUserId(db, viewer.id) : null;
+  const moduleRecord = moduleId && /^[0-9a-f-]{36}$/.test(moduleId) ? await getModule(db, moduleId) : null;
 
   // For content items (not assessments): record a view so Gate 1 can be evaluated.
   // Assessment items record their own view in submitAssessmentAction on submission.
@@ -163,8 +164,15 @@ export default async function Item({
                   <div className={`quiz-results-banner ${attemptResults.passed ? "quiz-results-banner--pass" : "quiz-results-banner--fail"}`}>
                     <div className="quiz-results-score">{attemptResults.score}%</div>
                     <div className="quiz-results-verdict">
-                      {attemptResults.passed ? t("learning.quiz_passed") : t("learning.quiz_failed")}
+                      {attemptResults.passed
+                        ? viewerPerson
+                          ? t("learning.quiz_passed_named", { name: viewerPerson.fullName })
+                          : t("learning.quiz_passed")
+                        : t("learning.quiz_failed")}
                     </div>
+                    {moduleRecord ? (
+                      <div className="quiz-results-module">{t("learning.quiz_module_label")}: {moduleRecord.title}</div>
+                    ) : null}
                     <div className="quiz-results-tally">
                       {t("learning.quiz_tally", { correct: String(attemptResults.correct), total: String(attemptResults.total) })}
                     </div>
@@ -174,7 +182,14 @@ export default async function Item({
                   ) : !attemptResults.gate1Satisfied ? (
                     <p className="quiz-results-retry-hint">{t("learning.quiz_gate1_pending")}</p>
                   ) : completed ? (
-                    <Link href="/my-learning?completed=1" className="quiz-continue-btn">{t("learning.quiz_continue")}</Link>
+                    <div className="quiz-continue-row">
+                      {cert ? (
+                        <Link href={`/certificate/${cert}`} className="quiz-cert-btn">
+                          {t("learning.quiz_cert_earned")}
+                        </Link>
+                      ) : null}
+                      <Link href="/my-learning?completed=1" className="quiz-continue-btn">{t("learning.quiz_continue")}</Link>
+                    </div>
                   ) : null}
                   <div className="quiz-review">
                     {attemptResults.responses.map((r, i) => (

@@ -1,6 +1,6 @@
 "use server";
 
-import { completeModule, personByUserId, recordItemView, submitAssessmentAttempt, type AttemptResponse } from "@mantle/db/tenant";
+import { completeModule, latestCertificateForPerson, personByUserId, recordItemView, submitAssessmentAttempt, type AttemptResponse } from "@mantle/db/tenant";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { authFor, requestHost } from "../server/auth.ts";
@@ -108,7 +108,12 @@ export async function submitAssessmentAction(form: FormData): Promise<void> {
 
   if (result.passed && result.gate1Satisfied) {
     await completeModule(db, person.id, moduleId, `system:assessment:${result.attemptId}`);
-    redirect(`/library/${itemId}?moduleId=${moduleId}&attempt=${result.attemptId}&completed=1`);
+    // Check for a certificate just issued (within the last 10 s) so the
+    // result page can surface a direct link to it.
+    const latest = await latestCertificateForPerson(db, person.id);
+    const justIssued = latest && Date.now() - latest.issuedAt.getTime() < 10_000;
+    const certParam = justIssued ? `&cert=${encodeURIComponent(latest.reference)}` : "";
+    redirect(`/library/${itemId}?moduleId=${moduleId}&attempt=${result.attemptId}&completed=1${certParam}`);
   }
 
   redirect(`/library/${itemId}?moduleId=${moduleId}&attempt=${result.attemptId}`);

@@ -240,8 +240,8 @@ export async function changeUserRoles(db: TenantDb, userId: string, roles: strin
 
 // Finds the staff record for a signed in user, if they have one (not every
 // account, such as a console administrator, is also staff).
-export async function personByUserId(db: TenantDb, userId: string): Promise<{ id: string } | null> {
-  const [found] = await db.select({ id: people.id }).from(people).where(eq(people.userId, userId));
+export async function personByUserId(db: TenantDb, userId: string): Promise<{ id: string; fullName: string } | null> {
+  const [found] = await db.select({ id: people.id, fullName: people.fullName }).from(people).where(eq(people.userId, userId));
   return found ?? null;
 }
 
