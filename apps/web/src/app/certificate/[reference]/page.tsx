@@ -101,9 +101,9 @@ export default async function CertificatePage({ params }: { params: Promise<{ re
           color: #1a1a1a;
           line-height: 1.2;
         }
-        .cert-issued-on { left: 9.7%; width: 22%; }
-        .cert-learning-path { left: 35.3%; width: 28%; }
-        .cert-cert-ref { left: 66.1%; width: 24%; }
+        .cert-issued-on { left: 10.5%; width: 22%; }
+        .cert-learning-path { left: 34.2%; width: 28%; }
+        .cert-cert-ref { left: 65.6%; width: 24%; }
 
         /* QR code overlaid on the template QR placeholder box (left of verify bar) */
         .cert-qr {
