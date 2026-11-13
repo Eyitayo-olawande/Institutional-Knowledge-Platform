@@ -101,9 +101,9 @@ export default async function CertificatePage({ params }: { params: Promise<{ re
           color: #1a1a1a;
           line-height: 1.2;
         }
-        .cert-issued-on { left: 9%; width: 22%; }
-        .cert-learning-path { left: 36%; width: 28%; }
-        .cert-cert-ref { left: 67%; width: 24%; }
+        .cert-issued-on { left: 9.7%; width: 22%; }
+        .cert-learning-path { left: 35.3%; width: 28%; }
+        .cert-cert-ref { left: 66.1%; width: 24%; }
 
         /* QR code overlaid on the template QR placeholder box (left of verify bar) */
         .cert-qr {
@@ -129,11 +129,12 @@ export default async function CertificatePage({ params }: { params: Promise<{ re
         }
 
         /* White cover erases the template signature lines from view */
+        /* Starts at 63% to clear the COURSE COMPLETION seal (~60% right edge) */
         .cert-sig-cover {
           position: absolute;
-          left: 55%;
+          left: 63%;
           top: 82.5%;
-          width: 42%;
+          width: 34%;
           height: 9%;
           background: #ffffff;
         }
