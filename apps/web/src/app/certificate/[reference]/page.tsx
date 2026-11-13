@@ -128,6 +128,15 @@ export default async function CertificatePage({ params }: { params: Promise<{ re
           line-height: 1.3;
         }
 
+        /* White cover erases the template signature lines from view */
+        .cert-sig-cover {
+          position: absolute;
+          left: 55%;
+          top: 82.5%;
+          width: 42%;
+          height: 9%;
+          background: #ffffff;
+        }
         /* Signatory: bottom of each text element aligns with its template line */
         /* Lines measured at 83.4%, 86.8%, 89.9% of template height */
         .cert-sig-name {
@@ -137,6 +146,7 @@ export default async function CertificatePage({ params }: { params: Promise<{ re
           transform: translateY(-100%);
           width: 28%;
           text-align: center;
+          z-index: 1;
           font-family: Inter, system-ui, sans-serif;
           font-weight: 700;
           font-size: clamp(8px, 1.1vw, 17px);
@@ -149,6 +159,7 @@ export default async function CertificatePage({ params }: { params: Promise<{ re
           transform: translateY(-100%);
           width: 28%;
           text-align: center;
+          z-index: 1;
           font-family: Inter, system-ui, sans-serif;
           font-size: clamp(7px, 0.82vw, 12px);
           color: #444;
@@ -160,6 +171,7 @@ export default async function CertificatePage({ params }: { params: Promise<{ re
           transform: translateY(-100%);
           width: 28%;
           text-align: center;
+          z-index: 1;
           font-family: Inter, system-ui, sans-serif;
           font-size: clamp(7px, 0.82vw, 12px);
           color: #444;
@@ -211,6 +223,7 @@ export default async function CertificatePage({ params }: { params: Promise<{ re
           <img className="cert-qr" src={qrDataUrl} alt="" aria-hidden="true" width={120} height={120} />
           <div className="cert-url">{certUrl}</div>
 
+          <div className="cert-sig-cover" aria-hidden="true" />
           <div className="cert-sig-name">{signatory.name}</div>
           <div className="cert-sig-title">{signatory.title}</div>
           {signatory.org && <div className="cert-sig-org">{signatory.org}</div>}
