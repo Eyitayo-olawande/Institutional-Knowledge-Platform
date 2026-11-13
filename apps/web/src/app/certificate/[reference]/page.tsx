@@ -74,12 +74,12 @@ export default async function CertificatePage({ params }: { params: Promise<{ re
           text-overflow: ellipsis;
         }
 
-        /* Course title in the blank zone below "For successfully completing" */
+        /* Course title sits ABOVE the second red underline (y=61.5%) */
         .cert-course-title {
           position: absolute;
           left: 10%;
           right: 10%;
-          top: 62%;
+          top: 57%;
           transform: translateY(-50%);
           text-align: center;
           font-family: Inter, system-ui, sans-serif;
@@ -89,11 +89,10 @@ export default async function CertificatePage({ params }: { params: Promise<{ re
           line-height: 1.25;
         }
 
-        /* Three-column footer values */
+        /* Three-column footer values sit ON the underscore lines (y=72.9%) */
         .cert-footer-val {
           position: absolute;
-          top: 70%;
-          transform: translateY(-50%);
+          top: 73%;
           text-align: center;
           font-family: Inter, system-ui, sans-serif;
           font-weight: 700;
@@ -105,21 +104,21 @@ export default async function CertificatePage({ params }: { params: Promise<{ re
         .cert-learning-path { left: 36%; width: 28%; }
         .cert-cert-ref { left: 67%; width: 24%; }
 
-        /* QR code in the dotted box, bottom-left */
+        /* QR code overlaid on the template QR placeholder box (left of verify bar) */
         .cert-qr {
           position: absolute;
-          left: 5.5%;
-          top: 77%;
-          width: 8.5%;
+          left: 8.5%;
+          top: 74%;
+          width: 7.5%;
           display: block;
         }
 
-        /* Certificate URL sits on the red underline below "Verify this certificate at:" */
+        /* Certificate URL left-aligned with the "Verify this certificate at:" label */
         .cert-url {
           position: absolute;
-          left: 17%;
+          left: 18%;
           top: 86%;
-          width: 23%;
+          width: 22%;
           font-family: Inter, system-ui, sans-serif;
           font-size: clamp(6px, 0.8vw, 12px);
           color: #c0392b;
@@ -128,27 +127,38 @@ export default async function CertificatePage({ params }: { params: Promise<{ re
           line-height: 1.3;
         }
 
-        /* Signatory block below the two horizontal template lines */
-        .cert-signatory {
+        /* Signatory: each element sits on its own template line */
+        /* Lines at 83.4%, 86.8%, 89.9% of template height */
+        .cert-sig-name {
           position: absolute;
-          right: 4%;
-          top: 85%;
-          width: 22%;
+          left: 57%;
+          top: 82%;
+          width: 28%;
           text-align: center;
-        }
-        .cert-signatory-name {
           font-family: Inter, system-ui, sans-serif;
           font-weight: 700;
           font-size: clamp(8px, 1.1vw, 17px);
           color: #1a1a1a;
-          line-height: 1.3;
         }
-        .cert-signatory-title {
-          margin-top: 3%;
+        .cert-sig-title {
+          position: absolute;
+          left: 57%;
+          top: 85.5%;
+          width: 28%;
+          text-align: center;
           font-family: Inter, system-ui, sans-serif;
           font-size: clamp(7px, 0.82vw, 12px);
           color: #444;
-          line-height: 1.5;
+        }
+        .cert-sig-org {
+          position: absolute;
+          left: 57%;
+          top: 88.5%;
+          width: 28%;
+          text-align: center;
+          font-family: Inter, system-ui, sans-serif;
+          font-size: clamp(7px, 0.82vw, 12px);
+          color: #444;
         }
 
         .cert-actions {
@@ -197,13 +207,9 @@ export default async function CertificatePage({ params }: { params: Promise<{ re
           <img className="cert-qr" src={qrDataUrl} alt="" aria-hidden="true" width={120} height={120} />
           <div className="cert-url">{certUrl}</div>
 
-          <div className="cert-signatory">
-            <div className="cert-signatory-name">{signatory.name}</div>
-            <div className="cert-signatory-title">
-              {signatory.title}
-              {signatory.org ? <><br />{signatory.org}</> : null}
-            </div>
-          </div>
+          <div className="cert-sig-name">{signatory.name}</div>
+          <div className="cert-sig-title">{signatory.title}</div>
+          {signatory.org && <div className="cert-sig-org">{signatory.org}</div>}
         </div>
         <div className="cert-actions">
           <button
