@@ -123,15 +123,16 @@ export default async function CertificatePage({ params }: { params: Promise<{ re
           font-family: Inter, system-ui, sans-serif;
           font-size: clamp(6px, 0.8vw, 12px);
           color: #c0392b;
-          word-break: break-all;
+          overflow-wrap: break-word;
+          word-break: normal;
           line-height: 1.3;
         }
 
-        /* Signatory block between the two horizontal template lines */
+        /* Signatory block below the two horizontal template lines */
         .cert-signatory {
           position: absolute;
           right: 4%;
-          top: 82%;
+          top: 85%;
           width: 22%;
           text-align: center;
         }
