@@ -79,7 +79,7 @@ export default async function CertificatePage({ params }: { params: Promise<{ re
           position: absolute;
           left: 10%;
           right: 10%;
-          top: 57%;
+          top: 57.5%;
           transform: translateY(-50%);
           text-align: center;
           font-family: Inter, system-ui, sans-serif;
@@ -89,10 +89,11 @@ export default async function CertificatePage({ params }: { params: Promise<{ re
           line-height: 1.25;
         }
 
-        /* Three-column footer values sit ON the underscore lines (y=72.9%) */
+        /* Three-column footer values: bottom of text aligns with underscore (y=72.9%) */
         .cert-footer-val {
           position: absolute;
           top: 73%;
+          transform: translateY(-100%);
           text-align: center;
           font-family: Inter, system-ui, sans-serif;
           font-weight: 700;
@@ -127,12 +128,13 @@ export default async function CertificatePage({ params }: { params: Promise<{ re
           line-height: 1.3;
         }
 
-        /* Signatory: each element sits on its own template line */
-        /* Lines at 83.4%, 86.8%, 89.9% of template height */
+        /* Signatory: bottom of each text element aligns with its template line */
+        /* Lines measured at 83.4%, 86.8%, 89.9% of template height */
         .cert-sig-name {
           position: absolute;
           left: 57%;
-          top: 82%;
+          top: 83.5%;
+          transform: translateY(-100%);
           width: 28%;
           text-align: center;
           font-family: Inter, system-ui, sans-serif;
@@ -143,7 +145,8 @@ export default async function CertificatePage({ params }: { params: Promise<{ re
         .cert-sig-title {
           position: absolute;
           left: 57%;
-          top: 85.5%;
+          top: 87%;
+          transform: translateY(-100%);
           width: 28%;
           text-align: center;
           font-family: Inter, system-ui, sans-serif;
@@ -153,7 +156,8 @@ export default async function CertificatePage({ params }: { params: Promise<{ re
         .cert-sig-org {
           position: absolute;
           left: 57%;
-          top: 88.5%;
+          top: 90%;
+          transform: translateY(-100%);
           width: 28%;
           text-align: center;
           font-family: Inter, system-ui, sans-serif;
