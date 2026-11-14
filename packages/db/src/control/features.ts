@@ -8,6 +8,7 @@ export const FEATURES = {
   people_import: { defaultOn: true },
   knowledge_library: { defaultOn: false },
   learning_paths: { defaultOn: false },
+  aptitude_testing: { defaultOn: false },
 } as const;
 
 export type Feature = keyof typeof FEATURES;

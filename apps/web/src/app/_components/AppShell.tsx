@@ -19,14 +19,15 @@ export interface ShellContext {
 // The frame around every signed in page: side menu on laptops, bottom menu
 // on phones, a top bar with library search and notices (ADR 0020).
 export async function AppShell({ ctx, active, children }: { ctx: ShellContext; active: NavKey; children: ReactNode }) {
-  const [libraryOn, peopleImportOn, pathsOn, unread, department] = await Promise.all([
+  const [libraryOn, peopleImportOn, pathsOn, aptitudeOn, unread, department] = await Promise.all([
     featureOn(ctx.tenant, "knowledge_library"),
     featureOn(ctx.tenant, "people_import"),
     featureOn(ctx.tenant, "learning_paths"),
+    featureOn(ctx.tenant, "aptitude_testing"),
     unreadCount(ctx.db, ctx.user.id),
     personDepartmentByUserId(ctx.db, ctx.user.id),
   ]);
-  const items = buildNav({ roles: ctx.roles, libraryOn, peopleImportOn, pathsOn });
+  const items = buildNav({ roles: ctx.roles, libraryOn, peopleImportOn, pathsOn, aptitudeOn });
   const main = items.filter((i) => i.section === "main");
   const admin = items.filter((i) => i.section === "admin");
 

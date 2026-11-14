@@ -51,16 +51,17 @@ export default async function Home() {
   const db = tenantDb(resolution.tenant);
   const roles = (session.user as { roles?: string }).roles ?? "";
   const isAdmin = can(roles, "activity.view");
-  const [unread, libraryOn, peopleImportOn, pathsOn] = await Promise.all([
+  const [unread, libraryOn, peopleImportOn, pathsOn, aptitudeOn] = await Promise.all([
     unreadCount(db, session.user.id),
     featureOn(resolution.tenant, "knowledge_library"),
     featureOn(resolution.tenant, "people_import"),
     featureOn(resolution.tenant, "learning_paths"),
+    featureOn(resolution.tenant, "aptitude_testing"),
   ]);
   if (!isAdmin && pathsOn) {
     redirect("/my-learning");
   }
-  const destinations = buildNav({ roles, libraryOn, peopleImportOn, pathsOn }).filter((i) => i.key !== "home");
+  const destinations = buildNav({ roles, libraryOn, peopleImportOn, pathsOn, aptitudeOn }).filter((i) => i.key !== "home");
   const mainDestinations = destinations.filter((d) => d.section === "main");
   const adminDestinations = destinations.filter((d) => d.section === "admin");
   const firstName = session.user.name.split(" ")[0] ?? session.user.name;

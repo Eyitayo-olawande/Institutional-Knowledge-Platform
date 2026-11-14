@@ -301,7 +301,9 @@
     "structure": "Structure",
     "areas": "Area access",
     "paths": "Learning paths",
-    "nominations": "Training nominations"
+    "nominations": "Training nominations",
+    "candidates": "Candidates",
+    "aptitude_tests": "Aptitude tests"
   },
   "home": {
     "greeting": "Welcome, {name}",
@@ -611,5 +613,116 @@
     "detail_label_detail": "Supporting detail",
     "detail_label_suggested": "Suggested start date",
     "confidential_note": "Supporting detail is confidential and not shown to the nominee."
+  },
+  "candidates": {
+    "banner_heading": "Candidates",
+    "banner_sub": "Register and manage job candidates for aptitude testing.",
+    "register_btn": "Register candidate",
+    "empty": "No candidates registered yet.",
+    "new_heading": "Register candidate",
+    "edit_heading": "Edit candidate",
+    "back": "Back to candidates",
+    "fields": {
+      "first_name": "First name",
+      "surname": "Surname",
+      "middle_name": "Middle name (optional)",
+      "email": "Email address",
+      "phone": "Phone number",
+      "position": "Position applied for",
+      "department": "Department",
+      "qualification": "Highest educational qualification (optional)",
+      "institution": "Institution attended (optional)"
+    },
+    "submit_btn": "Register",
+    "save_btn": "Save changes",
+    "columns": {
+      "ref": "Reference",
+      "name": "Name",
+      "position": "Position applied for",
+      "department": "Department",
+      "status": "Assessment status"
+    },
+    "status": {
+      "not_assigned": "Not assigned",
+      "not_started": "Not started",
+      "completed": "Completed"
+    }
+  },
+  "aptitude_tests": {
+    "banner_heading": "Aptitude Tests",
+    "banner_sub": "Create and manage on-site aptitude assessments for candidates.",
+    "new_btn": "New test",
+    "empty": "No aptitude tests created yet.",
+    "new_heading": "New aptitude test",
+    "edit_heading": "Edit test details",
+    "back": "Back to aptitude tests",
+    "fields": {
+      "name": "Test name",
+      "instructions": "Instructions (shown to candidates before they begin)",
+      "duration": "Duration (minutes)",
+      "num_questions": "Number of questions",
+      "total_marks": "Total marks",
+      "pass_mark": "Pass mark"
+    },
+    "submit_btn": "Create test",
+    "save_btn": "Save changes",
+    "columns": {
+      "name": "Test name",
+      "questions": "Questions",
+      "assigned": "Assigned",
+      "pass_mark": "Pass mark",
+      "duration": "Duration"
+    },
+    "sections": {
+      "general_aptitude": "General Aptitude (40%)",
+      "company_knowledge": "Company Knowledge (60%)"
+    },
+    "questions_heading": "Questions",
+    "add_question_btn": "Add question",
+    "assign_heading": "Assigned Candidates",
+    "assign_btn": "Assign candidate",
+    "generate_pin": "Generate PIN",
+    "pin_generated": "PIN generated. Hand this to the candidate:",
+    "results_heading": "Results",
+    "results_btn": "View results",
+    "columns_results": {
+      "candidate": "Candidate",
+      "ref": "Ref",
+      "position": "Position",
+      "status": "Status",
+      "ga_score": "Gen. Aptitude",
+      "ck_score": "Co. Knowledge",
+      "total": "Total",
+      "result": "Result",
+      "submitted": "Submitted"
+    },
+    "pass": "Pass",
+    "fail": "Fail",
+    "not_started": "Not started"
+  },
+  "aptitude": {
+    "access_heading": "Candidate Assessment",
+    "access_sub": "Enter your candidate reference number and 4-digit PIN to begin.",
+    "ref_label": "Candidate reference number",
+    "pin_label": "4-digit PIN",
+    "start_btn": "Access assessment",
+    "invalid_credentials": "Reference number or PIN not recognised. Please check and try again.",
+    "already_submitted": "You have already submitted this assessment.",
+    "start_heading": "Assessment Instructions",
+    "start_duration": "Duration:",
+    "start_minutes": "minutes",
+    "start_questions": "Questions:",
+    "start_pass_mark": "Pass mark:",
+    "start_btn_begin": "Begin assessment",
+    "timer_label": "Time remaining",
+    "submit_btn": "Submit assessment",
+    "confirm_submit": "Are you sure you want to submit? You cannot change your answers after submission.",
+    "results_heading": "Your Results",
+    "results_overall": "Overall score",
+    "results_section_ga": "General Aptitude",
+    "results_section_ck": "Company Knowledge",
+    "results_pass": "Pass",
+    "results_fail": "Did not pass",
+    "results_pass_mark": "Pass mark"
   }
 }

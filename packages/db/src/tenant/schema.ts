@@ -598,6 +598,104 @@ export const trainingNominations = pgTable("training_nominations", {
   ...auditColumns,
 });
 
+// Aptitude testing: candidate registration and on-site aptitude assessments,
+// kept separate from the employee and eLearning domains.
+export const aptitudeSectionKey = pgEnum("aptitude_section_key", ["general_aptitude", "company_knowledge"]);
+
+export const candidates = pgTable("candidates", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  candidateRef: text("candidate_ref").notNull().unique(),
+  firstName: text("first_name").notNull(),
+  surname: text("surname").notNull(),
+  middleName: text("middle_name"),
+  email: text("email").notNull().unique(),
+  phone: text("phone").notNull(),
+  positionAppliedFor: text("position_applied_for").notNull(),
+  department: text("department").notNull(),
+  highestQualification: text("highest_qualification"),
+  institution: text("institution"),
+  registeredAt: timestamp("registered_at", { withTimezone: true }).notNull().defaultNow(),
+  ...auditColumns,
+});
+
+export const aptitudeTests = pgTable("aptitude_tests", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  instructions: text("instructions").notNull().default(""),
+  durationMinutes: integer("duration_minutes").notNull().default(60),
+  numQuestions: integer("num_questions").notNull().default(20),
+  totalMarks: integer("total_marks").notNull().default(100),
+  passMark: integer("pass_mark").notNull().default(50),
+  ...auditColumns,
+});
+
+export const aptitudeSections = pgTable(
+  "aptitude_sections",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    testId: uuid("test_id").notNull().references(() => aptitudeTests.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    sectionKey: aptitudeSectionKey("section_key").notNull(),
+    weightPercent: integer("weight_percent").notNull().default(50),
+    ...auditColumns,
+  },
+  (t) => [uniqueIndex("aptitude_sections_test_key_unique").on(t.testId, t.sectionKey)],
+);
+
+export const aptitudeQuestions = pgTable("aptitude_questions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  testId: uuid("test_id").notNull().references(() => aptitudeTests.id, { onDelete: "cascade" }),
+  sectionId: uuid("section_id").notNull().references(() => aptitudeSections.id, { onDelete: "cascade" }),
+  questionText: text("question_text").notNull(),
+  marks: integer("marks").notNull().default(1),
+  sortOrder: integer("sort_order").notNull().default(0),
+  ...auditColumns,
+});
+
+export const aptitudeOptions = pgTable("aptitude_options", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  questionId: uuid("question_id").notNull().references(() => aptitudeQuestions.id, { onDelete: "cascade" }),
+  optionText: text("option_text").notNull(),
+  isCorrect: boolean("is_correct").notNull().default(false),
+  sortOrder: integer("sort_order").notNull().default(0),
+  ...auditColumns,
+});
+
+export const aptitudeAssignments = pgTable(
+  "aptitude_assignments",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    testId: uuid("test_id").notNull().references(() => aptitudeTests.id, { onDelete: "cascade" }),
+    candidateId: uuid("candidate_id").notNull().references(() => candidates.id, { onDelete: "cascade" }),
+    accessPinHash: text("access_pin_hash"),
+    pinSetAt: timestamp("pin_set_at", { withTimezone: true }),
+    ...auditColumns,
+  },
+  (t) => [uniqueIndex("aptitude_assignments_test_candidate_unique").on(t.testId, t.candidateId)],
+);
+
+export const aptitudeAttempts = pgTable("aptitude_attempts", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  testId: uuid("test_id").notNull().references(() => aptitudeTests.id),
+  candidateId: uuid("candidate_id").notNull().references(() => candidates.id),
+  startedAt: timestamp("started_at", { withTimezone: true }).notNull().defaultNow(),
+  submittedAt: timestamp("submitted_at", { withTimezone: true }),
+  totalScore: integer("total_score"),
+  generalAptitudeScore: integer("general_aptitude_score"),
+  companyKnowledgeScore: integer("company_knowledge_score"),
+  passed: boolean("passed"),
+  ...auditColumns,
+});
+
+export const aptitudeResponses = pgTable("aptitude_responses", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  attemptId: uuid("attempt_id").notNull().references(() => aptitudeAttempts.id, { onDelete: "cascade" }),
+  questionId: uuid("question_id").notNull().references(() => aptitudeQuestions.id),
+  optionId: uuid("option_id").notNull().references(() => aptitudeOptions.id),
+  isCorrect: boolean("is_correct").notNull().default(false),
+  ...auditColumns,
+});
+
 // Certificates (work package E9-a): issued when a person completes all
 // modules in a path stage. One per person per path per stage; idempotent.
 export const certificates = pgTable(

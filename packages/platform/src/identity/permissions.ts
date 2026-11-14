@@ -28,6 +28,7 @@ export const ACTIONS = [
   "areas.manage",
   "paths.edit",
   "nominations.manage",
+  "candidates.manage",
 ] as const;
 
 export type Action = (typeof ACTIONS)[number];
@@ -50,6 +51,8 @@ const GRANTS: Record<Action, readonly Role[]> = {
   "paths.edit": ["content_owner", "learning_administrator"],
   // Nominations: content owners and line managers nominate; learning admins approve.
   "nominations.manage": ["content_owner", "line_manager", "learning_administrator"],
+  // Aptitude testing: candidate registration and test administration.
+  "candidates.manage": ["learning_administrator"],
 };
 
 export function isRole(value: string): value is Role {
