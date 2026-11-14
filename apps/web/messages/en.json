@@ -300,7 +300,8 @@
     "my_learning": "My Learning",
     "structure": "Structure",
     "areas": "Area access",
-    "paths": "Learning paths"
+    "paths": "Learning paths",
+    "nominations": "Training nominations"
   },
   "home": {
     "greeting": "Welcome, {name}",
@@ -323,7 +324,8 @@
       "structure": "See and tidy the structure people belong to.",
       "areas": "Let people outside a team see its learning area.",
       "paths": "Build the stages, modules and due dates staff work through.",
-      "my_learning": "Track your assigned training paths and learning modules."
+      "my_learning": "Track your assigned training paths and learning modules.",
+      "nominations": "Nominate staff for training and review pending approvals."
     },
     "admin": {
       "overview_heading": "Portal overview",
@@ -548,5 +550,66 @@
     "revoked": "Access removed.",
     "error": "That change could not be made.",
     "empty": "No {departments} yet. They are added by the staff import."
+  },
+  "nominations": {
+    "banner_heading": "Training Nominations",
+    "banner_sub": "Nominate staff for a learning path. Learning Administrators review and approve each nomination.",
+    "new_heading": "New nomination",
+    "list_heading": "Nominations",
+    "pending_tab": "Pending",
+    "approved_tab": "Approved",
+    "rejected_tab": "Rejected",
+    "all_tab": "All",
+    "empty": "No nominations yet.",
+    "nominate_btn": "Nominate for training",
+    "submit_btn": "Submit nomination",
+    "fields": {
+      "person": "Staff member",
+      "path": "Learning path",
+      "reason": "Reason for nomination",
+      "reason_detail": "Supporting detail (performance feedback or development objective)",
+      "reason_detail_hint": "Visible to Learning Administrators only.",
+      "suggested_start_date": "Suggested start date (optional)"
+    },
+    "reasons": {
+      "performance_improvement": "Performance improvement",
+      "skills_gap": "Skills or competency gap",
+      "assessment_results": "Assessment results",
+      "compliance_requirement": "Compliance requirement",
+      "new_role": "New role or responsibility",
+      "manager_recommendation": "Manager recommendation",
+      "refresher_training": "Refresher training",
+      "career_development": "Career development"
+    },
+    "columns": {
+      "person": "Staff member",
+      "path": "Learning path",
+      "reason": "Reason",
+      "nominated_by": "Nominated by",
+      "status": "Status",
+      "date": "Date"
+    },
+    "statuses": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Not approved"
+    },
+    "review_heading": "Review nomination",
+    "review_fields": {
+      "start_date": "Approved start date",
+      "note": "Review note (optional, shared with nominator on rejection)"
+    },
+    "approve_btn": "Approve and schedule",
+    "reject_btn": "Do not approve",
+    "back": "Back to nominations",
+    "already_assigned": "This person already has an active assignment for this path.",
+    "not_pending": "This nomination has already been reviewed.",
+    "success_approved": "Nomination approved. Learning assignment scheduled.",
+    "success_rejected": "Nomination marked as not approved.",
+    "detail_label_nominated_by": "Nominated by",
+    "detail_label_reason": "Reason",
+    "detail_label_detail": "Supporting detail",
+    "detail_label_suggested": "Suggested start date",
+    "confidential_note": "Supporting detail is confidential and not shown to the nominee."
   }
 }

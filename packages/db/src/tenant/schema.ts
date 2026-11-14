@@ -569,6 +569,35 @@ export const assessmentResponses = pgTable("assessment_responses", {
   ...auditColumns,
 });
 
+// Training nominations: HR, line managers and content owners nominate staff
+// for a learning path; a learning administrator approves or rejects.
+export const nominationStatus = pgEnum("nomination_status", ["pending", "approved", "rejected"]);
+export const nominationReason = pgEnum("nomination_reason", [
+  "performance_improvement",
+  "skills_gap",
+  "assessment_results",
+  "compliance_requirement",
+  "new_role",
+  "manager_recommendation",
+  "refresher_training",
+  "career_development",
+]);
+
+export const trainingNominations = pgTable("training_nominations", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  personId: uuid("person_id").notNull().references(() => people.id),
+  pathId: uuid("path_id").notNull().references(() => paths.id),
+  nominatedBy: text("nominated_by").notNull(),
+  reason: nominationReason("reason").notNull(),
+  reasonDetail: text("reason_detail"),
+  suggestedStartDate: date("suggested_start_date"),
+  status: nominationStatus("status").notNull().default("pending"),
+  reviewedBy: text("reviewed_by"),
+  reviewNote: text("review_note"),
+  approvedStartDate: date("approved_start_date"),
+  ...auditColumns,
+});
+
 // Certificates (work package E9-a): issued when a person completes all
 // modules in a path stage. One per person per path per stage; idempotent.
 export const certificates = pgTable(
