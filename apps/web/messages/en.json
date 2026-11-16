@@ -179,6 +179,14 @@
     "edit_heading": "Start a new version",
     "save_draft": "Save draft",
     "publish": "Publish version {version}",
+    "publish_update_heading": "Publish update",
+    "publish_update_intro": "This will replace the version staff currently see. Describe what has changed so affected staff know what to re-read.",
+    "publish_classification_label": "Change classification",
+    "publish_classification_minor": "Minor (wording, formatting, minor corrections)",
+    "publish_classification_important": "Important (updated guidance, new requirements)",
+    "publish_classification_critical": "Critical (compliance, safety, urgent action required)",
+    "publish_description_label": "What changed (optional)",
+    "publish_description_placeholder": "Briefly describe what was updated and why.",
     "history": "Versions",
     "history_published": "Version {version}, published. {note}",
     "history_draft": "Version {version}, draft. {note}",
@@ -723,6 +731,9 @@
     "results_section_ck": "Company Knowledge",
     "results_pass": "Pass",
     "results_fail": "Did not pass",
-    "results_pass_mark": "Pass mark"
+    "results_pass_mark": "Pass mark",
+    "results_message_pass": "Well done on completing this assessment.",
+    "results_message_fail": "Thank you for completing this assessment.",
+    "results_recorded": "Result recorded"
   }
 }
