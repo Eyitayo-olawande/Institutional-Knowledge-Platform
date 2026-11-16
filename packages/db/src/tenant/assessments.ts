@@ -93,11 +93,16 @@ export async function recordItemView(
   moduleId: string,
   itemId: string,
   changedBy: string,
+  itemVersion?: number | null,
 ): Promise<void> {
+  const now = new Date();
   await db
     .insert(itemViews)
-    .values({ personId, moduleId, itemId, changedBy })
-    .onConflictDoNothing();
+    .values({ personId, moduleId, itemId, itemVersion: itemVersion ?? null, changedBy })
+    .onConflictDoUpdate({
+      target: [itemViews.personId, itemViews.moduleId, itemViews.itemId],
+      set: { viewedAt: now, itemVersion: itemVersion ?? null, updatedAt: now, changedBy },
+    });
 }
 
 export async function hasViewedAllModuleItems(

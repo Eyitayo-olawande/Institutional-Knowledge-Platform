@@ -2,12 +2,14 @@ import { and, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import type { TenantDb } from "./client.ts";
 import { deliveryRecords, notices, users } from "./schema.ts";
 
+type NoticeWriter = Pick<TenantDb, "insert" | "select">;
+
 export async function recipients(db: TenantDb, userIds: readonly string[]) {
   if (userIds.length === 0) return [];
   return db.select({ id: users.id, name: users.name, email: users.email }).from(users).where(inArray(users.id, [...userIds]));
 }
 
-export async function addNotice(db: TenantDb, notice: { userId: string; event: string; subject: string; body: string }) {
+export async function addNotice(db: NoticeWriter, notice: { userId: string; event: string; subject: string; body: string }) {
   await db.insert(notices).values(notice);
 }
 

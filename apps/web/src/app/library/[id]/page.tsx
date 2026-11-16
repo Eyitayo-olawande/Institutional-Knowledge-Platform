@@ -427,6 +427,25 @@ export default async function Item({
             {draft ? (
               <form action={publishItem} style={{ marginTop: 12 }}>
                 <input type="hidden" name="id" value={item.id} />
+                {found.published ? (
+                  <>
+                    <p style={{ marginBottom: 10, fontSize: 13, color: "var(--mantle-color-text_muted)" }}>
+                      {t("library.publish_update_intro")}
+                    </p>
+                    <label className="field">
+                      {t("library.publish_classification_label")}
+                      <select className="input" name="changeClassification" required>
+                        <option value="minor">{t("library.publish_classification_minor")}</option>
+                        <option value="important">{t("library.publish_classification_important")}</option>
+                        <option value="critical">{t("library.publish_classification_critical")}</option>
+                      </select>
+                    </label>
+                    <label className="field">
+                      {t("library.publish_description_label")}
+                      <textarea className="input" name="changeDescription" rows={3} placeholder={t("library.publish_description_placeholder")} />
+                    </label>
+                  </>
+                ) : null}
                 <Button type="submit">{t("library.publish", { version: draft.version })}</Button>
               </form>
             ) : null}

@@ -510,6 +510,9 @@ export const itemViews = pgTable(
     moduleId: uuid("module_id").notNull().references(() => modules.id),
     itemId: uuid("item_id").notNull().references(() => libraryItems.id),
     viewedAt: timestamp("viewed_at", { withTimezone: true }).notNull().defaultNow(),
+    // Set to the item's published_version at the time of viewing (E10).
+    // Null for rows written before migration 0018.
+    itemVersion: integer("item_version"),
     ...auditColumns,
   },
   (t) => [uniqueIndex("item_views_unique").on(t.personId, t.moduleId, t.itemId)],
@@ -695,6 +698,48 @@ export const aptitudeResponses = pgTable("aptitude_responses", {
   isCorrect: boolean("is_correct").notNull().default(false),
   ...auditColumns,
 });
+
+// Content change alerts (work package E10): when a library item is
+// re-published with a change classification, affected staff receive an
+// acknowledgement request. E10-b adds the learner banner and completion gate.
+export const changeClassification = pgEnum("change_classification", ["minor", "important", "critical"]);
+
+export const contentChangeAlerts = pgTable(
+  "content_change_alerts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    itemId: uuid("item_id").notNull().references(() => libraryItems.id),
+    previousVersion: integer("previous_version").notNull(),
+    newVersion: integer("new_version").notNull(),
+    classification: changeClassification("classification").notNull(),
+    changeDescription: text("change_description").notNull().default(""),
+    createdBy: text("created_by").notNull(),
+    ...auditColumns,
+  },
+  (t) => [
+    uniqueIndex("content_change_alerts_item_version_unique").on(t.itemId, t.newVersion),
+    index("content_change_alerts_item_idx").on(t.itemId),
+  ],
+);
+
+export const changeAlertAcknowledgements = pgTable(
+  "change_alert_acknowledgements",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    alertId: uuid("alert_id").notNull().references(() => contentChangeAlerts.id),
+    personId: uuid("person_id").notNull().references(() => people.id),
+    notifiedAt: timestamp("notified_at", { withTimezone: true }).notNull().defaultNow(),
+    acknowledgedAt: timestamp("acknowledged_at", { withTimezone: true }),
+    acknowledgedVersion: integer("acknowledged_version"),
+    lastRemindedAt: timestamp("last_reminded_at", { withTimezone: true }),
+    reminderCount: integer("reminder_count").notNull().default(0),
+    ...auditColumns,
+  },
+  (t) => [
+    uniqueIndex("change_alert_acknowledgements_alert_person_unique").on(t.alertId, t.personId),
+    index("change_alert_acknowledgements_person_idx").on(t.personId),
+  ],
+);
 
 // Certificates (work package E9-a): issued when a person completes all
 // modules in a path stage. One per person per path per stage; idempotent.

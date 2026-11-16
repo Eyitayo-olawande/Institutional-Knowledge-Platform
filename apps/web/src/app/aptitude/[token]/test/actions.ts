@@ -18,14 +18,17 @@ export async function submitTestAction(form: FormData): Promise<void> {
   if (attemptId === "pending") redirect(`/aptitude/${token}/start`);
 
   const responses: AptitudeAttemptResponse[] = [];
+  const shownQuestionIds: string[] = [];
   for (const [key, value] of form.entries()) {
     if (key.startsWith("q_")) {
       const questionId = key.slice(2);
       responses.push({ questionId, optionId: String(value) });
+    } else if (key === "shown_q") {
+      shownQuestionIds.push(String(value));
     }
   }
 
-  await submitAttempt(db, attemptId, testId, responses);
+  await submitAttempt(db, attemptId, testId, responses, shownQuestionIds);
 
   const resultsToken = signToken(testId, candidateId, attemptId);
   redirect(`/aptitude/${resultsToken}/results`);

@@ -21,7 +21,7 @@ export default async function AptitudeTestPage({
   const { testId, candidateId, attemptId } = parsed;
   if (attemptId === "pending") redirect(`/aptitude/${token}/start`);
 
-  const data = await getTestForCandidate(db, testId);
+  const data = await getTestForCandidate(db, testId, attemptId);
   if (!data) notFound();
 
   const { test, sections } = data;
@@ -59,6 +59,11 @@ export default async function AptitudeTestPage({
       <div className="at-body">
         <form id="at-form" action={submitTestAction}>
           <input type="hidden" name="token" value={token} />
+          {sections.flatMap((section) =>
+            section.questions.map((q) => (
+              <input key={q.id} type="hidden" name="shown_q" value={q.id} />
+            ))
+          )}
           {sections.map((section) => (
             <div className="at-section" key={section.id}>
               <h2>

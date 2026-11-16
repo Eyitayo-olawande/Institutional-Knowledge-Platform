@@ -1,6 +1,6 @@
 "use server";
 
-import { attachFileToItem, canSeeArea, createLibraryItem, detachFileFromItem, getLibraryItem, PlacementError, placeItem, publishDraft, retireItem, saveDraft } from "@mantle/db/tenant";
+import { attachFileToItem, canSeeArea, createLibraryItem, detachFileFromItem, getLibraryItem, PlacementError, placeItem, publishDraft, retireItem, saveDraft, type ChangeClassification } from "@mantle/db/tenant";
 import { checkUpload, MAX_FILES_PER_UPLOAD } from "@mantle/platform/files";
 import { needsConversion } from "@mantle/documents/convert";
 import { converter, fileStore, scanner } from "../../server/files.ts";
@@ -84,12 +84,23 @@ export async function saveItemDraft(form: FormData): Promise<void> {
   redirect(`/library/${id}?saved=1`);
 }
 
+const VALID_CLASSIFICATIONS = new Set<ChangeClassification>(["minor", "important", "critical"]);
+
 export async function publishItem(form: FormData): Promise<void> {
   const ctx = await editor();
   const { db, user } = ctx;
   const id = String(form.get("id") ?? "");
-  await editableItem(ctx, id);
-  const version = await publishDraft(db, id, `user:${user.id}`);
+  const found = await editableItem(ctx, id);
+
+  let changeAlert: { classification: ChangeClassification; description: string } | undefined;
+  if (found.item.publishedVersion !== null) {
+    const classification = String(form.get("changeClassification") ?? "") as ChangeClassification;
+    if (!VALID_CLASSIFICATIONS.has(classification)) redirect(`/library/${id}?error=missing`);
+    const description = String(form.get("changeDescription") ?? "").trim();
+    changeAlert = { classification, description };
+  }
+
+  const version = await publishDraft(db, id, `user:${user.id}`, changeAlert);
   redirect(`/library/${id}?${version ? "published=1" : "error=no_draft"}`);
 }
 

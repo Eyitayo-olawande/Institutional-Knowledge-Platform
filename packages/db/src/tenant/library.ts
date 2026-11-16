@@ -1,8 +1,13 @@
-import { and, asc, desc, eq, isNull, lte, max, ne, type SQL } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNull, lte, max, ne, type SQL } from "drizzle-orm";
 import { recordActivity } from "./activity.ts";
 import { areaIdsOrAll, checkPlacement, type VisibleAreas } from "./areas.ts";
 import type { TenantDb } from "./client.ts";
-import { contentTypes, files, libraryItemFiles, libraryItems, libraryItemVersions } from "./schema.ts";
+import { addNotice } from "./notices.ts";
+import { assignments, changeAlertAcknowledgements, changeClassification, contentChangeAlerts, contentTypes, files, itemViews, libraryItemFiles, libraryItems, libraryItemVersions, moduleItems, pathStages, people, stageModules } from "./schema.ts";
+
+export type ChangeClassification = typeof changeClassification.enumValues[number];
+
+type Tx = Parameters<Parameters<TenantDb["transaction"]>[0]>[0];
 
 export interface NewItem {
   readonly title: string;
@@ -112,8 +117,18 @@ export async function saveDraft(
 }
 
 // Publishes the open draft. Earlier published versions stay as history.
-export async function publishDraft(db: TenantDb, itemId: string, actor: string): Promise<number | null> {
+// changeAlert is required on re-publishes (when the item already has a
+// publishedVersion); first-time publishes leave it undefined.
+export async function publishDraft(
+  db: TenantDb,
+  itemId: string,
+  actor: string,
+  changeAlert?: { classification: ChangeClassification; description: string },
+): Promise<number | null> {
   return db.transaction(async (tx) => {
+    const [current] = await tx.select({ publishedVersion: libraryItems.publishedVersion }).from(libraryItems).where(eq(libraryItems.id, itemId));
+    const previousVersion = current?.publishedVersion ?? null;
+
     const [draft] = await tx
       .select({ id: libraryItemVersions.id, version: libraryItemVersions.version })
       .from(libraryItemVersions)
@@ -125,10 +140,98 @@ export async function publishDraft(db: TenantDb, itemId: string, actor: string):
       .update(libraryItems)
       .set({ status: "published", publishedVersion: draft.version, updatedAt: now, changedBy: actor })
       .where(eq(libraryItems.id, itemId));
-    // Change alerts (E10) will react to this entry for items staff must confirm.
+    if (changeAlert && previousVersion !== null) {
+      await createChangeAlerts(tx, itemId, previousVersion, draft.version, changeAlert, actor);
+    }
     await recordActivity(tx, { actor, action: "library.published", entityType: "library_item", entityId: itemId, details: { version: draft.version } });
     return draft.version;
   });
+}
+
+// Creates an alert and queues acknowledgement rows for all affected staff.
+// Called inside the publishDraft transaction.
+async function createChangeAlerts(
+  tx: Tx,
+  itemId: string,
+  previousVersion: number,
+  newVersion: number,
+  changeAlert: { classification: ChangeClassification; description: string },
+  actor: string,
+): Promise<void> {
+  const [alertRow] = await tx
+    .insert(contentChangeAlerts)
+    .values({
+      itemId,
+      previousVersion,
+      newVersion,
+      classification: changeAlert.classification,
+      changeDescription: changeAlert.description,
+      createdBy: actor,
+      changedBy: actor,
+    })
+    .onConflictDoNothing()
+    .returning({ id: contentChangeAlerts.id });
+
+  // If the alert already exists (retry), skip sending notices again.
+  if (!alertRow) return;
+
+  // Find all active people who: have an active assignment for a path that
+  // has a stage with a module containing this item, AND have already viewed
+  // this item in that module (item_views row exists).
+  const moduleIds = await tx
+    .selectDistinct({ moduleId: moduleItems.moduleId })
+    .from(moduleItems)
+    .where(eq(moduleItems.itemId, itemId));
+
+  if (moduleIds.length === 0) return;
+
+  const mIds = moduleIds.map((r) => r.moduleId);
+
+  // People who have viewed this item and have an assignment that includes one
+  // of those modules, joined to get their userId for notices.
+  const affected = await tx
+    .selectDistinct({
+      personId: itemViews.personId,
+      userId: people.userId,
+    })
+    .from(itemViews)
+    .innerJoin(people, eq(people.id, itemViews.personId))
+    .innerJoin(stageModules, eq(stageModules.moduleId, itemViews.moduleId))
+    .innerJoin(pathStages, eq(pathStages.id, stageModules.stageId))
+    .innerJoin(assignments, eq(assignments.pathId, pathStages.pathId))
+    .where(
+      and(
+        eq(itemViews.itemId, itemId),
+        inArray(itemViews.moduleId, mIds),
+        eq(assignments.personId, itemViews.personId),
+      ),
+    );
+
+  if (affected.length === 0) return;
+
+  const now = new Date();
+
+  await tx
+    .insert(changeAlertAcknowledgements)
+    .values(
+      affected.map((r) => ({
+        alertId: alertRow.id,
+        personId: r.personId,
+        notifiedAt: now,
+        changedBy: actor,
+      })),
+    )
+    .onConflictDoNothing();
+
+  for (const { userId } of affected) {
+    if (!userId) continue;
+    await addNotice(tx, {
+      userId,
+      event: `change_alert.${alertRow.id}`,
+      subject: "A learning item you have read has been updated",
+      body: `Classification: ${changeAlert.classification}. ${changeAlert.description ? changeAlert.description : "Please re-read the item and confirm you have reviewed the update."}`,
+    });
+  }
 }
 
 export interface ListOptions {

@@ -346,6 +346,34 @@ export async function verifyPin(
   return row ?? null;
 }
 
+// ---- Seeded PRNG (Mulberry32) ----
+// Deterministic shuffle seeded from the attemptId so each candidate always
+// sees the same subset and order on refresh, but different candidates get
+// different subsets. The seed is derived by XOR-folding the first 8 hex
+// characters of the UUID (32 bits is enough entropy for question selection).
+
+function makePrng(seed: string): () => number {
+  // Take first 8 hex chars of the UUID (strip hyphens) as a 32-bit seed.
+  const hex = seed.replace(/-/g, "").slice(0, 8);
+  let s = parseInt(hex, 16) >>> 0;
+  return function () {
+    s += 0x6d2b79f5;
+    let z = s;
+    z = Math.imul(z ^ (z >>> 15), z | 1);
+    z ^= z + Math.imul(z ^ (z >>> 7), z | 61);
+    return ((z ^ (z >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function seededShuffle<T>(arr: T[], rand: () => number): T[] {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [a[i], a[j]] = [a[j]!, a[i]!];
+  }
+  return a;
+}
+
 // ---- Test taking ----
 
 export interface AptitudeTestForCandidate {
@@ -353,20 +381,47 @@ export interface AptitudeTestForCandidate {
   sections: (AptitudeSectionRow & { questions: AptitudeQuestionRow[] })[];
 }
 
-export async function getTestForCandidate(db: TenantDb, testId: string): Promise<AptitudeTestForCandidate | null> {
+// Returns a randomised, attempt-specific subset of questions.
+// numQuestions drives how many to show total (proportional per section).
+// If the bank has fewer questions than numQuestions, all are shown.
+// Options within each question are also shuffled.
+export async function getTestForCandidate(
+  db: TenantDb,
+  testId: string,
+  attemptId: string,
+): Promise<AptitudeTestForCandidate | null> {
   const test = await getAptitudeTest(db, testId);
   if (!test) return null;
   const sections = await getTestSections(db, testId);
-  const questions = await getTestQuestions(db, testId);
+  const allQuestions = await getTestQuestions(db, testId);
+
+  const rand = makePrng(attemptId);
+  const totalWanted = test.numQuestions;
+  const totalWeight = sections.reduce((s, sec) => s + sec.weightPercent, 0) || 100;
+
   const bySection = new Map<string, AptitudeQuestionRow[]>();
-  for (const q of questions) {
+  for (const q of allQuestions) {
     const arr = bySection.get(q.sectionId) ?? [];
     arr.push(q);
     bySection.set(q.sectionId, arr);
   }
+
+  const selectedBySection = new Map<string, AptitudeQuestionRow[]>();
+  for (const sec of sections) {
+    const pool = bySection.get(sec.id) ?? [];
+    const want = Math.round((sec.weightPercent / totalWeight) * totalWanted);
+    const count = Math.min(want, pool.length);
+    const shuffledPool = seededShuffle(pool, rand);
+    const chosen = shuffledPool.slice(0, count).map((q) => ({
+      ...q,
+      options: seededShuffle(q.options, rand),
+    }));
+    selectedBySection.set(sec.id, chosen);
+  }
+
   return {
     test,
-    sections: sections.map((s) => ({ ...s, questions: bySection.get(s.id) ?? [] })),
+    sections: sections.map((s) => ({ ...s, questions: selectedBySection.get(s.id) ?? [] })),
   };
 }
 
@@ -407,13 +462,17 @@ export async function submitAttempt(
   attemptId: string,
   testId: string,
   responses: AptitudeAttemptResponse[],
+  shownQuestionIds: string[],
 ): Promise<SubmitResult> {
   return db.transaction(async (tx) => {
     const test = await tx.select().from(aptitudeTests).where(eq(aptitudeTests.id, testId)).then(([r]) => r);
     if (!test) throw new Error("test_not_found");
 
     const sections = await tx.select().from(aptitudeSections).where(eq(aptitudeSections.testId, testId));
-    const questions = await tx.select().from(aptitudeQuestions).where(eq(aptitudeQuestions.testId, testId));
+    // Score only against the questions the candidate was actually shown.
+    const shownSet = new Set(shownQuestionIds);
+    const allQuestions = await tx.select().from(aptitudeQuestions).where(eq(aptitudeQuestions.testId, testId));
+    const questions = shownSet.size > 0 ? allQuestions.filter((q) => shownSet.has(q.id)) : allQuestions;
     const options = questions.length > 0
       ? await tx.select().from(aptitudeOptions).where(inArray(aptitudeOptions.questionId, questions.map((q) => q.id)))
       : [];

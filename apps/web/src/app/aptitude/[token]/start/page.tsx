@@ -27,7 +27,7 @@ export default async function AptitudeStartPage({
     redirect(`/aptitude/${signToken(testId, candidateId, attemptId)}/results`);
   }
 
-  const data = await getTestForCandidate(db, testId);
+  const data = await getTestForCandidate(db, testId, attemptId);
   if (!data) notFound();
 
   const { test } = data;

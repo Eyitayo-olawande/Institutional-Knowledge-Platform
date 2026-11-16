@@ -18,6 +18,7 @@ export {
   publishDraft,
   saveDraft,
   searchLibrary,
+  type ChangeClassification,
   type ListOptions,
   type NewItem,
 } from "./library.ts";
