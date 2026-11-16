@@ -1,6 +1,7 @@
 import { and, asc, eq, inArray, sql } from "drizzle-orm";
 import { recordActivity } from "./activity.ts";
 import type { TenantDb } from "./client.ts";
+import { hasOutstandingChangeAlerts } from "./library.ts";
 import { assignmentRules, assignments, certificates, libraryItems, moduleItems, modules, moduleProgress, pathStages, paths, people, stageModules } from "./schema.ts";
 
 // Learning paths (work package E8, Blueprint v3.1 section 5). A path has
@@ -302,7 +303,12 @@ export async function personAssignments(db: TenantDb, personId: string, today = 
 
 export async function canCompleteModule(db: TenantDb, personId: string, moduleId: string): Promise<boolean> {
   const views = await personAssignments(db, personId);
-  return views.some((v) => v.stages.some((s) => s.unlocked && s.modules.some((m) => m.id === moduleId)));
+  if (!views.some((v) => v.stages.some((s) => s.unlocked && s.modules.some((m) => m.id === moduleId)))) {
+    return false;
+  }
+  // Gate 1.5: all change alert acknowledgements for this module must be done.
+  const hasAlerts = await hasOutstandingChangeAlerts(db, personId, moduleId);
+  return !hasAlerts;
 }
 
 // "I have read this" (tests and certificates are a separate package, E9).

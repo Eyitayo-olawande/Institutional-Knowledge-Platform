@@ -1,4 +1,4 @@
-import { canSeeArea, getAssessmentForItem, getAttemptResults, getLibraryItem, getModule, hasViewedAllModuleItems, itemFiles, listLibraryItems, listModuleItems, personByUserId, recordItemView } from "@mantle/db/tenant";
+import { canSeeArea, getAssessmentForItem, getAttemptResults, getLibraryItem, getModule, getOutstandingChangeAlertForItem, hasOutstandingChangeAlerts, hasViewedAllModuleItems, itemFiles, listLibraryItems, listModuleItems, personByUserId, recordItemView } from "@mantle/db/tenant";
 import { needsConversion } from "@mantle/documents/convert";
 import { ACCEPT_ATTR } from "@mantle/platform/files";
 import { can } from "@mantle/platform/identity";
@@ -9,7 +9,7 @@ import { t } from "../../../i18n.ts";
 import { requireFeature, requirePermission, viewerAreas } from "../../../server/session.ts";
 import { AppShell } from "../../_components/AppShell.tsx";
 import { completeModuleAction, submitAssessmentAction } from "../../actions.ts";
-import { deleteItemFile, placeLibraryItem, publishItem, retireLibraryItem, saveItemDraft, uploadItemFile } from "../actions.ts";
+import { acknowledgeChangeAlert, deleteItemFile, placeLibraryItem, publishItem, retireLibraryItem, saveItemDraft, uploadItemFile } from "../actions.ts";
 import { areaChoices, areaName } from "../areas.ts";
 import { PlacementFields } from "../PlacementFields.tsx";
 import { ViewerActionsClient } from "../ViewerActionsClient.tsx";
@@ -107,6 +107,18 @@ export default async function Item({
     ? await hasViewedAllModuleItems(db, viewerPerson.id, moduleId!)
     : true;
 
+  // Gate 1.5 — change alert banner: shown when a person re-reads a content
+  // item that has been updated and they have an unacknowledged alert row.
+  const outstandingAlert = moduleId && viewerPerson && !isAssessmentItem
+    ? await getOutstandingChangeAlertForItem(db, viewerPerson.id, item.id)
+    : null;
+
+  // Gate 1.5 — module completion block: true if any item in this module has
+  // an unacknowledged alert for this person. Used to gate the "Mark done" btn.
+  const moduleHasOutstandingAlerts = isLastModuleItem && viewerPerson && moduleId
+    ? await hasOutstandingChangeAlerts(db, viewerPerson.id, moduleId)
+    : false;
+
   // If ?attempt= is present, load prior results to show the feedback panel.
   const attemptResults =
     attemptId && /^[0-9a-f-]{36}$/.test(attemptId)
@@ -144,6 +156,24 @@ export default async function Item({
       {fileRemoved ? <div className="alert alert-success" role="status"><p>{t("library.files.removed")}</p></div> : null}
       {fileError && FILE_ERRORS.has(fileError) ? (
         <div className="alert alert-danger" role="alert"><p>{t(`library.files.errors.${fileError}`)}</p></div>
+      ) : null}
+
+      {outstandingAlert ? (
+        <div className={`change-alert-banner change-alert-banner--${outstandingAlert.classification}`} role="alert">
+          <div className="change-alert-banner-body">
+            <span className="change-alert-badge">{t(`library.change_alert_badge_${outstandingAlert.classification}`)}</span>
+            <p className="change-alert-banner-heading">{t("library.change_alert_banner_heading")}</p>
+            {outstandingAlert.description ? (
+              <p className="change-alert-banner-desc">{outstandingAlert.description}</p>
+            ) : null}
+          </div>
+          <form action={acknowledgeChangeAlert} className="change-alert-banner-form">
+            <input type="hidden" name="acknowledgementId" value={outstandingAlert.acknowledgementId} />
+            <input type="hidden" name="itemId" value={item.id} />
+            {moduleId ? <input type="hidden" name="moduleId" value={moduleId} /> : null}
+            <button type="submit" className="change-alert-ack-btn">{t("library.change_alert_ack_btn")}</button>
+          </form>
+        </div>
       ) : null}
 
       <div className="lib-item-viewer">
@@ -383,12 +413,18 @@ export default async function Item({
                   {t("learning.action_next")}: {nextModuleItem.title} →
                 </Link>
               ) : isLastModuleItem && !isAssessmentItem ? (
-                <form action={completeModuleAction}>
-                  <input type="hidden" name="moduleId" value={moduleId} />
-                  <button type="submit" className="my-module-action-btn primary">
+                moduleHasOutstandingAlerts ? (
+                  <span className="my-module-action-btn my-module-action-btn--blocked" title={t("library.change_alert_gate_hint")}>
                     {t("learning.action_mark_done")}
-                  </button>
-                </form>
+                  </span>
+                ) : (
+                  <form action={completeModuleAction}>
+                    <input type="hidden" name="moduleId" value={moduleId} />
+                    <button type="submit" className="my-module-action-btn primary">
+                      {t("learning.action_mark_done")}
+                    </button>
+                  </form>
+                )
               ) : null}
             </div>
           </div>

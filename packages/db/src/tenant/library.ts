@@ -380,6 +380,91 @@ export async function detachFileFromItem(
   });
 }
 
+// ------------------------------------------------- change alert queries ----
+
+export type OutstandingAlert = {
+  acknowledgementId: string;
+  classification: ChangeClassification;
+  description: string;
+};
+
+// Returns the first unacknowledged change alert for a specific item/person pair.
+// Used to render the acknowledgement banner in the library item viewer.
+export async function getOutstandingChangeAlertForItem(
+  db: TenantDb,
+  personId: string,
+  itemId: string,
+): Promise<OutstandingAlert | null> {
+  const [row] = await db
+    .select({
+      acknowledgementId: changeAlertAcknowledgements.id,
+      classification: contentChangeAlerts.classification,
+      description: contentChangeAlerts.changeDescription,
+    })
+    .from(changeAlertAcknowledgements)
+    .innerJoin(contentChangeAlerts, eq(changeAlertAcknowledgements.alertId, contentChangeAlerts.id))
+    .where(
+      and(
+        eq(changeAlertAcknowledgements.personId, personId),
+        eq(contentChangeAlerts.itemId, itemId),
+        isNull(changeAlertAcknowledgements.acknowledgedAt),
+      ),
+    )
+    .limit(1);
+  return row ?? null;
+}
+
+// Returns true if the person has any unacknowledged change alerts for items
+// within the given module. Used as Gate 1.5 in canCompleteModule.
+export async function hasOutstandingChangeAlerts(
+  db: TenantDb,
+  personId: string,
+  moduleId: string,
+): Promise<boolean> {
+  const [row] = await db
+    .select({ id: changeAlertAcknowledgements.id })
+    .from(changeAlertAcknowledgements)
+    .innerJoin(contentChangeAlerts, eq(changeAlertAcknowledgements.alertId, contentChangeAlerts.id))
+    .innerJoin(moduleItems, eq(contentChangeAlerts.itemId, moduleItems.itemId))
+    .where(
+      and(
+        eq(changeAlertAcknowledgements.personId, personId),
+        eq(moduleItems.moduleId, moduleId),
+        isNull(changeAlertAcknowledgements.acknowledgedAt),
+      ),
+    )
+    .limit(1);
+  return !!row;
+}
+
+// Marks an acknowledgement as done. Only succeeds when the row belongs to
+// personId and is not already acknowledged (prevents double-submit and
+// cross-person spoofing).
+export async function acknowledgeAlert(
+  db: TenantDb,
+  acknowledgementId: string,
+  personId: string,
+): Promise<void> {
+  const now = new Date();
+  const [row] = await db
+    .select({ newVersion: contentChangeAlerts.newVersion })
+    .from(changeAlertAcknowledgements)
+    .innerJoin(contentChangeAlerts, eq(changeAlertAcknowledgements.alertId, contentChangeAlerts.id))
+    .where(
+      and(
+        eq(changeAlertAcknowledgements.id, acknowledgementId),
+        eq(changeAlertAcknowledgements.personId, personId),
+        isNull(changeAlertAcknowledgements.acknowledgedAt),
+      ),
+    )
+    .limit(1);
+  if (!row) return;
+  await db
+    .update(changeAlertAcknowledgements)
+    .set({ acknowledgedAt: now, acknowledgedVersion: row.newVersion, updatedAt: now })
+    .where(eq(changeAlertAcknowledgements.id, acknowledgementId));
+}
+
 // A file with the item it belongs to, so callers can check who may open it.
 export async function fileWithItem(db: TenantDb, fileId: string) {
   const [row] = await db

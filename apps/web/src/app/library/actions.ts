@@ -1,6 +1,6 @@
 "use server";
 
-import { attachFileToItem, canSeeArea, createLibraryItem, detachFileFromItem, getLibraryItem, PlacementError, placeItem, publishDraft, retireItem, saveDraft, type ChangeClassification } from "@mantle/db/tenant";
+import { acknowledgeAlert, attachFileToItem, canSeeArea, createLibraryItem, detachFileFromItem, getLibraryItem, personByUserId, PlacementError, placeItem, publishDraft, retireItem, saveDraft, type ChangeClassification } from "@mantle/db/tenant";
 import { checkUpload, MAX_FILES_PER_UPLOAD } from "@mantle/platform/files";
 import { needsConversion } from "@mantle/documents/convert";
 import { converter, fileStore, scanner } from "../../server/files.ts";
@@ -156,6 +156,21 @@ export async function retireLibraryItem(form: FormData): Promise<void> {
   await editableItem(ctx, id);
   await retireItem(db, id, `user:${user.id}`);
   redirect("/library?retired=1");
+}
+
+export async function acknowledgeChangeAlert(form: FormData): Promise<void> {
+  const ctx = await requirePermission("library.view");
+  await requireFeature(ctx.tenant, "knowledge_library");
+  const { db, user } = ctx;
+  const ackId = String(form.get("acknowledgementId") ?? "");
+  const itemId = String(form.get("itemId") ?? "");
+  const moduleId = String(form.get("moduleId") ?? "");
+  if (!ID.test(ackId) || !ID.test(itemId)) return;
+  const person = await personByUserId(db, user.id);
+  if (!person) return;
+  await acknowledgeAlert(db, ackId, person.id);
+  const qs = ID.test(moduleId) ? `?moduleId=${moduleId}` : "";
+  redirect(`/library/${itemId}${qs}`);
 }
 
 export async function deleteItemFile(form: FormData): Promise<void> {

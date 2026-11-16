@@ -4,10 +4,13 @@ export { addAdministrator, applyStaffImport, changeUserRoles, listActiveStaff, l
 export { recentActivity, recordActivity, type ActivityEntry } from "./activity.ts";
 export { certificateSignatory, isWordingKey, setWording, wording, WORDING_DEFAULTS, type Signatory, type Wording, type WordingKey } from "./wording.ts";
 export {
+  acknowledgeAlert,
   attachFileToItem,
   createLibraryItem,
   detachFileFromItem,
   fileWithItem,
+  getOutstandingChangeAlertForItem,
+  hasOutstandingChangeAlerts,
   retireItem,
   getLibraryItem,
   itemFiles,
@@ -21,6 +24,7 @@ export {
   type ChangeClassification,
   type ListOptions,
   type NewItem,
+  type OutstandingAlert,
 } from "./library.ts";
 export {
   canSeeArea,
