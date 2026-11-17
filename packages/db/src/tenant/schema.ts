@@ -269,6 +269,12 @@ export const areaAccessGrants = pgTable(
 // published version; editors work on a draft until it is published.
 export const libraryItemStatus = pgEnum("library_item_status", ["draft", "published", "retired"]);
 
+// Item-level visibility. 'area' (default) keeps current behaviour: anyone who
+// can see the area can read the item. 'role_level' restricts to people whose
+// role level appears in libraryItemAccessRules. 'restricted' restricts to
+// specific people listed by person id in libraryItemAccessRules.
+export const itemVisibility = pgEnum("item_visibility", ["area", "role_level", "restricted"]);
+
 export const libraryItems = pgTable("library_items", {
   id: uuid("id").primaryKey().defaultRandom(),
   title: text("title").notNull(),
@@ -291,6 +297,11 @@ export const libraryItems = pgTable("library_items", {
   // they are excluded from library listings and search, and direct access
   // without a moduleId returns 404 for non-editors.
   assessmentOnly: boolean("assessment_only").notNull().default(false),
+  // Item-level visibility gate applied on top of the area gate.
+  visibility: itemVisibility("visibility").notNull().default("area"),
+  // When true, staff must submit a read-and-understand attestation before
+  // they can progress past this item in a module.
+  requiresAttestation: boolean("requires_attestation").notNull().default(false),
   ...auditColumns,
 });
 
@@ -760,5 +771,51 @@ export const certificates = pgTable(
   (t) => [
     uniqueIndex("certificates_person_path_stage_unique").on(t.personId, t.pathId, t.stageKind),
     index("certificates_reference_idx").on(t.reference),
+  ],
+);
+
+// Item-level access rules. When an item's visibility is 'role_level',
+// each row names a role_levels.id whose staff may read it. When 'restricted',
+// each row names a people.id who may read it. Unused when visibility = 'area'.
+export const libraryItemAccessRules = pgTable(
+  "library_item_access_rules",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    itemId: uuid("item_id")
+      .notNull()
+      .references(() => libraryItems.id, { onDelete: "cascade" }),
+    // 'role_level': refId points at role_levels.id
+    // 'person': refId points at people.id
+    kind: text("kind").notNull(),
+    refId: uuid("ref_id").notNull(),
+    ...auditColumns,
+  },
+  (t) => [
+    uniqueIndex("library_item_access_rules_unique").on(t.itemId, t.kind, t.refId),
+    index("library_item_access_rules_item_idx").on(t.itemId),
+  ],
+);
+
+// Staff read-and-understand attestations. One row per person per item per
+// published version. A re-publish with requiresAttestation creates a gap
+// (no row for the new version) so the banner reappears.
+export const staffAttestations = pgTable(
+  "staff_attestations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    personId: uuid("person_id")
+      .notNull()
+      .references(() => people.id),
+    itemId: uuid("item_id")
+      .notNull()
+      .references(() => libraryItems.id),
+    version: integer("version").notNull(),
+    attestedAt: timestamp("attested_at", { withTimezone: true }).notNull().defaultNow(),
+    ...auditColumns,
+  },
+  (t) => [
+    uniqueIndex("staff_attestations_person_item_version_unique").on(t.personId, t.itemId, t.version),
+    index("staff_attestations_item_idx").on(t.itemId),
+    index("staff_attestations_person_idx").on(t.personId),
   ],
 );

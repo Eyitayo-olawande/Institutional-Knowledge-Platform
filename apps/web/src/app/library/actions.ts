@@ -1,6 +1,6 @@
 "use server";
 
-import { acknowledgeAlert, attachFileToItem, canSeeArea, createLibraryItem, detachFileFromItem, getLibraryItem, personByUserId, PlacementError, placeItem, publishDraft, retireItem, saveDraft, type ChangeClassification } from "@mantle/db/tenant";
+import { acknowledgeAlert, attachFileToItem, canSeeArea, createAttestation, createLibraryItem, detachFileFromItem, getLibraryItem, personByUserId, PlacementError, placeItem, publishDraft, retireItem, saveDraft, setItemAccessRules, setRequiresAttestation, type ChangeClassification, type ItemVisibility } from "@mantle/db/tenant";
 import { checkUpload, MAX_FILES_PER_UPLOAD } from "@mantle/platform/files";
 import { needsConversion } from "@mantle/documents/convert";
 import { converter, fileStore, scanner } from "../../server/files.ts";
@@ -184,4 +184,50 @@ export async function deleteItemFile(form: FormData): Promise<void> {
   await fileStore.remove(tenant.id, storageKey);
   if (renditionKey) await fileStore.remove(tenant.id, renditionKey);
   redirect(`/library/${id}?file_removed=1`);
+}
+
+const VALID_VISIBILITY = new Set<ItemVisibility>(["area", "role_level", "restricted"]);
+
+// Sets the item-level visibility and access rules. Editors only.
+export async function setItemAccess(form: FormData): Promise<void> {
+  const ctx = await editor();
+  const id = String(form.get("id") ?? "");
+  await editableItem(ctx, id);
+  const visibility = String(form.get("visibility") ?? "area") as ItemVisibility;
+  if (!VALID_VISIBILITY.has(visibility)) redirect(`/library/${id}?error=missing`);
+  // Role levels use multiple checkboxes (name="refId"); restricted uses a
+  // textarea (name="refIdBlock") with one UUID per line.
+  let refIds: string[];
+  if (visibility === "restricted") {
+    const block = String(form.get("refIdBlock") ?? "");
+    refIds = block.split(/[\s,]+/).map((s) => s.trim()).filter((s) => ID.test(s));
+  } else {
+    refIds = form.getAll("refId").map(String).filter((s) => ID.test(s));
+  }
+  await setItemAccessRules(ctx.db, id, visibility, refIds, `user:${ctx.user.id}`);
+  redirect(`/library/${id}?saved=1`);
+}
+
+// Toggles the requiresAttestation flag. Editors only.
+export async function setAttestationRequired(form: FormData): Promise<void> {
+  const ctx = await editor();
+  const id = String(form.get("id") ?? "");
+  await editableItem(ctx, id);
+  const value = form.get("requiresAttestation") === "true";
+  await setRequiresAttestation(ctx.db, id, value, `user:${ctx.user.id}`);
+  redirect(`/library/${id}?saved=1`);
+}
+
+// Submits a staff attestation for the current published version.
+export async function attestItem(form: FormData): Promise<void> {
+  const ctx = await requirePermission("library.view");
+  await requireFeature(ctx.tenant, "knowledge_library");
+  const id = String(form.get("id") ?? "");
+  const version = parseInt(String(form.get("version") ?? ""), 10);
+  if (!ID.test(id) || isNaN(version) || version < 1) redirect(`/library/${id}`);
+  const person = await personByUserId(ctx.db, ctx.user.id);
+  if (!person) redirect(`/library/${id}`);
+  await createAttestation(ctx.db, person.id, id, version, `user:${ctx.user.id}`);
+  const moduleId = String(form.get("moduleId") ?? "");
+  redirect(ID.test(moduleId) ? `/library/${id}?moduleId=${moduleId}` : `/library/${id}`);
 }

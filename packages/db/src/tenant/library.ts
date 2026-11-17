@@ -3,7 +3,9 @@ import { recordActivity } from "./activity.ts";
 import { areaIdsOrAll, checkPlacement, type VisibleAreas } from "./areas.ts";
 import type { TenantDb } from "./client.ts";
 import { addNotice } from "./notices.ts";
-import { assignments, changeAlertAcknowledgements, changeClassification, contentChangeAlerts, contentTypes, files, itemViews, libraryItemFiles, libraryItems, libraryItemVersions, moduleItems, pathStages, people, stageModules } from "./schema.ts";
+import { assignments, changeAlertAcknowledgements, changeClassification, contentChangeAlerts, contentTypes, files, itemViews, libraryItemAccessRules, libraryItemFiles, libraryItems, libraryItemVersions, moduleItems, pathStages, people, stageModules } from "./schema.ts";
+
+export type ItemVisibility = "area" | "role_level" | "restricted";
 
 export type ChangeClassification = typeof changeClassification.enumValues[number];
 
@@ -241,6 +243,9 @@ export interface ListOptions {
   readonly areas: VisibleAreas;
   readonly areaId?: string;
   readonly contentTypeId?: string;
+  // When set for a non-editor, item-level visibility rules are applied.
+  // Editors (areas === 'all') always see everything regardless.
+  readonly person?: { id: string; roleLevelId: string | null };
 }
 
 export async function listLibraryItems(db: TenantDb, options: ListOptions) {
@@ -253,8 +258,39 @@ export async function listLibraryItems(db: TenantDb, options: ListOptions) {
     .innerJoin(contentTypes, eq(libraryItems.contentTypeId, contentTypes.id))
     .where(and(...where))
     .orderBy(libraryItems.title);
-  const items = rows.map((r) => ({ ...r.item, typeLabel: r.typeLabel }));
-  return options.publishedOnly ? items.filter((r) => r.publishedVersion !== null && r.status === "published") : items;
+  let items = rows.map((r) => ({ ...r.item, typeLabel: r.typeLabel }));
+  if (options.publishedOnly) {
+    items = items.filter((r) => r.publishedVersion !== null && r.status === "published");
+  }
+  // Apply item-level visibility only for non-editors with a person context.
+  if (options.areas !== "all" && options.person) {
+    const person = options.person;
+    const narrowed = items.filter((r) => r.visibility !== "area");
+    if (narrowed.length > 0) {
+      const narrowedIds = narrowed.map((r) => r.id);
+      const rules = await db
+        .select()
+        .from(libraryItemAccessRules)
+        .where(inArray(libraryItemAccessRules.itemId, narrowedIds));
+      const rulesByItem = new Map<string, typeof rules>();
+      for (const r of rules) {
+        const existing = rulesByItem.get(r.itemId) ?? [];
+        existing.push(r);
+        rulesByItem.set(r.itemId, existing);
+      }
+      items = items.filter((item) => {
+        if (item.visibility === "area") return true;
+        const itemRules = rulesByItem.get(item.id) ?? [];
+        if (item.visibility === "role_level") {
+          return person.roleLevelId !== null &&
+            itemRules.some((r) => r.kind === "role_level" && r.refId === person.roleLevelId);
+        }
+        // restricted
+        return itemRules.some((r) => r.kind === "person" && r.refId === person.id);
+      });
+    }
+  }
+  return items;
 }
 
 export async function getLibraryItem(db: TenantDb, itemId: string) {
@@ -474,4 +510,90 @@ export async function fileWithItem(db: TenantDb, fileId: string) {
     .innerJoin(libraryItems, eq(libraryItems.id, libraryItemFiles.itemId))
     .where(eq(files.id, fileId));
   return row ?? null;
+}
+
+// ------------------------------------------- item-level access rules ----
+
+// Returns the access rules for a single item.
+export async function getItemAccessRules(db: TenantDb, itemId: string) {
+  return db
+    .select()
+    .from(libraryItemAccessRules)
+    .where(eq(libraryItemAccessRules.itemId, itemId));
+}
+
+// Replaces the access rules and visibility setting for an item atomically.
+// refIds are role_level IDs when visibility = 'role_level', person IDs when
+// visibility = 'restricted'. When visibility = 'area' the rules are cleared.
+export async function setItemAccessRules(
+  db: TenantDb,
+  itemId: string,
+  visibility: ItemVisibility,
+  refIds: string[],
+  actor: string,
+): Promise<void> {
+  await db.transaction(async (tx) => {
+    await tx
+      .update(libraryItems)
+      .set({ visibility, updatedAt: new Date(), changedBy: actor })
+      .where(eq(libraryItems.id, itemId));
+    await tx.delete(libraryItemAccessRules).where(eq(libraryItemAccessRules.itemId, itemId));
+    if (visibility !== "area" && refIds.length > 0) {
+      const kind = visibility === "role_level" ? "role_level" : "person";
+      await tx.insert(libraryItemAccessRules).values(
+        refIds.map((refId) => ({ itemId, kind, refId, changedBy: actor })),
+      ).onConflictDoNothing();
+    }
+    await recordActivity(tx, {
+      actor,
+      action: "library.access_rules_set",
+      entityType: "library_item",
+      entityId: itemId,
+      details: { visibility, ref_count: refIds.length },
+    });
+  });
+}
+
+// Sets the requiresAttestation flag on an item.
+export async function setRequiresAttestation(
+  db: TenantDb,
+  itemId: string,
+  requiresAttestation: boolean,
+  actor: string,
+): Promise<void> {
+  await db
+    .update(libraryItems)
+    .set({ requiresAttestation, updatedAt: new Date(), changedBy: actor })
+    .where(eq(libraryItems.id, itemId));
+  await recordActivity(db, {
+    actor,
+    action: "library.attestation_flag_set",
+    entityType: "library_item",
+    entityId: itemId,
+    details: { requires_attestation: requiresAttestation },
+  });
+}
+
+// Checks whether a person can see an item, respecting item-level visibility.
+// Editors always pass; this is for learner-context item-page access.
+export async function canPersonSeeItem(
+  db: TenantDb,
+  itemId: string,
+  person: { id: string; roleLevelId: string | null },
+): Promise<boolean> {
+  const [item] = await db
+    .select({ visibility: libraryItems.visibility })
+    .from(libraryItems)
+    .where(eq(libraryItems.id, itemId));
+  if (!item) return false;
+  if (item.visibility === "area") return true;
+  const rules = await db
+    .select()
+    .from(libraryItemAccessRules)
+    .where(eq(libraryItemAccessRules.itemId, itemId));
+  if (item.visibility === "role_level") {
+    return person.roleLevelId !== null &&
+      rules.some((r) => r.kind === "role_level" && r.refId === person.roleLevelId);
+  }
+  return rules.some((r) => r.kind === "person" && r.refId === person.id);
 }

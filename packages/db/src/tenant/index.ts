@@ -6,9 +6,11 @@ export { certificateSignatory, isWordingKey, setWording, wording, WORDING_DEFAUL
 export {
   acknowledgeAlert,
   attachFileToItem,
+  canPersonSeeItem,
   createLibraryItem,
   detachFileFromItem,
   fileWithItem,
+  getItemAccessRules,
   getOutstandingChangeAlertForItem,
   hasOutstandingChangeAlerts,
   retireItem,
@@ -21,11 +23,20 @@ export {
   publishDraft,
   saveDraft,
   searchLibrary,
+  setItemAccessRules,
+  setRequiresAttestation,
   type ChangeClassification,
+  type ItemVisibility,
   type ListOptions,
   type NewItem,
   type OutstandingAlert,
 } from "./library.ts";
+export {
+  createAttestation,
+  getAttestation,
+  listAttestationItems,
+  listItemAttestationDetail,
+} from "./attestations.ts";
 export {
   canSeeArea,
   commonArea,

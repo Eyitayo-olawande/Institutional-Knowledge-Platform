@@ -1,4 +1,4 @@
-import { canSeeArea, getAssessmentForItem, getAttemptResults, getLibraryItem, getModule, getOutstandingChangeAlertForItem, hasOutstandingChangeAlerts, hasViewedAllModuleItems, itemFiles, listLibraryItems, listModuleItems, personByUserId, recordItemView } from "@mantle/db/tenant";
+import { canPersonSeeItem, canSeeArea, getAssessmentForItem, getAttemptResults, getAttestation, getItemAccessRules, getLibraryItem, getModule, getOutstandingChangeAlertForItem, hasOutstandingChangeAlerts, hasViewedAllModuleItems, itemFiles, listLibraryItems, listModuleItems, listStructure, personByUserId, recordItemView } from "@mantle/db/tenant";
 import { needsConversion } from "@mantle/documents/convert";
 import { ACCEPT_ATTR } from "@mantle/platform/files";
 import { can } from "@mantle/platform/identity";
@@ -9,7 +9,7 @@ import { t } from "../../../i18n.ts";
 import { requireFeature, requirePermission, viewerAreas } from "../../../server/session.ts";
 import { AppShell } from "../../_components/AppShell.tsx";
 import { completeModuleAction, submitAssessmentAction } from "../../actions.ts";
-import { acknowledgeChangeAlert, deleteItemFile, placeLibraryItem, publishItem, retireLibraryItem, saveItemDraft, uploadItemFile } from "../actions.ts";
+import { acknowledgeChangeAlert, attestItem, deleteItemFile, placeLibraryItem, publishItem, retireLibraryItem, saveItemDraft, setAttestationRequired, setItemAccess, uploadItemFile } from "../actions.ts";
 import { areaChoices, areaName } from "../areas.ts";
 import { PlacementFields } from "../PlacementFields.tsx";
 import { ViewerActionsClient } from "../ViewerActionsClient.tsx";
@@ -63,6 +63,22 @@ export default async function Item({
   const current = draft ?? found.published;
   const attachments = await itemFiles(db, item.id);
 
+  // Item-level visibility check for non-editors. If the item's visibility
+  // is narrower than the area, check the person's access rules.
+  const { user: ctxUser } = ctx;
+  const viewerPersonForAccess = !editor ? await personByUserId(db, ctxUser.id) : null;
+  if (!editor && viewerPersonForAccess && item.visibility !== "area") {
+    const canSee = await canPersonSeeItem(db, item.id, {
+      id: viewerPersonForAccess.id,
+      roleLevelId: viewerPersonForAccess.roleLevelId ?? null,
+    });
+    if (!canSee) notFound();
+  }
+
+  // Editor-only: access rules and role levels for the access control panel.
+  const accessRules = editor ? await getItemAccessRules(db, item.id) : [];
+  const roleLevelOptions = editor ? await listStructure(db, "role_level") : [];
+
   const relatedItems = item.areaId
     ? (await listLibraryItems(db, { publishedOnly: true, areas: visible, areaId: item.areaId }))
         .filter((r) => r.id !== item.id)
@@ -90,9 +106,10 @@ export default async function Item({
   const assessment = await getAssessmentForItem(db, item.id);
   const isAssessmentItem = !!assessment && !!moduleId;
 
-  // Compute viewer's person record once; used for view recording and gate checks.
+  // Compute viewer's person record once; used for view recording, gate checks,
+  // and attestation. Always fetched for non-editors.
   const { user: viewer } = ctx;
-  const viewerPerson = moduleId ? await personByUserId(db, viewer.id) : null;
+  const viewerPerson = !editor ? await personByUserId(db, viewer.id) : null;
   const moduleRecord = moduleId && /^[0-9a-f-]{36}$/.test(moduleId) ? await getModule(db, moduleId) : null;
 
   // For content items (not assessments): record a view so Gate 1 can be evaluated.
@@ -117,6 +134,13 @@ export default async function Item({
   // an unacknowledged alert for this person. Used to gate the "Mark done" btn.
   const moduleHasOutstandingAlerts = isLastModuleItem && viewerPerson && moduleId
     ? await hasOutstandingChangeAlerts(db, viewerPerson.id, moduleId)
+    : false;
+
+  // Attestation — shown when item.requiresAttestation is true and the person
+  // has not yet attested to the current published version. Shown for all
+  // non-editors with a person record, with or without a module context.
+  const attestationOutstanding = !editor && item.requiresAttestation && found.published && viewerPerson
+    ? (await getAttestation(db, viewerPerson.id, item.id, found.published.version)) === null
     : false;
 
   // If ?attempt= is present, load prior results to show the feedback panel.
@@ -172,6 +196,21 @@ export default async function Item({
             <input type="hidden" name="itemId" value={item.id} />
             {moduleId ? <input type="hidden" name="moduleId" value={moduleId} /> : null}
             <button type="submit" className="change-alert-ack-btn">{t("library.change_alert_ack_btn")}</button>
+          </form>
+        </div>
+      ) : null}
+
+      {attestationOutstanding && found.published ? (
+        <div className="change-alert-banner change-alert-banner--important" role="alert">
+          <div className="change-alert-banner-body">
+            <span className="change-alert-badge">Attestation Required</span>
+            <p className="change-alert-banner-heading">Please read this document carefully and confirm you have understood it.</p>
+          </div>
+          <form action={attestItem} className="change-alert-banner-form">
+            <input type="hidden" name="id" value={item.id} />
+            <input type="hidden" name="version" value={found.published.version} />
+            {moduleId ? <input type="hidden" name="moduleId" value={moduleId} /> : null}
+            <button type="submit" className="change-alert-ack-btn">I confirm I have read and understood this document</button>
           </form>
         </div>
       ) : null}
@@ -493,6 +532,86 @@ export default async function Item({
               <PlacementFields areas={areas} types={types} areaId={item.areaId} contentTypeId={item.contentTypeId} />
               <Button type="submit" variant="secondary">{t(item.needsAreaReview ? "library.areas.confirm" : "library.areas.move")}</Button>
             </form>
+          </Card>
+          <Card>
+            <h2>Access Control</h2>
+            <p className="sub" style={{ marginBottom: 12 }}>
+              Set who can see this item within its area. The default is all staff with area access.
+            </p>
+            <form action={setItemAccess}>
+              <input type="hidden" name="id" value={item.id} />
+              <label className="field">
+                Visibility
+                <select className="input" name="visibility" defaultValue={item.visibility}>
+                  <option value="area">All staff in this area</option>
+                  <option value="role_level">Restricted by role level</option>
+                  <option value="restricted">Specific people only</option>
+                </select>
+              </label>
+              {item.visibility === "role_level" && roleLevelOptions.length > 0 ? (
+                <div style={{ marginBottom: 12 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 6 }}>Allowed role levels</div>
+                  {roleLevelOptions.map((rl) => (
+                    <label key={rl.id} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                      <input
+                        type="checkbox"
+                        name="refId"
+                        value={rl.id}
+                        defaultChecked={accessRules.some((r) => r.kind === "role_level" && r.refId === rl.id)}
+                      />
+                      {rl.name}
+                    </label>
+                  ))}
+                </div>
+              ) : null}
+              {item.visibility === "restricted" ? (
+                <div style={{ marginBottom: 12 }}>
+                  <label className="field">
+                    Allowed person IDs (one UUID per line)
+                    <textarea
+                      className="input"
+                      name="refIdBlock"
+                      rows={4}
+                      placeholder="Paste person UUIDs here, one per line"
+                      defaultValue={accessRules.filter((r) => r.kind === "person").map((r) => r.refId).join("\n")}
+                    />
+                  </label>
+                  <p className="sub" style={{ fontSize: 12 }}>Find person IDs on the People admin page.</p>
+                </div>
+              ) : null}
+              <Button type="submit" variant="secondary">Save Access Rules</Button>
+            </form>
+          </Card>
+          <Card>
+            <h2>Read and Understand Attestation</h2>
+            <p className="sub" style={{ marginBottom: 12 }}>
+              When enabled, staff must formally confirm they have read and understood this document before progressing.
+            </p>
+            <form action={setAttestationRequired}>
+              <input type="hidden" name="id" value={item.id} />
+              <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
+                <input
+                  type="hidden"
+                  name="requiresAttestation"
+                  value={item.requiresAttestation ? "false" : "true"}
+                />
+                <Button type="submit" variant="secondary">
+                  {item.requiresAttestation ? "Disable attestation requirement" : "Enable attestation requirement"}
+                </Button>
+              </label>
+              {item.requiresAttestation ? (
+                <p style={{ marginTop: 8, fontSize: 13, color: "var(--mantle-color-text_success)" }}>
+                  Attestation is currently required. Staff will see a confirmation banner.
+                </p>
+              ) : null}
+            </form>
+            {item.requiresAttestation ? (
+              <div style={{ marginTop: 12 }}>
+                <Link href={`/admin/attestations?item=${item.id}`} className="btn-link">
+                  View attestation report
+                </Link>
+              </div>
+            ) : null}
           </Card>
           <Card>
             <h2>{t("library.files.heading")}</h2>
