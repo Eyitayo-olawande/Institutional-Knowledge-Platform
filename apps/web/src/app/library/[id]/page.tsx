@@ -48,10 +48,20 @@ export default async function Item({
   const found = /^[0-9a-f-]{36}$/.test(id) ? await getLibraryItem(db, id) : null;
   const editor = can(roles, "library.edit");
   const visible = await viewerAreas(ctx);
-  // An item in an area the viewer cannot see does not exist for them.
+
+  // Module items are fetched early so the area check can be bypassed when a
+  // learner arrives via My Learning — the path assignment is their authorisation
+  // to view items in areas they don't otherwise have general access to.
+  const moduleItems = moduleId && /^[0-9a-f-]{36}$/.test(moduleId)
+    ? await listModuleItems(db, moduleId)
+    : [];
+  const itemIsInModule = moduleItems.some((mi) => mi.id === id);
+
+  // An item in an area the viewer cannot see does not exist for them —
+  // unless they arrived via a module that contains the item.
   if (
     !found ||
-    !canSeeArea(visible, found.item.areaId) ||
+    (!canSeeArea(visible, found.item.areaId) && !itemIsInModule) ||
     (!editor && !found.published) ||
     (!editor && found.item.status === "retired") ||
     (!editor && found.item.assessmentOnly && !moduleId)
@@ -90,10 +100,7 @@ export default async function Item({
     ? new Date(found.published.publishedAt).toISOString().slice(0, 10)
     : null;
 
-  // Module navigation — only when arriving from My Learning with a moduleId
-  const moduleItems = moduleId && /^[0-9a-f-]{36}$/.test(moduleId)
-    ? await listModuleItems(db, moduleId)
-    : [];
+  // Module navigation — moduleItems already fetched above for the area bypass.
   const moduleIdx = moduleItems.findIndex((mi) => mi.id === id);
   const prevModuleItem = moduleIdx > 0 ? moduleItems[moduleIdx - 1] ?? null : null;
   const nextModuleItem = moduleIdx >= 0 && moduleIdx < moduleItems.length - 1
