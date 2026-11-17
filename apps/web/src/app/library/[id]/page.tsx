@@ -111,7 +111,7 @@ export default async function Item({
   // Assessment (Gate 2) — check if this item has a knowledge check attached.
   // Always fetched: editors see the admin panel; learners get the quiz when moduleId is set.
   const assessment = await getAssessmentForItem(db, item.id);
-  const isAssessmentItem = !!assessment && !!moduleId;
+  const isAssessmentItem = item.assessmentOnly && !!assessment && !!moduleId;
 
   // Compute viewer's person record once; used for view recording, gate checks,
   // and attestation. Always fetched for non-editors.

@@ -7,6 +7,7 @@ import {
   assessments,
   assessmentResponses,
   itemViews,
+  libraryItems,
   moduleItems,
 } from "./schema.ts";
 
@@ -110,12 +111,15 @@ export async function hasViewedAllModuleItems(
   personId: string,
   moduleId: string,
 ): Promise<boolean> {
-  const allItems = await db
+  // Only content items count — assessmentOnly items are quizzes and
+  // never have their view recorded, so they must not be included here.
+  const contentItems = await db
     .select({ itemId: moduleItems.itemId })
     .from(moduleItems)
-    .where(eq(moduleItems.moduleId, moduleId));
+    .innerJoin(libraryItems, eq(libraryItems.id, moduleItems.itemId))
+    .where(and(eq(moduleItems.moduleId, moduleId), eq(libraryItems.assessmentOnly, false)));
 
-  if (allItems.length === 0) return false;
+  if (contentItems.length === 0) return true;
 
   const viewed = await db
     .select({ itemId: itemViews.itemId })
@@ -123,7 +127,7 @@ export async function hasViewedAllModuleItems(
     .where(and(eq(itemViews.personId, personId), eq(itemViews.moduleId, moduleId)));
 
   const viewedSet = new Set(viewed.map((v) => v.itemId));
-  return allItems.every((mi) => viewedSet.has(mi.itemId));
+  return contentItems.every((mi) => viewedSet.has(mi.itemId));
 }
 
 export async function submitAssessmentAttempt(
