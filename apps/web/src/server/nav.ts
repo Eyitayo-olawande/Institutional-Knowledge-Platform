@@ -5,8 +5,8 @@ import { can } from "@mantle/platform/identity";
 // The server still checks every permission on each page; this only decides
 // which links to show.
 
-export type NavKey = "home" | "library" | "my_learning" | "notices" | "people" | "roles" | "wording" | "structure" | "areas" | "activity" | "paths" | "nominations" | "candidates" | "aptitude_tests";
-export type NavIcon = "home" | "library" | "bell" | "people" | "key" | "text" | "tree" | "list" | "doc" | "clipboard" | "check";
+export type NavKey = "home" | "library" | "my_learning" | "notices" | "people" | "roles" | "wording" | "structure" | "areas" | "activity" | "paths" | "nominations" | "candidates" | "aptitude_tests" | "reports";
+export type NavIcon = "home" | "library" | "bell" | "people" | "key" | "text" | "tree" | "list" | "doc" | "clipboard" | "check" | "chart";
 
 export interface NavItem {
   key: NavKey;
@@ -38,6 +38,7 @@ export function buildNav({ roles, libraryOn, peopleImportOn, pathsOn, aptitudeOn
   if (aptitudeOn && can(roles, "candidates.manage")) items.push({ key: "candidates", href: "/admin/candidates", icon: "people", section: "admin" });
   if (aptitudeOn && can(roles, "candidates.manage")) items.push({ key: "aptitude_tests", href: "/admin/aptitude-tests", icon: "check", section: "admin" });
   if (can(roles, "activity.view")) items.push({ key: "activity", href: "/admin/activity", icon: "list", section: "admin" });
+  if (can(roles, "reports.view")) items.push({ key: "reports", href: "/admin/reports", icon: "chart", section: "admin" });
   return items;
 }
 

@@ -120,7 +120,7 @@ export default async function Library({ searchParams }: { searchParams: Promise<
               <Link href={link(area ? { area: area.id } : {})} aria-current={!type ? "true" : undefined} className="lib-tab">
                 {t("library.areas.all_types")} ({areaItems.length})
               </Link>
-              {displayTypes.map((ty) => (
+              {displayTypes.filter((ty) => (countByType[ty.id] ?? 0) > 0).map((ty) => (
                 <Link
                   key={ty.id}
                   href={link({ ...(area ? { area: area.id } : {}), type: ty.id })}
@@ -220,7 +220,7 @@ export default async function Library({ searchParams }: { searchParams: Promise<
                   {t("library.areas.all_types")}
                   <span className="lib-filter-count">{areaItems.length}</span>
                 </Link>
-                {displayTypes.map((ty) => (
+                {displayTypes.filter((ty) => (countByType[ty.id] ?? 0) > 0).map((ty) => (
                   <Link key={ty.id} href={link({ ...(area ? { area: area.id } : {}), type: ty.id })} className="lib-filter-link" aria-current={ty.id === type?.id ? "true" : undefined}>
                     {ty.label}
                     <span className="lib-filter-count">{countByType[ty.id] ?? 0}</span>

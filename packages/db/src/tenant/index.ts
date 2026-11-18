@@ -138,6 +138,25 @@ export {
   type NominationReason,
 } from "./nominations.ts";
 export {
+  assessmentReport,
+  complianceReport,
+  dashboardMetrics,
+  intelligenceReport,
+  knowledgeReport,
+  learningReport,
+  peopleReport,
+  toCsv,
+  type AssessmentRow,
+  type ComplianceRow,
+  type DashboardMetrics,
+  type DeptPerformanceRow,
+  type KnowledgeRow,
+  type LearningDeptRow,
+  type LearningReport,
+  type NominationSummaryRow,
+  type PersonLearningRow,
+} from "./reports.ts";
+export {
   assignCandidateToTest,
   createAptitudeTest,
   deleteQuestion,

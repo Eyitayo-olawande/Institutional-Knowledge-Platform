@@ -317,7 +317,8 @@
     "paths": "Learning paths",
     "nominations": "Training nominations",
     "candidates": "Candidates",
-    "aptitude_tests": "Aptitude tests"
+    "aptitude_tests": "Aptitude tests",
+    "reports": "Reports"
   },
   "home": {
     "greeting": "Welcome, {name}",
@@ -713,6 +714,119 @@
     "pass": "Pass",
     "fail": "Fail",
     "not_started": "Not started"
+  },
+  "reports": {
+    "title": "Reports",
+    "banner_heading": "Reports & Insights",
+    "banner_sub": "Organisation-wide learning, compliance and assessment data.",
+    "back": "Back to Reports",
+    "export_csv": "Export CSV",
+    "empty": "No data available yet.",
+    "metrics": {
+      "active_staff": "Active Staff",
+      "published_items": "Published Library Items",
+      "active_assignments": "Active Assignments",
+      "completed_modules": "Modules Completed",
+      "pending_nominations": "Pending Nominations",
+      "assessment_pass_rate": "Assessment Pass Rate",
+      "assessment_attempts": "Assessment Attempts",
+      "pending_acknowledgements": "Pending Acknowledgements"
+    },
+    "categories": {
+      "knowledge": "Knowledge Management",
+      "knowledge_sub": "Library resources, usage and document acknowledgements.",
+      "learning": "Learning & Development",
+      "learning_sub": "Path enrolments, completions and training nominations.",
+      "assessment": "Assessment & Readiness",
+      "assessment_sub": "Assessment participation, pass rates and knowledge gaps.",
+      "compliance": "Policy & Compliance",
+      "compliance_sub": "Attestation status and document acknowledgements.",
+      "people": "People & Development",
+      "people_sub": "Individual learning records and development activity.",
+      "intelligence": "Organisational Intelligence",
+      "intelligence_sub": "Department-level performance and capability overview."
+    },
+    "knowledge": {
+      "title": "Knowledge Management",
+      "sub": "Library resources, usage and document acknowledgements.",
+      "columns": {
+        "item": "Item",
+        "area": "Learning Area",
+        "type": "Type",
+        "status": "Status",
+        "views": "Views",
+        "attested": "Attested",
+        "pending_acks": "Pending Acks"
+      }
+    },
+    "learning": {
+      "title": "Learning & Development",
+      "sub": "Path enrolments, module completions and training nominations by department.",
+      "dept_heading": "Department Performance",
+      "nominations_heading": "Training Nominations",
+      "columns": {
+        "department": "Department",
+        "enrolled": "Enrolled",
+        "completed": "Modules Completed",
+        "total": "Total Modules Started",
+        "rate": "Completion Rate",
+        "overdue": "Overdue Assignments"
+      },
+      "nomination_columns": {
+        "status": "Status",
+        "count": "Count"
+      }
+    },
+    "assessment": {
+      "title": "Assessment & Readiness",
+      "sub": "Assessment participation, pass rates and performance by assessment.",
+      "columns": {
+        "item": "Assessment",
+        "attempts": "Attempts",
+        "people": "People",
+        "passed": "Passed",
+        "failed": "Failed",
+        "pass_rate": "Pass Rate",
+        "avg_score": "Avg Score"
+      }
+    },
+    "compliance": {
+      "title": "Policy & Compliance",
+      "sub": "Attestation status and outstanding document acknowledgements.",
+      "columns": {
+        "item": "Document",
+        "version": "Version",
+        "attested": "Attested",
+        "total_staff": "Active Staff",
+        "rate": "Attestation Rate",
+        "pending_acks": "Pending Acks"
+      }
+    },
+    "people": {
+      "title": "People & Development",
+      "sub": "Individual learning records, assignments and nominations.",
+      "columns": {
+        "name": "Name",
+        "department": "Department",
+        "paths": "Paths Enrolled",
+        "modules": "Modules Completed",
+        "nominations": "Nominations"
+      }
+    },
+    "intelligence": {
+      "title": "Organisational Intelligence",
+      "sub": "Department-level performance, learning trends and capability overview.",
+      "columns": {
+        "department": "Department",
+        "staff": "Staff",
+        "enrolled": "Paths Enrolled",
+        "modules": "Modules Completed",
+        "completion_rate": "Completion Rate",
+        "attempts": "Assessment Attempts",
+        "pass_rate": "Assessment Pass Rate",
+        "nominations": "Nominations"
+      }
+    }
   },
   "aptitude": {
     "access_heading": "Candidate Assessment",

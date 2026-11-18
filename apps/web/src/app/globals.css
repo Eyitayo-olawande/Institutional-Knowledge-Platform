@@ -832,3 +832,39 @@ a.admin-kpi:hover { box-shadow: 0 4px 20px -4px rgba(0,0,0,0.14), 0 1px 3px rgba
 .crumb { font-size: 13px; color: var(--mantle-color-text_muted); margin: 0 0 8px; }
 .crumb a { color: var(--mantle-color-primary); text-decoration: none; }
 .crumb a:hover { text-decoration: underline; }
+
+
+/* Reports module */
+.report-metrics-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
+.report-metric-tile { background: var(--mantle-color-surface); border: 1px solid var(--mantle-color-border); border-radius: var(--mantle-radius-md); padding: 18px 20px; border-top: 3px solid var(--mantle-color-primary); }
+.report-metric-tile--link { display: block; text-decoration: none; color: inherit; cursor: pointer; transition: box-shadow 0.12s, transform 0.1s; }
+.report-metric-tile--link:hover { box-shadow: 0 4px 16px color-mix(in srgb, var(--mantle-color-primary) 14%, transparent); transform: translateY(-1px); }
+.report-metric-tile--link:hover .report-metric-arrow { opacity: 1; transform: translate(1px, -1px); }
+.report-metric-tile--warning { border-top-color: var(--mantle-color-warning, #d97706); }
+.report-metric-tile--danger { border-top-color: var(--mantle-color-danger, #dc2626); }
+.report-metric-tile-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.report-metric-icon { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 8px; background: color-mix(in srgb, var(--mantle-color-primary) 10%, transparent); color: var(--mantle-color-primary); }
+.report-metric-tile--warning .report-metric-icon { background: color-mix(in srgb, var(--mantle-color-warning, #d97706) 12%, transparent); color: var(--mantle-color-warning, #d97706); }
+.report-metric-tile--danger .report-metric-icon { background: color-mix(in srgb, var(--mantle-color-danger, #dc2626) 12%, transparent); color: var(--mantle-color-danger, #dc2626); }
+.report-metric-arrow { color: var(--mantle-color-text_muted); opacity: 0; transition: opacity 0.12s, transform 0.12s; }
+.report-metric-value { font-size: 28px; font-weight: 800; color: var(--mantle-color-primary); line-height: 1; margin-bottom: 6px; }
+.report-metric-tile--warning .report-metric-value { color: var(--mantle-color-warning, #d97706); }
+.report-metric-tile--danger .report-metric-value { color: var(--mantle-color-danger, #dc2626); }
+.report-metric-label { font-size: 12px; color: var(--mantle-color-text_muted); line-height: 1.4; }
+/* report bar chart */
+.report-chart { margin-bottom: 24px; }
+.report-chart-title { font-size: 11px; font-weight: 600; margin-bottom: 12px; color: var(--mantle-color-text_muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.report-bar-row { display: grid; grid-template-columns: 160px 1fr 44px; align-items: center; gap: 10px; margin-bottom: 7px; }
+.report-bar-row-label { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.report-bar-track { height: 8px; border-radius: 99px; background: var(--mantle-color-border); overflow: hidden; }
+.report-bar-fill { height: 100%; border-radius: 99px; background: var(--mantle-color-primary); }
+.report-bar-fill--warning { background: var(--mantle-color-warning, #d97706); }
+.report-bar-fill--danger { background: var(--mantle-color-danger, #dc2626); }
+.report-bar-pct { font-size: 12px; font-weight: 600; text-align: right; color: var(--mantle-color-text_muted); }
+.report-category-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+.report-category-card { display: flex; align-items: center; gap: 14px; padding: 16px 18px; background: var(--mantle-color-surface); border: 1px solid var(--mantle-color-border); border-radius: var(--mantle-radius-md); text-decoration: none; color: var(--mantle-color-text); transition: border-color 0.12s, box-shadow 0.12s; }
+.report-category-card:hover { border-color: var(--mantle-color-primary); box-shadow: 0 2px 8px color-mix(in srgb, var(--mantle-color-primary) 12%, transparent); }
+.report-category-icon { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: var(--mantle-radius-sm); background: color-mix(in srgb, var(--mantle-color-primary) 10%, transparent); color: var(--mantle-color-primary); flex-shrink: 0; }
+.report-category-name { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+.report-category-sub { font-size: 12px; color: var(--mantle-color-text_muted); line-height: 1.4; }
+.report-category-arrow { margin-left: auto; color: var(--mantle-color-text_muted); transform: rotate(-90deg); flex-shrink: 0; }
