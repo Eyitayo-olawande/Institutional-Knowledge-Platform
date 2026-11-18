@@ -29,7 +29,7 @@ export default async function ComplianceReport() {
 
       {rows.length > 0 && (
         <div className="report-chart" style={{ marginBottom: 8 }}>
-          <div className="report-chart-title">Attestation rate by document</div>
+          <div className="report-chart-title">{t("reports.compliance.chart_title")}</div>
           {rows.map((row) => {
             const tone = row.attestationRate >= 80 ? "" : row.attestationRate >= 50 ? "--warning" : "--danger";
             return (
@@ -59,6 +59,7 @@ export default async function ComplianceReport() {
                   <th style={{ textAlign: "right" }}>{t("reports.compliance.columns.total_staff")}</th>
                   <th style={{ textAlign: "right" }}>{t("reports.compliance.columns.rate")}</th>
                   <th style={{ textAlign: "right" }}>{t("reports.compliance.columns.pending_acks")}</th>
+                  <th style={{ textAlign: "right" }}>{t("reports.compliance.columns.overdue_acks")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -75,6 +76,9 @@ export default async function ComplianceReport() {
                     </td>
                     <td style={{ textAlign: "right" }}>
                       {row.pendingAcks > 0 ? <Badge tone="warning">{row.pendingAcks}</Badge> : 0}
+                    </td>
+                    <td style={{ textAlign: "right" }}>
+                      {row.overdueAcks > 0 ? <Badge tone="danger">{row.overdueAcks}</Badge> : 0}
                     </td>
                   </tr>
                 ))}

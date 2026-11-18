@@ -29,7 +29,7 @@ export default async function IntelligenceReport() {
 
       {rows.length > 0 && (
         <div className="report-chart" style={{ marginBottom: 8 }}>
-          <div className="report-chart-title">Completion rate by department</div>
+          <div className="report-chart-title">{t("reports.intelligence.chart_title")}</div>
           {rows.map((row) => {
             const tone = row.completionRate >= 70 ? "" : row.completionRate >= 40 ? "--warning" : "--danger";
             return (

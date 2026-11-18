@@ -29,11 +29,11 @@ export default async function AssessmentReport() {
 
       {rows.length > 0 && (
         <div className="report-chart" style={{ marginBottom: 8 }}>
-          <div className="report-chart-title">Pass rate by assessment</div>
+          <div className="report-chart-title">{t("reports.assessment.chart_title")}</div>
           {rows.map((row) => {
             const tone = row.passRate >= 70 ? "" : row.passRate >= 50 ? "--warning" : "--danger";
             return (
-              <div key={row.itemTitle} className="report-bar-row">
+              <div key={row.assessmentId} className="report-bar-row">
                 <div className="report-bar-row-label" title={row.itemTitle}>{row.itemTitle}</div>
                 <div className="report-bar-track">
                   <div className={`report-bar-fill${tone}`} style={{ width: `${row.passRate}%` }} />

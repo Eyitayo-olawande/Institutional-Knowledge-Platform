@@ -292,26 +292,54 @@ export type ComplianceRow = {
   publishedVersion: number;
   attestedCount: number;
   activeStaff: number;
+  overdueAcks: number;
   attestationRate: number;
   pendingAcks: number;
 };
 
 export async function complianceReport(db: TenantDb): Promise<ComplianceRow[]> {
-  const [attestationItems, activeStaffRows, pendingAlerts] = await Promise.all([
+  const today = new Date().toISOString().slice(0, 10);
+  const [attestationItems, globalStaffRows, deptStaffRows, pendingAlerts, overdueAlerts] = await Promise.all([
+    // Join to learningAreas so we know the scope (common vs department) of each document.
     db
-      .select({ id: libraryItems.id, title: libraryItems.title, publishedVersion: libraryItems.publishedVersion })
+      .select({
+        id: libraryItems.id,
+        title: libraryItems.title,
+        publishedVersion: libraryItems.publishedVersion,
+        areaKind: learningAreas.kind,
+        areaDeptId: learningAreas.departmentId,
+      })
       .from(libraryItems)
+      .leftJoin(learningAreas, eq(libraryItems.areaId, learningAreas.id))
       .where(and(eq(libraryItems.requiresAttestation, true), eq(libraryItems.status, "published"))),
     db.select({ n: sql<number>`count(*)::int` }).from(people).where(eq(people.status, "active")),
+    // Per-department active headcount so department-scoped documents get the right denominator.
+    db
+      .select({ departmentId: people.departmentId, n: sql<number>`count(*)::int` })
+      .from(people)
+      .where(and(eq(people.status, "active"), isNotNull(people.departmentId)))
+      .groupBy(people.departmentId),
     db
       .select({ alertId: changeAlertAcknowledgements.alertId, n: sql<number>`count(*)::int` })
       .from(changeAlertAcknowledgements)
       .where(isNull(changeAlertAcknowledgements.acknowledgedAt))
       .groupBy(changeAlertAcknowledgements.alertId),
+    // Overdue = unacknowledged and past due_by date.
+    db
+      .select({ alertId: changeAlertAcknowledgements.alertId, n: sql<number>`count(*)::int` })
+      .from(changeAlertAcknowledgements)
+      .where(and(
+        isNull(changeAlertAcknowledgements.acknowledgedAt),
+        isNotNull(changeAlertAcknowledgements.dueBy),
+        sql`${changeAlertAcknowledgements.dueBy} < ${today}`,
+      ))
+      .groupBy(changeAlertAcknowledgements.alertId),
   ]);
 
   if (attestationItems.length === 0) return [];
-  const activeStaff = activeStaffRows[0]?.n ?? 0;
+
+  const globalStaff = globalStaffRows[0]?.n ?? 0;
+  const deptStaffMap = new Map(deptStaffRows.map((r) => [r.departmentId!, r.n]));
 
   const itemIds = attestationItems.map((i) => i.id);
   const attestCounts = await db
@@ -339,19 +367,30 @@ export async function complianceReport(db: TenantDb): Promise<ComplianceRow[]> {
     const itemId = alertToItem.get(row.alertId);
     if (itemId) pendingAcksByItem[itemId] = (pendingAcksByItem[itemId] ?? 0) + (row.n ?? 0);
   }
+  const overdueAcksByItem: Record<string, number> = {};
+  for (const row of overdueAlerts) {
+    const itemId = alertToItem.get(row.alertId);
+    if (itemId) overdueAcksByItem[itemId] = (overdueAcksByItem[itemId] ?? 0) + (row.n ?? 0);
+  }
 
   return attestationItems.map((item) => {
     const pv = item.publishedVersion ?? 1;
     const currentVersionAttestations = attestCounts.filter((a) => a.itemId === item.id && a.version === pv);
     const attestedCount = currentVersionAttestations.reduce((sum, a) => sum + (a.n ?? 0), 0);
+    // Use department headcount for department-scoped documents; global for common docs.
+    const denominator =
+      item.areaKind === "department" && item.areaDeptId
+        ? (deptStaffMap.get(item.areaDeptId) ?? globalStaff)
+        : globalStaff;
     return {
       id: item.id,
       title: item.title,
       publishedVersion: pv,
       attestedCount,
-      activeStaff,
-      attestationRate: activeStaff > 0 ? Math.round((attestedCount / activeStaff) * 100) : 0,
+      activeStaff: denominator,
+      attestationRate: denominator > 0 ? Math.min(100, Math.round((attestedCount / denominator) * 100)) : 0,
       pendingAcks: pendingAcksByItem[item.id] ?? 0,
+      overdueAcks: overdueAcksByItem[item.id] ?? 0,
     };
   });
 }

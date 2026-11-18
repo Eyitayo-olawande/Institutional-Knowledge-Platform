@@ -17,9 +17,14 @@ export default async function LearningReport() {
         title={t("reports.learning.title")}
         sub={t("reports.learning.sub")}
         action={
-          <Link href="/admin/reports/export?category=learning" className="btn btn-secondary" style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-            {t("reports.export_csv")}
-          </Link>
+          <div style={{ display: "inline-flex", gap: 8 }}>
+            <Link href="/admin/reports/export?category=learning-dept" className="btn btn-secondary" style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+              {t("reports.learning.export_dept_csv")}
+            </Link>
+            <Link href="/admin/reports/export?category=learning-nominations" className="btn btn-secondary" style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+              {t("reports.learning.export_nominations_csv")}
+            </Link>
+          </div>
         }
       />
 
@@ -31,7 +36,7 @@ export default async function LearningReport() {
 
       {deptRows.length > 0 && (
         <div className="report-chart" style={{ marginBottom: 8 }}>
-          <div className="report-chart-title">Completion rate by department</div>
+          <div className="report-chart-title">{t("reports.learning.chart_title")}</div>
           {deptRows.map((row) => {
             const tone = row.completionRate >= 70 ? "" : row.completionRate >= 40 ? "--warning" : "--danger";
             return (
@@ -60,7 +65,7 @@ export default async function LearningReport() {
                   <th style={{ textAlign: "right" }}>{t("reports.learning.columns.enrolled")}</th>
                   <th style={{ textAlign: "right" }}>{t("reports.learning.columns.completed")}</th>
                   <th style={{ textAlign: "right" }}>{t("reports.learning.columns.total")}</th>
-                  <th style={{ textAlign: "right" }}>{t("reports.learning.columns.rate")}</th>
+                  <th style={{ textAlign: "right" }} title={t("reports.learning.columns.rate_tooltip")}>{t("reports.learning.columns.rate")} ⓘ</th>
                 </tr>
               </thead>
               <tbody>

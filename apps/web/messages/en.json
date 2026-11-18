@@ -764,22 +764,27 @@
       "sub": "Path enrolments, module completions and training nominations by department.",
       "dept_heading": "Department Performance",
       "nominations_heading": "Training Nominations",
+      "chart_title": "Completion rate by department",
       "columns": {
         "department": "Department",
         "enrolled": "Enrolled",
         "completed": "Modules Completed",
         "total": "Total Modules Started",
         "rate": "Completion Rate",
+        "rate_tooltip": "Percentage of started modules that are completed (among starters only, not all enrolled staff)",
         "overdue": "Overdue Assignments"
       },
       "nomination_columns": {
         "status": "Status",
         "count": "Count"
-      }
+      },
+      "export_dept_csv": "Export Dept CSV",
+      "export_nominations_csv": "Export Nominations CSV"
     },
     "assessment": {
       "title": "Assessment & Readiness",
       "sub": "Assessment participation, pass rates and performance by assessment.",
+      "chart_title": "Pass rate by assessment",
       "columns": {
         "item": "Assessment",
         "attempts": "Attempts",
@@ -793,13 +798,15 @@
     "compliance": {
       "title": "Policy & Compliance",
       "sub": "Attestation status and outstanding document acknowledgements.",
+      "chart_title": "Attestation rate by document",
       "columns": {
         "item": "Document",
         "version": "Version",
         "attested": "Attested",
         "total_staff": "Active Staff",
         "rate": "Attestation Rate",
-        "pending_acks": "Pending Acks"
+        "pending_acks": "Pending Acks",
+        "overdue_acks": "Overdue"
       }
     },
     "people": {
@@ -816,6 +823,7 @@
     "intelligence": {
       "title": "Organisational Intelligence",
       "sub": "Department-level performance, learning trends and capability overview.",
+      "chart_title": "Completion rate by department",
       "columns": {
         "department": "Department",
         "staff": "Staff",

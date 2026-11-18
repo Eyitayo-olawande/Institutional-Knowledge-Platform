@@ -740,6 +740,7 @@ export const changeAlertAcknowledgements = pgTable(
     alertId: uuid("alert_id").notNull().references(() => contentChangeAlerts.id),
     personId: uuid("person_id").notNull().references(() => people.id),
     notifiedAt: timestamp("notified_at", { withTimezone: true }).notNull().defaultNow(),
+    dueBy: date("due_by"),
     acknowledgedAt: timestamp("acknowledged_at", { withTimezone: true }),
     acknowledgedVersion: integer("acknowledged_version"),
     lastRemindedAt: timestamp("last_reminded_at", { withTimezone: true }),

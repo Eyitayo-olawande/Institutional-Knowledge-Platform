@@ -22,14 +22,16 @@ export async function GET(req: Request) {
     csv = toCsv(["Item", "Learning Area", "Type", "Status", "Views", "Attested", "Pending Acks"],
       rows.map((r) => [r.title, r.area, r.contentType, r.status, r.viewCount, r.attestedCount, r.pendingAcks]));
     filename = "knowledge-report.csv";
-  } else if (category === "learning") {
-    const { deptRows, nominationSummary } = await learningReport(ctx.db);
-    const deptCsv = toCsv(["Department", "Enrolled", "Modules Completed", "Total Modules Started", "Completion Rate %"],
+  } else if (category === "learning" || category === "learning-dept") {
+    const { deptRows } = await learningReport(ctx.db);
+    csv = toCsv(["Department", "Enrolled", "Modules Completed", "Total Modules Started", "Completion Rate %"],
       deptRows.map((r) => [r.department, r.enrolledCount, r.completedModules, r.totalModulesStarted, r.completionRate]));
-    const nominCsv = toCsv(["Nomination Status", "Count"],
+    filename = "learning-dept-report.csv";
+  } else if (category === "learning-nominations") {
+    const { nominationSummary } = await learningReport(ctx.db);
+    csv = toCsv(["Nomination Status", "Count"],
       nominationSummary.map((r) => [r.status, r.count]));
-    csv = `Department Performance\r\n${deptCsv}\r\n\r\nTraining Nominations\r\n${nominCsv}`;
-    filename = "learning-report.csv";
+    filename = "learning-nominations-report.csv";
   } else if (category === "assessment") {
     const rows = await assessmentReport(ctx.db);
     csv = toCsv(["Assessment", "Attempts", "People", "Passed", "Failed", "Pass Rate %", "Avg Score %"],
@@ -37,8 +39,8 @@ export async function GET(req: Request) {
     filename = "assessment-report.csv";
   } else if (category === "compliance") {
     const rows = await complianceReport(ctx.db);
-    csv = toCsv(["Document", "Version", "Attested", "Active Staff", "Attestation Rate %", "Pending Acks"],
-      rows.map((r) => [r.title, r.publishedVersion, r.attestedCount, r.activeStaff, r.attestationRate, r.pendingAcks]));
+    csv = toCsv(["Document", "Version", "Attested", "Active Staff", "Attestation Rate %", "Pending Acks", "Overdue"],
+      rows.map((r) => [r.title, r.publishedVersion, r.attestedCount, r.activeStaff, r.attestationRate, r.pendingAcks, r.overdueAcks]));
     filename = "compliance-report.csv";
   } else if (category === "people") {
     const rows = await peopleReport(ctx.db);
