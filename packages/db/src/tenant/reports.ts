@@ -299,7 +299,7 @@ export type ComplianceRow = {
 
 export async function complianceReport(db: TenantDb): Promise<ComplianceRow[]> {
   const today = new Date().toISOString().slice(0, 10);
-  const [attestationItems, globalStaffRows, deptStaffRows, pendingAlerts, overdueAlerts] = await Promise.all([
+  const [attestationItems, globalStaffRows, deptStaffRows, pendingAlerts] = await Promise.all([
     // Join to learningAreas so we know the scope (common vs department) of each document.
     db
       .select({
@@ -324,17 +324,19 @@ export async function complianceReport(db: TenantDb): Promise<ComplianceRow[]> {
       .from(changeAlertAcknowledgements)
       .where(isNull(changeAlertAcknowledgements.acknowledgedAt))
       .groupBy(changeAlertAcknowledgements.alertId),
-    // Overdue = unacknowledged and past due_by date.
-    db
-      .select({ alertId: changeAlertAcknowledgements.alertId, n: sql<number>`count(*)::int` })
-      .from(changeAlertAcknowledgements)
-      .where(and(
-        isNull(changeAlertAcknowledgements.acknowledgedAt),
-        isNotNull(changeAlertAcknowledgements.dueBy),
-        sql`${changeAlertAcknowledgements.dueBy} < ${today}`,
-      ))
-      .groupBy(changeAlertAcknowledgements.alertId),
   ]);
+
+  // Overdue = unacknowledged and past due_by. Runs separately so a missing due_by column
+  // (migration not yet applied) degrades gracefully to zero counts rather than crashing.
+  const overdueAlerts = await db
+    .select({ alertId: changeAlertAcknowledgements.alertId, n: sql<number>`count(*)::int` })
+    .from(changeAlertAcknowledgements)
+    .where(and(
+      isNull(changeAlertAcknowledgements.acknowledgedAt),
+      sql`${changeAlertAcknowledgements.dueBy} < ${today}`,
+    ))
+    .groupBy(changeAlertAcknowledgements.alertId)
+    .catch(() => [] as { alertId: string; n: number }[]);
 
   if (attestationItems.length === 0) return [];
 
