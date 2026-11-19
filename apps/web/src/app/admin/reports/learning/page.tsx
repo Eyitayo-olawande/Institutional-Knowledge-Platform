@@ -11,6 +11,16 @@ export default async function LearningReport() {
   const ctx = await requirePermission("reports.view");
   const { deptRows, nominationSummary } = await learningReport(ctx.db);
 
+  const totalEnrolled = deptRows.reduce((s, r) => s + r.enrolledCount, 0);
+  const totalCompleted = deptRows.reduce((s, r) => s + r.completedModules, 0);
+  const totalStarted = deptRows.reduce((s, r) => s + r.totalModulesStarted, 0);
+  const avgCompletion = totalStarted > 0 ? Math.round((totalCompleted / totalStarted) * 100) : 0;
+  const totalPending = nominationSummary.find((r) => r.status === "pending")?.count ?? 0;
+
+  const activeDepts = deptRows.filter((r) => r.totalModulesStarted > 0);
+  const topDepts = [...activeDepts].sort((a, b) => b.completionRate - a.completionRate).slice(0, 3);
+  const attentionDepts = [...activeDepts].sort((a, b) => a.completionRate - b.completionRate).slice(0, 3);
+
   return (
     <AppShell ctx={ctx} active="reports">
       <PageHead
@@ -28,27 +38,79 @@ export default async function LearningReport() {
         }
       />
 
-      <div style={{ marginBottom: 12 }}>
+      <div style={{ marginBottom: 20 }}>
         <Link href="/admin/reports" className="sub" style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 13 }}>
           {t("reports.back")}
         </Link>
       </div>
 
+      <div className="report-kpi-strip" role="region" aria-label="Summary metrics">
+        <div className="report-kpi-stat">
+          <div className="report-kpi-stat-value">{totalEnrolled}</div>
+          <div className="report-kpi-stat-label">{t("reports.kpi.total_enrolled")}</div>
+        </div>
+        <div className={`report-kpi-stat${avgCompletion < 40 ? " report-kpi-stat--danger" : avgCompletion < 70 ? " report-kpi-stat--warning" : ""}`}>
+          <div className="report-kpi-stat-value">{totalStarted > 0 ? `${avgCompletion}%` : "—"}</div>
+          <div className="report-kpi-stat-label">{t("reports.kpi.avg_completion")}</div>
+        </div>
+        <div className="report-kpi-stat">
+          <div className="report-kpi-stat-value">{totalCompleted}</div>
+          <div className="report-kpi-stat-label">{t("reports.kpi.modules_completed")}</div>
+        </div>
+        <div className={`report-kpi-stat${totalPending > 0 ? " report-kpi-stat--warning" : ""}`}>
+          <div className="report-kpi-stat-value">{totalPending}</div>
+          <div className="report-kpi-stat-label">{t("reports.kpi.pending_nominations")}</div>
+        </div>
+      </div>
+
       {deptRows.length > 0 && (
-        <div className="report-chart" style={{ marginBottom: 8 }}>
+        <div className="report-chart-container">
           <div className="report-chart-title">{t("reports.learning.chart_title")}</div>
-          {deptRows.map((row) => {
-            const tone = row.completionRate >= 70 ? "" : row.completionRate >= 40 ? "--warning" : "--danger";
-            return (
-              <div key={row.department} className="report-bar-row">
-                <div className="report-bar-row-label" title={row.department}>{row.department}</div>
-                <div className="report-bar-track">
-                  <div className={`report-bar-fill${tone}`} style={{ width: `${row.completionRate}%` }} />
+          {activeDepts.length === 0 ? (
+            <div className="report-chart-empty">{t("reports.empty")}</div>
+          ) : (
+            activeDepts.map((row) => {
+              const tone = row.completionRate >= 70 ? "" : row.completionRate >= 40 ? "--warning" : "--danger";
+              return (
+                <div key={row.department} className="report-bar-row">
+                  <div className="report-bar-row-label" title={row.department}>{row.department}</div>
+                  <div className="report-bar-track">
+                    <div className={`report-bar-fill${tone}`} style={{ width: `${row.completionRate}%` }} />
+                  </div>
+                  <div className="report-bar-pct">{row.completionRate}%</div>
                 </div>
-                <div className="report-bar-pct">{row.completionRate}%</div>
+              );
+            })
+          )}
+        </div>
+      )}
+
+      {activeDepts.length > 0 && (
+        <div className="report-insight-row">
+          <div className="report-insight-panel">
+            <div className="report-insight-title">{t("reports.insight.top_depts")}</div>
+            {topDepts.length === 0 ? (
+              <div className="report-insight-empty">{t("reports.insight.no_data")}</div>
+            ) : topDepts.map((r, i) => (
+              <div key={r.departmentId} className="report-insight-item">
+                <div className="report-insight-rank">{i + 1}</div>
+                <div className="report-insight-name">{r.department}</div>
+                <div className="report-insight-score">{r.completionRate}%</div>
               </div>
-            );
-          })}
+            ))}
+          </div>
+          <div className="report-insight-panel report-insight-panel--attention">
+            <div className="report-insight-title">{t("reports.insight.attention_depts")}</div>
+            {attentionDepts.length === 0 ? (
+              <div className="report-insight-empty">{t("reports.insight.no_data")}</div>
+            ) : attentionDepts.map((r, i) => (
+              <div key={r.departmentId} className="report-insight-item">
+                <div className="report-insight-rank">{i + 1}</div>
+                <div className="report-insight-name">{r.department}</div>
+                <div className="report-insight-score">{r.completionRate}%</div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 

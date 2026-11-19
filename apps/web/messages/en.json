@@ -834,6 +834,44 @@
         "pass_rate": "Assessment Pass Rate",
         "nominations": "Nominations"
       }
+    },
+    "kpi": {
+      "total_enrolled": "Total Enrolled",
+      "avg_completion": "Avg Completion Rate",
+      "modules_completed": "Modules Completed",
+      "pending_nominations": "Pending Nominations",
+      "total_assessments": "Total Assessments",
+      "total_attempts": "Total Attempts",
+      "overall_pass_rate": "Overall Pass Rate",
+      "avg_score": "Avg Score",
+      "total_documents": "Total Documents",
+      "avg_attestation": "Avg Attestation Rate",
+      "total_attested": "Total Attested",
+      "total_overdue": "Total Overdue",
+      "total_items": "Published Items",
+      "total_views": "Total Views",
+      "total_employees": "Total Employees",
+      "total_paths": "Paths Assigned",
+      "total_nominations": "Total Nominations",
+      "departments": "Departments",
+      "total_staff": "Total Staff",
+      "avg_pass_rate": "Avg Pass Rate"
+    },
+    "insight": {
+      "top_depts": "Top Departments",
+      "attention_depts": "Needs Attention",
+      "top_assessments": "Top Assessments",
+      "struggling": "Needs Improvement",
+      "fully_attested": "Fully Attested",
+      "low_attestation": "Low Attestation",
+      "most_viewed": "Most Viewed Items",
+      "top_people": "Most Active Learners",
+      "no_data": "No data to show yet.",
+      "engagement_chart": "Modules Completed by Department",
+      "dept_filter_label": "Filtered by department",
+      "clear_filter": "Clear filter",
+      "view_people": "View people",
+      "people_dept_filter": "Showing staff in"
     }
   },
   "aptitude": {

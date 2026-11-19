@@ -58,7 +58,9 @@ export default async function ReportsDashboard() {
         </div>
       </div>
 
-      <section aria-label="Key metrics" style={{ marginBottom: 32 }}>
+      <div className="report-hub-section">Key Metrics</div>
+
+      <section aria-label="Key metrics" style={{ marginBottom: 0 }}>
         <div className="report-metrics-grid">
           <MetricTile
             value={metrics.activeStaff}
@@ -113,6 +115,8 @@ export default async function ReportsDashboard() {
           />
         </div>
       </section>
+
+      <div className="report-hub-section">Report Areas</div>
 
       <section aria-label="Report categories">
         <div className="report-category-grid">
