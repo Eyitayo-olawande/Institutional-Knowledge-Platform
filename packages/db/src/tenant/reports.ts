@@ -75,7 +75,7 @@ export async function knowledgeReport(db: TenantDb): Promise<KnowledgeRow[]> {
       contentTypeId: libraryItems.contentTypeId,
     })
     .from(libraryItems)
-    .where(eq(libraryItems.assessmentOnly, false))
+    .where(and(eq(libraryItems.assessmentOnly, false), eq(libraryItems.status, "published")))
     .orderBy(libraryItems.title);
 
   if (items.length === 0) return [];
@@ -529,8 +529,9 @@ export async function intelligenceReport(db: TenantDb): Promise<DeptPerformanceR
   });
 }
 
-export function toCsv(headers: string[], rows: (string | number)[][]): string {
-  const escape = (v: string | number) => {
+export function toCsv(headers: string[], rows: (string | number | null | undefined)[][]): string {
+  const escape = (v: string | number | null | undefined) => {
+    if (v == null) return "";
     const s = String(v);
     return s.includes(",") || s.includes('"') || s.includes("\n") ? `"${s.replace(/"/g, '""')}"` : s;
   };
