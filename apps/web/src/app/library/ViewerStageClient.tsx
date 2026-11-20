@@ -59,6 +59,7 @@ export function ViewerStageClient({ fileUrl, contentType, fileName, conversionFa
   const stageRef = useRef<HTMLDivElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [imgBroken, setImgBroken] = useState(false);
+  const [videoBroken, setVideoBroken] = useState(false);
 
   const toggleFullscreen = useCallback(() => {
     if (!stageRef.current) return;
@@ -115,7 +116,11 @@ export function ViewerStageClient({ fileUrl, contentType, fileName, conversionFa
               <img src={fileUrl} alt={fileName} onError={() => setImgBroken(true)} />
             )
           ) : isVideo ? (
-            <video src={fileUrl} controls />
+            videoBroken ? (
+              <div className="lib-item-no-file"><p>{t("library.files.unavailable")}</p></div>
+            ) : (
+              <video src={fileUrl} controls onError={() => setVideoBroken(true)} />
+            )
           ) : (
             <iframe src={fileUrl} title={fileName} />
           )
