@@ -228,7 +228,7 @@ export default async function Item({
       <div className="lib-item-viewer">
         {/* Main: document viewer (PDF gets its own thumbs + toolbar; others get the stage wrapper) */}
         <ViewerStageClient
-          fileUrl={selectedFile ? `/files/${selectedFile.id}` : null}
+          fileUrl={canSeeArea(visible, item.areaId) && selectedFile ? `/files/${selectedFile.id}` : null}
           contentType={selectedFile?.contentType ?? null}
           fileName={selectedFile?.name ?? ""}
           conversionFailed={!!(selectedFile && needsConversion(selectedFile.contentType) && selectedFile.conversionStatus !== "ready")}
