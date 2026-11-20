@@ -126,7 +126,7 @@ export function ModulesPanel({ flatModules, tab, modulesCompleted, inProgressCou
                 </div>
                 {m.unlocked ? (
                   m.completed ? (
-                    <Link href={m.itemId ? `/library/${m.itemId}` : "/library"} className="my-module-action-btn" style={{ textAlign: "center" }}>
+                    <Link href={m.itemId ? `/library/${m.itemId}?moduleId=${m.id}` : "/library"} className="my-module-action-btn" style={{ textAlign: "center" }}>
                       {t("learning.action_review")}
                     </Link>
                   ) : (
@@ -180,7 +180,7 @@ export function ModulesPanel({ flatModules, tab, modulesCompleted, inProgressCou
                   </div>
                   {m.unlocked ? (
                     m.completed ? (
-                      <Link href={m.itemId ? `/library/${m.itemId}` : "/library"} className="my-module-action-btn">
+                      <Link href={m.itemId ? `/library/${m.itemId}?moduleId=${m.id}` : "/library"} className="my-module-action-btn">
                         {t("learning.action_review")}
                       </Link>
                     ) : (
