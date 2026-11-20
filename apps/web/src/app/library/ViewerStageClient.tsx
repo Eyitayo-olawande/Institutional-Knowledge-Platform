@@ -58,6 +58,7 @@ function ExternalLinkSvg() {
 export function ViewerStageClient({ fileUrl, contentType, fileName, conversionFailed, itemTitle, children }: Props) {
   const stageRef = useRef<HTMLDivElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [imgBroken, setImgBroken] = useState(false);
 
   const toggleFullscreen = useCallback(() => {
     if (!stageRef.current) return;
@@ -107,8 +108,12 @@ export function ViewerStageClient({ fileUrl, contentType, fileName, conversionFa
       <div className="lib-item-stage-content">
         {showFile ? (
           isImage ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={fileUrl} alt={fileName} />
+            imgBroken ? (
+              <div className="lib-item-no-file"><p>{t("library.files.unavailable")}</p></div>
+            ) : (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={fileUrl} alt={fileName} onError={() => setImgBroken(true)} />
+            )
           ) : isVideo ? (
             <video src={fileUrl} controls />
           ) : (

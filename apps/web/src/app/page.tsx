@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { t } from "../i18n.ts";
 import { authFor, requestHost } from "../server/auth.ts";
 import { buildNav } from "../server/nav.ts";
-import { featureOn, tenantDb } from "../server/session.ts";
+import { featureOn, tenantDb, viewerAreas } from "../server/session.ts";
 import { listActiveStaff, listLibraryItems, listPaths, listStructure, myLearning, noticesFor, personByUserId, recentActivity, STAGE_ORDER, tenantSchema, unreadCount } from "@mantle/db/tenant";
 import { can } from "@mantle/platform/identity";
 import { resolveRequestTenant } from "../server/tenant.ts";
@@ -97,8 +97,9 @@ export default async function Home() {
   let featuredResources: Awaited<ReturnType<typeof listLibraryItems>> | null = null;
   let recentNotices: Awaited<ReturnType<typeof noticesFor>> | null = null;
   if (!isAdmin) {
+    const visible = await viewerAreas({ db, roles, user: session.user });
     const [items, notices] = await Promise.all([
-      libraryOn ? listLibraryItems(db, { publishedOnly: true, areas: "all" }) : Promise.resolve([]),
+      libraryOn ? listLibraryItems(db, { publishedOnly: true, areas: visible }) : Promise.resolve([]),
       noticesFor(db, session.user.id, 4),
     ]);
     featuredResources = items.slice(0, 4);

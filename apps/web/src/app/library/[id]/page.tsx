@@ -1,4 +1,4 @@
-import { canPersonSeeItem, canSeeArea, getAssessmentForItem, getAttemptResults, getAttestation, getItemAccessRules, getLibraryItem, getModule, getOutstandingChangeAlertForItem, hasOutstandingChangeAlerts, hasViewedAllModuleItems, itemFiles, listLibraryItems, listModuleItems, listStructure, personByUserId, recordItemView } from "@mantle/db/tenant";
+import { canPersonSeeItem, canSeeArea, getAssessmentForItem, getAttemptResults, getAttestation, getItemAccessRules, getLibraryItem, getModule, getOutstandingChangeAlertForItem, hasOutstandingChangeAlerts, hasViewedAllModuleItems, itemFiles, listAreas, listLibraryItems, listModuleItems, listStructure, personByUserId, recordItemView } from "@mantle/db/tenant";
 import { needsConversion } from "@mantle/documents/convert";
 import { ACCEPT_ATTR } from "@mantle/platform/files";
 import { can } from "@mantle/platform/identity";
@@ -17,10 +17,10 @@ import { ViewerStageClient } from "../ViewerStageClient.tsx";
 
 const FILE_ERRORS = new Set(["empty", "too_many", "too_large", "type_not_allowed", "content_mismatch", "infected"]);
 
-function youtubeEmbedUrl(url: string): string {
+function youtubeEmbedUrl(url: string): string | null {
   const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([A-Za-z0-9_-]{11})/);
   if (match?.[1]) return `https://www.youtube.com/embed/${match[1]}`;
-  return url;
+  return null;
 }
 
 function fileTypeAbbr(contentType: string): string {
@@ -68,7 +68,10 @@ export default async function Item({
   ) notFound();
   const { item, draft, versions } = found;
   const { areas, types } = await areaChoices(db, visible);
-  const area = areas.find((a) => a.id === item.areaId);
+  // If the item is accessible via a module that bypasses area visibility, its area may
+  // not be in the filtered list. Fall back to a full lookup so Document Details still render.
+  const area = areas.find((a) => a.id === item.areaId)
+    ?? (item.areaId && itemIsInModule ? (await listAreas(db)).find((a) => a.id === item.areaId) : undefined);
   const type = types.find((ty) => ty.id === item.contentTypeId);
   const current = draft ?? found.published;
   const attachments = await itemFiles(db, item.id);
@@ -337,16 +340,25 @@ export default async function Item({
               )
             ) : (
               <>
-                {item.videoUrl ? (
-                  <div className="lib-item-video-wrap">
-                    <iframe
-                      src={youtubeEmbedUrl(item.videoUrl)}
-                      title={item.title}
-                      allowFullScreen
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    />
-                  </div>
-                ) : null}
+                {item.videoUrl ? (() => {
+                  const embedUrl = youtubeEmbedUrl(item.videoUrl);
+                  return embedUrl ? (
+                    <div className="lib-item-video-wrap">
+                      <iframe
+                        src={embedUrl}
+                        title={item.title}
+                        allowFullScreen
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      />
+                    </div>
+                  ) : (
+                    <div className="lib-item-video-external">
+                      <a href={item.videoUrl} target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
+                        {t("library.viewer.watch_video")}
+                      </a>
+                    </div>
+                  );
+                })() : null}
                 {found.published ? (
                   <div className="prose">{found.published.body}</div>
                 ) : (

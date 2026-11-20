@@ -2,7 +2,7 @@ import { certificatesForPerson, listLibraryItems, listModuleItems, myLearning, n
 import { eq } from "drizzle-orm";
 import Link from "next/link";
 import { t } from "../../i18n.ts";
-import { requireFeature, requirePermission } from "../../server/session.ts";
+import { requireFeature, requirePermission, viewerAreas } from "../../server/session.ts";
 import { AppShell } from "../_components/AppShell.tsx";
 import { Icon } from "../_components/Icon.tsx";
 import { cardThumbBg } from "../library/card-cover.ts";
@@ -53,8 +53,9 @@ export default async function MyLearning({
   const person = await personByUserId(db, user.id);
 
   // Always fetch featured resources and notices for the dashboard bottom sections.
+  const visible = await viewerAreas(ctx);
   const [featuredItems, recentNotices] = await Promise.all([
-    listLibraryItems(db, { publishedOnly: true, areas: "all" }),
+    listLibraryItems(db, { publishedOnly: true, areas: visible }),
     noticesFor(db, user.id, 4),
   ]);
   const featuredResources = featuredItems.slice(0, 4);
