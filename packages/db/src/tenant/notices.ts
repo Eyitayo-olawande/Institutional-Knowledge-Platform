@@ -9,7 +9,7 @@ export async function recipients(db: TenantDb, userIds: readonly string[]) {
   return db.select({ id: users.id, name: users.name, email: users.email }).from(users).where(inArray(users.id, [...userIds]));
 }
 
-export async function addNotice(db: NoticeWriter, notice: { userId: string; event: string; subject: string; body: string }) {
+export async function addNotice(db: NoticeWriter, notice: { userId: string; event: string; subject: string; body: string; link?: string | null }) {
   await db.insert(notices).values(notice);
 }
 

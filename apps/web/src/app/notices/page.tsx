@@ -1,5 +1,6 @@
 import { noticesFor } from "@mantle/db/tenant";
 import { Badge, Button, Card } from "@mantle/ui";
+import Link from "next/link";
 import { t } from "../../i18n.ts";
 import { requireSignedIn } from "../../server/session.ts";
 import { AppShell } from "../_components/AppShell.tsx";
@@ -36,6 +37,11 @@ export default async function Notices() {
                     <span className="notices-date">{n.createdAt.toLocaleDateString("en-NG", { day: "numeric", month: "short", year: "numeric" })}</span>
                   </div>
                   <p style={{ margin: "4px 0 0", color: "var(--mantle-color-text_muted)", fontSize: 14 }}>{n.body}</p>
+                  {n.link ? (
+                    <Link href={n.link} style={{ display: "inline-block", marginTop: 8, fontSize: 13, fontWeight: 600, color: "var(--mantle-color-primary)" }}>
+                      {t("notices.view_link")} →
+                    </Link>
+                  ) : null}
                 </div>
               </li>
             ))}

@@ -166,6 +166,7 @@ export async function notifyNominationDecision(
       event: `nomination.approved.${nomination.id}`,
       subject: `You have been scheduled for training: ${nomination.pathName}`,
       body: `Your learning assignment for "${nomination.pathName}" has been approved and scheduled from ${nomination.approvedStartDate ?? ""}. Open My Learning to get started.`,
+      link: "/my-learning",
     });
   }
 

@@ -232,6 +232,7 @@ async function createChangeAlerts(
       event: `change_alert.${alertRow.id}`,
       subject: "A learning item you have read has been updated",
       body: `Classification: ${changeAlert.classification}. ${changeAlert.description ? changeAlert.description : "Please re-read the item and confirm you have reviewed the update."}`,
+      link: `/library/${itemId}`,
     });
   }
 }

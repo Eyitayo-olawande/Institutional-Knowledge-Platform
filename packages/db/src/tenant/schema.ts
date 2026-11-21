@@ -338,6 +338,7 @@ export const notices = pgTable(
     event: text("event").notNull(),
     subject: text("subject").notNull(),
     body: text("body").notNull(),
+    link: text("link"),
     readAt: timestamp("read_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
