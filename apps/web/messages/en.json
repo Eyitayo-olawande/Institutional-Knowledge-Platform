@@ -749,7 +749,39 @@
       "people": "People & Development",
       "people_sub": "Individual learning records and development activity.",
       "intelligence": "Organisational Intelligence",
-      "intelligence_sub": "Department-level performance and capability overview."
+      "intelligence_sub": "Department-level performance and capability overview.",
+      "onboarding": "Onboarding Report",
+      "onboarding_sub": "New joiners: path enrolment, attestations pending and overdue acknowledgements."
+    },
+    "onboarding": {
+      "title": "Onboarding Report",
+      "sub": "New joiners by date range: path enrolment status, attestations pending and overdue acknowledgements.",
+      "from_label": "From",
+      "to_label": "To",
+      "filter_btn": "Apply",
+      "empty": "No joiners found for the selected date range.",
+      "columns": {
+        "name": "Name",
+        "department": "Department",
+        "joined": "Joined",
+        "days": "Days Since Joining",
+        "paths": "Paths Enrolled",
+        "attestations": "Attestations Pending",
+        "overdue_acks": "Overdue Acks"
+      }
+    },
+    "compliance_detail": {
+      "title": "Compliance Drill-down",
+      "sub": "Active staff who have not yet attested to the current version of this document.",
+      "back": "Back to Compliance Report",
+      "empty": "All active staff have attested to the current version.",
+      "columns": {
+        "name": "Name",
+        "department": "Department",
+        "last_attested": "Last Attested",
+        "attested_version": "Version Attested",
+        "current_version": "Current Version"
+      }
     },
     "knowledge": {
       "title": "Knowledge Management",

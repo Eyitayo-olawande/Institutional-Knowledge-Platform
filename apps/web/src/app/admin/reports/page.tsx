@@ -12,6 +12,7 @@ const CATEGORIES = [
   { key: "compliance", href: "/admin/reports/compliance", icon: "clipboard" as const },
   { key: "people", href: "/admin/reports/people", icon: "people" as const },
   { key: "intelligence", href: "/admin/reports/intelligence", icon: "chart" as const },
+  { key: "onboarding", href: "/admin/reports/onboarding", icon: "people" as const },
 ];
 
 type MetricTileProps = {

@@ -120,7 +120,11 @@ export default async function ComplianceReport() {
               <tbody>
                 {rows.map((row) => (
                   <tr key={row.id}>
-                    <td>{row.title}</td>
+                    <td>
+                      <Link href={`/admin/reports/compliance/${row.id}`} style={{ color: "inherit", textDecoration: "underline", textDecorationColor: "var(--mantle-color-text_muted)" }}>
+                        {row.title}
+                      </Link>
+                    </td>
                     <td style={{ textAlign: "right" }}>{row.publishedVersion}</td>
                     <td style={{ textAlign: "right" }}>{row.attestedCount}</td>
                     <td style={{ textAlign: "right" }}>{row.activeStaff}</td>

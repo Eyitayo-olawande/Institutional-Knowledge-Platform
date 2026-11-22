@@ -170,3 +170,55 @@ export async function addItemApplicabilityRule(
 export async function removeItemApplicabilityRule(db: TenantDb, ruleId: string, _actor: string): Promise<void> {
   await db.delete(itemApplicabilityRules).where(eq(itemApplicabilityRules.id, ruleId));
 }
+
+// Returns a map of personId -> outstanding requirement count for all active
+// people. Uses the same satisfaction logic as outstandingRequirements().
+export async function outstandingCountsByPerson(db: TenantDb): Promise<Map<string, number>> {
+  const [rules, activePeople, attestations] = await Promise.all([
+    db
+      .select({
+        itemId: itemApplicabilityRules.itemId,
+        requiresAttestation: libraryItems.requiresAttestation,
+        publishedVersion: libraryItems.publishedVersion,
+      })
+      .from(itemApplicabilityRules)
+      .innerJoin(libraryItems, eq(libraryItems.id, itemApplicabilityRules.itemId))
+      .where(eq(libraryItems.status, "published")),
+    db.select({ id: people.id }).from(people).where(eq(people.status, "active")),
+    db.select({ personId: staffAttestations.personId, itemId: staffAttestations.itemId, version: staffAttestations.version }).from(staffAttestations),
+  ]);
+
+  if (rules.length === 0 || activePeople.length === 0) return new Map();
+
+  const itemMetaMap = new Map<string, { requiresAttestation: boolean; publishedVersion: number | null }>();
+  for (const r of rules) {
+    if (!itemMetaMap.has(r.itemId)) {
+      itemMetaMap.set(r.itemId, { requiresAttestation: r.requiresAttestation ?? false, publishedVersion: r.publishedVersion });
+    }
+  }
+  const requiredItemIds = [...itemMetaMap.keys()];
+
+  const latestByPersonItem = new Map<string, number>();
+  for (const a of attestations) {
+    const key = `${a.personId}|${a.itemId}`;
+    const prev = latestByPersonItem.get(key) ?? -1;
+    if (a.version > prev) latestByPersonItem.set(key, a.version);
+  }
+
+  const counts = new Map<string, number>();
+  for (const person of activePeople) {
+    let count = 0;
+    for (const itemId of requiredItemIds) {
+      const item = itemMetaMap.get(itemId)!;
+      const attestedVersion = latestByPersonItem.get(`${person.id}|${itemId}`) ?? null;
+      const currentVersion = item.publishedVersion ?? 0;
+      if (item.requiresAttestation) {
+        if (attestedVersion === null || attestedVersion < currentVersion) count++;
+      } else {
+        if (attestedVersion === null) count++;
+      }
+    }
+    if (count > 0) counts.set(person.id, count);
+  }
+  return counts;
+}
