@@ -321,7 +321,8 @@
     "nominations": "Training nominations",
     "candidates": "Candidates",
     "aptitude_tests": "Aptitude tests",
-    "reports": "Reports"
+    "reports": "Reports",
+    "applicability": "Knowledge requirements"
   },
   "home": {
     "greeting": "Welcome, {name}",

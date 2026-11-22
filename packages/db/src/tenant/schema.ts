@@ -480,6 +480,19 @@ export const assignmentRules = pgTable("assignment_rules", {
   ...auditColumns,
 });
 
+// Which library items are required reading for which org attributes. Mirrors
+// assignmentRules but targets items instead of paths.
+export const itemApplicabilityRules = pgTable("item_applicability_rules", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  itemId: uuid("item_id")
+    .notNull()
+    .references(() => libraryItems.id, { onDelete: "cascade" }),
+  departmentId: uuid("department_id").references(() => departments.id),
+  roleLevelId: uuid("role_level_id").references(() => roleLevels.id),
+  unitId: uuid("unit_id").references(() => units.id),
+  ...auditColumns,
+});
+
 export const assignments = pgTable(
   "assignments",
   {

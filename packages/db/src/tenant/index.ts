@@ -138,6 +138,15 @@ export {
   type NominationReason,
 } from "./nominations.ts";
 export {
+  addItemApplicabilityRule,
+  applyKnowledgeRequirements,
+  listItemApplicabilityRules,
+  outstandingRequirements,
+  removeItemApplicabilityRule,
+  type OrgAttrs,
+  type OutstandingItem,
+} from "./requirements.ts";
+export {
   assessmentReport,
   complianceReport,
   dashboardMetrics,

@@ -5,6 +5,7 @@ import { recordActivity } from "./activity.ts";
 import { randomUUID } from "node:crypto";
 import { structureResolver } from "./structure.ts";
 import { assignOnJoin } from "./paths.ts";
+import { applyKnowledgeRequirements } from "./requirements.ts";
 
 // A checked staff file row (see @mantle/platform/people for the file rules).
 export interface StaffRow {
@@ -80,6 +81,7 @@ export async function applyStaffImport(db: TenantDb, rows: readonly StaffRow[], 
             { personId: person.id, departmentId: links.departmentId, roleLevelId: links.roleLevelId, unitId: links.unitId, startDate: now.toISOString().slice(0, 10) },
             changedBy,
           );
+          await applyKnowledgeRequirements(tx, person.id, { departmentId: links.departmentId, roleLevelId: links.roleLevelId, unitId: links.unitId });
         }
         counts.joined++;
         continue;
@@ -121,6 +123,7 @@ export async function applyStaffImport(db: TenantDb, rows: readonly StaffRow[], 
         // progress is recorded against the module, not the path (E8 paths,
         // acceptance criterion 4).
         await assignOnJoin(tx, { personId: current.id, departmentId: links.departmentId, roleLevelId: links.roleLevelId, unitId: links.unitId, startDate: now.toISOString().slice(0, 10) }, changedBy);
+        await applyKnowledgeRequirements(tx, current.id, { departmentId: links.departmentId, roleLevelId: links.roleLevelId, unitId: links.unitId });
       } else {
         counts.updated++;
       }
@@ -136,6 +139,7 @@ export async function applyStaffImport(db: TenantDb, rows: readonly StaffRow[], 
           changedBy,
         });
         await assignOnJoin(tx, { personId: current.id, departmentId: links.departmentId, roleLevelId: links.roleLevelId, unitId: links.unitId, startDate: now.toISOString().slice(0, 10) }, changedBy);
+        await applyKnowledgeRequirements(tx, current.id, { departmentId: links.departmentId, roleLevelId: links.roleLevelId, unitId: links.unitId });
       }
       await recordActivity(tx, {
         actor: changedBy,
