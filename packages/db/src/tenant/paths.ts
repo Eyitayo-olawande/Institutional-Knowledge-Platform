@@ -2,7 +2,8 @@ import { and, asc, eq, inArray, isNull, sql } from "drizzle-orm";
 import { recordActivity } from "./activity.ts";
 import type { TenantDb } from "./client.ts";
 import { hasOutstandingChangeAlerts } from "./library.ts";
-import { assignmentRules, assignments, certificates, libraryItems, moduleItems, modules, moduleProgress, pathStages, paths, people, stageModules } from "./schema.ts";
+import { addNotice } from "./notices.ts";
+import { assignmentRules, assignments, certificates, libraryItems, moduleItems, modules, moduleProgress, pathStages, paths, people, stageModules, users } from "./schema.ts";
 
 // Learning paths (work package E8, Blueprint v3.1 section 5). A path has
 // four fixed stages; a module sits in one or more stages across one or
@@ -229,6 +230,10 @@ export async function assignOnJoin(
       )
       .map((r) => r.pathId),
   );
+  const [personUser] = await db
+    .select({ userId: people.userId })
+    .from(people)
+    .where(eq(people.id, input.personId));
   for (const pathId of matchingPathIds) {
     const inserted = await db
       .insert(assignments)
@@ -237,6 +242,17 @@ export async function assignOnJoin(
       .returning({ id: assignments.id });
     if (inserted.length > 0) {
       await recordActivity(db, { actor, action: "paths.assigned", entityType: "person", entityId: input.personId, details: { path_id: pathId } });
+      if (personUser?.userId) {
+        const [pathRow] = await db.select({ name: paths.name }).from(paths).where(eq(paths.id, pathId));
+        const [userRow] = await db.select({ name: users.name }).from(users).where(eq(users.id, personUser.userId));
+        await addNotice(db, {
+          userId: personUser.userId,
+          event: "paths.assigned",
+          subject: "You have been enrolled in a learning path",
+          body: `Hello ${userRow?.name ?? "there"}, you have been enrolled in "${pathRow?.name ?? "a learning path"}". Open My Learning to get started.`,
+          link: "/my-learning",
+        });
+      }
     }
   }
 }

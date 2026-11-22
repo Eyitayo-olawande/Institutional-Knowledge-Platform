@@ -322,7 +322,8 @@
     "candidates": "Candidates",
     "aptitude_tests": "Aptitude tests",
     "reports": "Reports",
-    "applicability": "Knowledge requirements"
+    "applicability": "Knowledge requirements",
+    "team": "My Team"
   },
   "home": {
     "greeting": "Welcome, {name}",

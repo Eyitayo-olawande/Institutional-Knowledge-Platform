@@ -1,6 +1,7 @@
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, inArray, isNull } from "drizzle-orm";
 import type { TenantDb } from "./client.ts";
-import { itemApplicabilityRules, libraryItems, staffAttestations } from "./schema.ts";
+import { addNotice } from "./notices.ts";
+import { itemApplicabilityRules, libraryItems, people, staffAttestations, users } from "./schema.ts";
 
 // Org attributes used to match applicability rules.
 export interface OrgAttrs {
@@ -109,7 +110,30 @@ export async function applyKnowledgeRequirements(
       ),
     );
 
-  return [...new Set(rules.map((r) => r.itemId))];
+  const itemIds = [...new Set(rules.map((r) => r.itemId))];
+  if (itemIds.length > 0) {
+    const [personUser] = await db
+      .select({ userId: people.userId })
+      .from(people)
+      .where(eq(people.id, personId));
+    if (personUser?.userId) {
+      const [userRow] = await db.select({ name: users.name }).from(users).where(eq(users.id, personUser.userId));
+      const applicableItems = await db
+        .select({ id: libraryItems.id, title: libraryItems.title })
+        .from(libraryItems)
+        .where(inArray(libraryItems.id, itemIds));
+      for (const item of applicableItems) {
+        await addNotice(db, {
+          userId: personUser.userId,
+          event: "content.required",
+          subject: "You have required reading to complete",
+          body: `Hello ${userRow?.name ?? "there"}, "${item.title}" has been assigned as required reading for your role. Open the Library to read it.`,
+          link: "/library",
+        });
+      }
+    }
+  }
+  return itemIds;
 }
 
 // --- Admin management functions ---

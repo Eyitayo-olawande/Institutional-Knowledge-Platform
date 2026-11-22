@@ -328,3 +328,22 @@ export async function listActiveStaff(db: TenantDb) {
     .where(eq(people.status, "active"))
     .orderBy(people.fullName);
 }
+
+// Returns the active direct reports of a manager, identified by their employeeId.
+export async function directReports(db: TenantDb, managerEmployeeId: string) {
+  return db
+    .select({
+      id: tenantSchema.people.id,
+      fullName: tenantSchema.people.fullName,
+      employeeId: tenantSchema.people.employeeId,
+      userId: tenantSchema.people.userId,
+    })
+    .from(tenantSchema.people)
+    .where(
+      and(
+        eq(tenantSchema.people.managerEmployeeId, managerEmployeeId),
+        eq(tenantSchema.people.status, "active"),
+      ),
+    )
+    .orderBy(tenantSchema.people.fullName);
+}

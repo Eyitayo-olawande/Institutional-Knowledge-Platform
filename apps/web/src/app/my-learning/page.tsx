@@ -1,4 +1,4 @@
-import { certificatesForPerson, listLibraryItems, listModuleItems, myLearning, noticesFor, personByUserId, tenantSchema, type AssignmentStageView, STAGE_ORDER } from "@mantle/db/tenant";
+import { certificatesForPerson, listLibraryItems, listModuleItems, myLearning, noticesFor, outstandingRequirements, personByUserId, tenantSchema, type AssignmentStageView, STAGE_ORDER } from "@mantle/db/tenant";
 import { eq } from "drizzle-orm";
 import Link from "next/link";
 import { t } from "../../i18n.ts";
@@ -82,8 +82,11 @@ export default async function MyLearning({
     );
   }
 
-  const data = await myLearning(db, person.id);
-  const certs = await certificatesForPerson(db, person.id);
+  const [data, certs, outstanding] = await Promise.all([
+    myLearning(db, person.id),
+    certificatesForPerson(db, person.id),
+    outstandingRequirements(db, person.id),
+  ]);
 
   if (data.pathsEnrolled === 0) {
     return (
@@ -180,6 +183,37 @@ export default async function MyLearning({
       {completed ? (
         <div className="alert alert-success" role="status" style={{ marginBottom: 0 }}>
           <p>{t("learning.module_completed_banner")}</p>
+        </div>
+      ) : null}
+
+      {outstanding.length > 0 ? (
+        <div className="my-panel" style={{ marginBottom: 24, border: "1px solid var(--mantle-color-warning, #d97706)", borderRadius: 10 }}>
+          <h2 style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden style={{ color: "var(--mantle-color-warning, #d97706)" }}>
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+              <line x1="12" y1="9" x2="12" y2="13" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+            Outstanding Requirements
+          </h2>
+          <p className="sub" style={{ marginBottom: 12 }}>
+            {outstanding.length === 1
+              ? "You have 1 item that requires your attention."
+              : `You have ${outstanding.length} items that require your attention.`}
+          </p>
+          <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 8 }}>
+            {outstanding.map((item) => (
+              <li key={item.itemId} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "8px 10px", borderRadius: 6, background: "var(--mantle-color-surface_muted)" }}>
+                <span style={{ fontWeight: 500, fontSize: 13 }}>{item.title}</span>
+                <Link
+                  href={`/library/${item.itemId}`}
+                  style={{ fontSize: 12, whiteSpace: "nowrap", color: "var(--mantle-color-primary)" }}
+                >
+                  {item.requiresAttestation ? "Read & attest →" : "Read →"}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
       ) : null}
 
