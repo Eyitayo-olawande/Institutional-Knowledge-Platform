@@ -5,7 +5,7 @@ import { can } from "@mantle/platform/identity";
 // The server still checks every permission on each page; this only decides
 // which links to show.
 
-export type NavKey = "home" | "library" | "my_learning" | "notices" | "people" | "roles" | "wording" | "structure" | "areas" | "activity" | "paths" | "nominations" | "candidates" | "aptitude_tests" | "reports";
+export type NavKey = "home" | "library" | "my_learning" | "notices" | "people" | "roles" | "wording" | "structure" | "areas" | "activity" | "paths" | "nominations" | "candidates" | "aptitude_tests" | "reports" | "applicability" | "team";
 export type NavIcon = "home" | "library" | "bell" | "people" | "key" | "text" | "tree" | "list" | "doc" | "clipboard" | "check" | "chart";
 
 export interface NavItem {
@@ -33,12 +33,14 @@ export function buildNav({ roles, libraryOn, peopleImportOn, pathsOn, aptitudeOn
   if (can(roles, "wording.edit")) items.push({ key: "wording", href: "/admin/wording", icon: "text", section: "admin" });
   if (can(roles, "structure.manage")) items.push({ key: "structure", href: "/admin/structure", icon: "tree", section: "admin" });
   if (libraryOn && can(roles, "areas.manage")) items.push({ key: "areas", href: "/admin/areas", icon: "library", section: "admin" });
+  if (libraryOn && can(roles, "library.edit")) items.push({ key: "applicability", href: "/admin/library/applicability", icon: "list", section: "admin" });
   if (pathsOn && can(roles, "paths.edit")) items.push({ key: "paths", href: "/admin/paths", icon: "tree", section: "admin" });
   if (pathsOn && can(roles, "nominations.manage")) items.push({ key: "nominations", href: "/admin/nominations", icon: "clipboard", section: "admin" });
   if (aptitudeOn && can(roles, "candidates.manage")) items.push({ key: "candidates", href: "/admin/candidates", icon: "people", section: "admin" });
   if (aptitudeOn && can(roles, "candidates.manage")) items.push({ key: "aptitude_tests", href: "/admin/aptitude-tests", icon: "check", section: "admin" });
   if (can(roles, "activity.view")) items.push({ key: "activity", href: "/admin/activity", icon: "list", section: "admin" });
   if (can(roles, "reports.view")) items.push({ key: "reports", href: "/admin/reports", icon: "chart", section: "admin" });
+  if (pathsOn && can(roles, "team.view")) items.push({ key: "team", href: "/team", icon: "people", section: "main" });
   return items;
 }
 

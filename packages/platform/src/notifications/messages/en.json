@@ -4,5 +4,17 @@
       "subject": "Your roles have changed",
       "body": "Hello {name}, your roles at {organisation} are now: {roles}."
     }
+  },
+  "paths": {
+    "assigned": {
+      "subject": "You have been enrolled in a learning path",
+      "body": "Hello {name}, you have been enrolled in \"{path}\". Open My Learning to get started."
+    }
+  },
+  "content": {
+    "required": {
+      "subject": "You have required reading to complete",
+      "body": "Hello {name}, \"{item}\" has been assigned as required reading for your role. Open the Library to read it."
+    }
   }
 }

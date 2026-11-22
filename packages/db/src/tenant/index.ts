@@ -1,6 +1,6 @@
 export { connectTenant, type TenantDb } from "./client.ts";
 export * as tenantSchema from "./schema.ts";
-export { addAdministrator, applyStaffImport, changeUserRoles, listActiveStaff, listPeople, listUsers, personByUserId, personDepartmentByUserId, setUserRoles, type ImportOptions, type ImportSummary, type StaffRow } from "./people.ts";
+export { addAdministrator, applyStaffImport, changeUserRoles, directReports, listActiveStaff, listPeople, listUsers, personByUserId, personDepartmentByUserId, setUserRoles, type ImportOptions, type ImportSummary, type StaffRow } from "./people.ts";
 export { recentActivity, recordActivity, type ActivityEntry } from "./activity.ts";
 export { certificateSignatory, isWordingKey, setWording, wording, WORDING_DEFAULTS, type Signatory, type Wording, type WordingKey } from "./wording.ts";
 export {
@@ -137,6 +137,15 @@ export {
   type NominationListRow,
   type NominationReason,
 } from "./nominations.ts";
+export {
+  addItemApplicabilityRule,
+  applyKnowledgeRequirements,
+  listItemApplicabilityRules,
+  outstandingRequirements,
+  removeItemApplicabilityRule,
+  type OrgAttrs,
+  type OutstandingItem,
+} from "./requirements.ts";
 export {
   assessmentReport,
   complianceReport,

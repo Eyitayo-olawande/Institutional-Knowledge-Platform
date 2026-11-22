@@ -1,10 +1,11 @@
-import { eq } from "drizzle-orm";
+import { and, eq, inArray, isNull } from "drizzle-orm";
 import type { TenantDb } from "./client.ts";
 import * as tenantSchema from "./schema.ts";
 import { recordActivity } from "./activity.ts";
 import { randomUUID } from "node:crypto";
 import { structureResolver } from "./structure.ts";
 import { assignOnJoin } from "./paths.ts";
+import { applyKnowledgeRequirements } from "./requirements.ts";
 
 // A checked staff file row (see @mantle/platform/people for the file rules).
 export interface StaffRow {
@@ -18,7 +19,7 @@ export interface StaffRow {
   readonly roleLevel?: string | null;
 }
 
-const { people, employmentEvents, users, departments } = tenantSchema;
+const { people, employmentEvents, users, departments, assignments, assignmentRules } = tenantSchema;
 
 export interface ImportOptions {
   // People in the organisation but missing from the file become leavers.
@@ -80,6 +81,7 @@ export async function applyStaffImport(db: TenantDb, rows: readonly StaffRow[], 
             { personId: person.id, departmentId: links.departmentId, roleLevelId: links.roleLevelId, unitId: links.unitId, startDate: now.toISOString().slice(0, 10) },
             changedBy,
           );
+          await applyKnowledgeRequirements(tx, person.id, { departmentId: links.departmentId, roleLevelId: links.roleLevelId, unitId: links.unitId });
         }
         counts.joined++;
         continue;
@@ -107,13 +109,37 @@ export async function applyStaffImport(db: TenantDb, rows: readonly StaffRow[], 
           changedBy,
         });
         counts.moved++;
+        // Old-department paths that no longer apply are superseded so the
+        // learner's dashboard only shows current work (K2C Phase 1).
+        await supersedePreviousAssignments(tx, {
+          personId: current.id,
+          oldProfile: { departmentId: current.departmentId, roleLevelId: current.roleLevelId, unitId: current.unitId },
+          newProfile: { departmentId: links.departmentId, roleLevelId: links.roleLevelId, unitId: links.unitId },
+          now,
+          changedBy,
+        });
         // A mover picks up their new department's path too, starting today;
         // shared Common modules they already completed stay completed, since
         // progress is recorded against the module, not the path (E8 paths,
         // acceptance criterion 4).
         await assignOnJoin(tx, { personId: current.id, departmentId: links.departmentId, roleLevelId: links.roleLevelId, unitId: links.unitId, startDate: now.toISOString().slice(0, 10) }, changedBy);
+        await applyKnowledgeRequirements(tx, current.id, { departmentId: links.departmentId, roleLevelId: links.roleLevelId, unitId: links.unitId });
       } else {
         counts.updated++;
+      }
+      // A role-level change triggers a new path assignment even without a
+      // department move (K2C Phase 1).
+      const roleChanged = !moved && (current.roleLevelId ?? null) !== links.roleLevelId;
+      if (roleChanged) {
+        await tx.insert(employmentEvents).values({
+          personId: current.id,
+          type: "role_change",
+          fromRoleLevelId: current.roleLevelId,
+          toRoleLevelId: links.roleLevelId,
+          changedBy,
+        });
+        await assignOnJoin(tx, { personId: current.id, departmentId: links.departmentId, roleLevelId: links.roleLevelId, unitId: links.unitId, startDate: now.toISOString().slice(0, 10) }, changedBy);
+        await applyKnowledgeRequirements(tx, current.id, { departmentId: links.departmentId, roleLevelId: links.roleLevelId, unitId: links.unitId });
       }
       await recordActivity(tx, {
         actor: changedBy,
@@ -255,6 +281,45 @@ export async function personDepartmentByUserId(db: TenantDb, userId: string): Pr
   return found?.department ?? null;
 }
 
+// Marks active assignments whose path belongs to the old department (but not
+// the new one) as superseded, so the learner's dashboard only shows current work.
+async function supersedePreviousAssignments(
+  tx: Tx,
+  opts: {
+    personId: string;
+    oldProfile: { departmentId: string | null; roleLevelId: string | null; unitId: string | null };
+    newProfile: { departmentId: string | null; roleLevelId: string | null; unitId: string | null };
+    now: Date;
+    changedBy: string;
+  },
+): Promise<void> {
+  // Find rules that matched the old profile but no longer match the new one.
+  const oldRules = await tx
+    .select({ pathId: assignmentRules.pathId })
+    .from(assignmentRules)
+    .where(opts.oldProfile.departmentId ? eq(assignmentRules.departmentId, opts.oldProfile.departmentId) : isNull(assignmentRules.departmentId));
+  if (oldRules.length === 0) return;
+
+  const newRules = await tx
+    .select({ pathId: assignmentRules.pathId })
+    .from(assignmentRules)
+    .where(opts.newProfile.departmentId ? eq(assignmentRules.departmentId, opts.newProfile.departmentId) : isNull(assignmentRules.departmentId));
+  const keepPathIds = new Set(newRules.map((r) => r.pathId));
+  const obsoletePathIds = oldRules.map((r) => r.pathId).filter((id) => !keepPathIds.has(id));
+  if (obsoletePathIds.length === 0) return;
+
+  await tx
+    .update(assignments)
+    .set({ supersededAt: opts.now, updatedAt: opts.now, changedBy: opts.changedBy })
+    .where(
+      and(
+        eq(assignments.personId, opts.personId),
+        inArray(assignments.pathId, obsoletePathIds),
+        isNull(assignments.supersededAt),
+      ),
+    );
+}
+
 // Active staff with their department, for choosing people on admin pages.
 export async function listActiveStaff(db: TenantDb) {
   return db
@@ -262,4 +327,23 @@ export async function listActiveStaff(db: TenantDb) {
     .from(people)
     .where(eq(people.status, "active"))
     .orderBy(people.fullName);
+}
+
+// Returns the active direct reports of a manager, identified by their employeeId.
+export async function directReports(db: TenantDb, managerEmployeeId: string) {
+  return db
+    .select({
+      id: tenantSchema.people.id,
+      fullName: tenantSchema.people.fullName,
+      employeeId: tenantSchema.people.employeeId,
+      userId: tenantSchema.people.userId,
+    })
+    .from(tenantSchema.people)
+    .where(
+      and(
+        eq(tenantSchema.people.managerEmployeeId, managerEmployeeId),
+        eq(tenantSchema.people.status, "active"),
+      ),
+    )
+    .orderBy(tenantSchema.people.fullName);
 }

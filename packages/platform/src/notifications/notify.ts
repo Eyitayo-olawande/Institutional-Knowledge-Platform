@@ -8,7 +8,7 @@ import en from "./messages/en.json" with { type: "json" };
 // for each channel and records every delivery. Version 1 channels: work
 // email and in app notices. SMS, WhatsApp and push plug in here later.
 
-export const EVENTS = ["roles.changed"] as const;
+export const EVENTS = ["roles.changed", "paths.assigned", "content.required"] as const;
 export type NotificationEvent = (typeof EVENTS)[number];
 export type Channel = "email" | "in_app";
 
