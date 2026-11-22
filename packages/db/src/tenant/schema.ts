@@ -80,7 +80,7 @@ export const verifications = pgTable(
 // a member of staff known to the organisation; signing in is separate and
 // linked through userId.
 export const personStatus = pgEnum("person_status", ["active", "left"]);
-export const employmentEventType = pgEnum("employment_event_type", ["join", "move", "leave"]);
+export const employmentEventType = pgEnum("employment_event_type", ["join", "move", "leave", "role_change"]);
 
 // Organisation structure (Product Architecture v1.1, sections 4 and 7):
 // departments, units, locations and role levels as records that people link
@@ -176,6 +176,9 @@ export const employmentEvents = pgTable(
     toDepartment: text("to_department"),
     fromDepartmentId: uuid("from_department_id").references(() => departments.id),
     toDepartmentId: uuid("to_department_id").references(() => departments.id),
+    // For a role_change: the role level before and after.
+    fromRoleLevelId: uuid("from_role_level_id").references(() => roleLevels.id),
+    toRoleLevelId: uuid("to_role_level_id").references(() => roleLevels.id),
     ...auditColumns,
   },
   (t) => [index("employment_events_person_idx").on(t.personId)],
@@ -489,6 +492,9 @@ export const assignments = pgTable(
       .references(() => people.id),
     // Due dates are startDate + each stage's dueDays, not stored directly.
     startDate: date("start_date").notNull(),
+    // Set when a department move makes this assignment obsolete; the new
+    // department's assignment is created separately.
+    supersededAt: timestamp("superseded_at", { withTimezone: true }),
     ...auditColumns,
   },
   (t) => [uniqueIndex("assignments_path_person_unique").on(t.pathId, t.personId)],

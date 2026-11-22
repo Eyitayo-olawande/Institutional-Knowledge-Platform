@@ -1,4 +1,4 @@
-import { and, asc, eq, inArray, sql } from "drizzle-orm";
+import { and, asc, eq, inArray, isNull, sql } from "drizzle-orm";
 import { recordActivity } from "./activity.ts";
 import type { TenantDb } from "./client.ts";
 import { hasOutstandingChangeAlerts } from "./library.ts";
@@ -266,7 +266,7 @@ export async function personAssignments(db: TenantDb, personId: string, today = 
     .select({ assignmentId: assignments.id, pathId: assignments.pathId, pathName: paths.name, startDate: assignments.startDate })
     .from(assignments)
     .innerJoin(paths, eq(paths.id, assignments.pathId))
-    .where(eq(assignments.personId, personId));
+    .where(and(eq(assignments.personId, personId), isNull(assignments.supersededAt)));
   if (rows.length === 0) return [];
 
   const pathIds = [...new Set(rows.map((r) => r.pathId))];

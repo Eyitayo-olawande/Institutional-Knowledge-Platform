@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq, inArray, isNull } from "drizzle-orm";
 import type { TenantDb } from "./client.ts";
 import * as tenantSchema from "./schema.ts";
 import { recordActivity } from "./activity.ts";
@@ -18,7 +18,7 @@ export interface StaffRow {
   readonly roleLevel?: string | null;
 }
 
-const { people, employmentEvents, users, departments } = tenantSchema;
+const { people, employmentEvents, users, departments, assignments, assignmentRules } = tenantSchema;
 
 export interface ImportOptions {
   // People in the organisation but missing from the file become leavers.
@@ -107,6 +107,15 @@ export async function applyStaffImport(db: TenantDb, rows: readonly StaffRow[], 
           changedBy,
         });
         counts.moved++;
+        // Old-department paths that no longer apply are superseded so the
+        // learner's dashboard only shows current work (K2C Phase 1).
+        await supersedePreviousAssignments(tx, {
+          personId: current.id,
+          oldProfile: { departmentId: current.departmentId, roleLevelId: current.roleLevelId, unitId: current.unitId },
+          newProfile: { departmentId: links.departmentId, roleLevelId: links.roleLevelId, unitId: links.unitId },
+          now,
+          changedBy,
+        });
         // A mover picks up their new department's path too, starting today;
         // shared Common modules they already completed stay completed, since
         // progress is recorded against the module, not the path (E8 paths,
@@ -114,6 +123,19 @@ export async function applyStaffImport(db: TenantDb, rows: readonly StaffRow[], 
         await assignOnJoin(tx, { personId: current.id, departmentId: links.departmentId, roleLevelId: links.roleLevelId, unitId: links.unitId, startDate: now.toISOString().slice(0, 10) }, changedBy);
       } else {
         counts.updated++;
+      }
+      // A role-level change triggers a new path assignment even without a
+      // department move (K2C Phase 1).
+      const roleChanged = !moved && (current.roleLevelId ?? null) !== links.roleLevelId;
+      if (roleChanged) {
+        await tx.insert(employmentEvents).values({
+          personId: current.id,
+          type: "role_change",
+          fromRoleLevelId: current.roleLevelId,
+          toRoleLevelId: links.roleLevelId,
+          changedBy,
+        });
+        await assignOnJoin(tx, { personId: current.id, departmentId: links.departmentId, roleLevelId: links.roleLevelId, unitId: links.unitId, startDate: now.toISOString().slice(0, 10) }, changedBy);
       }
       await recordActivity(tx, {
         actor: changedBy,
@@ -253,6 +275,45 @@ export async function personDepartmentByUserId(db: TenantDb, userId: string): Pr
     .leftJoin(departments, eq(people.departmentId, departments.id))
     .where(eq(people.userId, userId));
   return found?.department ?? null;
+}
+
+// Marks active assignments whose path belongs to the old department (but not
+// the new one) as superseded, so the learner's dashboard only shows current work.
+async function supersedePreviousAssignments(
+  tx: Tx,
+  opts: {
+    personId: string;
+    oldProfile: { departmentId: string | null; roleLevelId: string | null; unitId: string | null };
+    newProfile: { departmentId: string | null; roleLevelId: string | null; unitId: string | null };
+    now: Date;
+    changedBy: string;
+  },
+): Promise<void> {
+  // Find rules that matched the old profile but no longer match the new one.
+  const oldRules = await tx
+    .select({ pathId: assignmentRules.pathId })
+    .from(assignmentRules)
+    .where(opts.oldProfile.departmentId ? eq(assignmentRules.departmentId, opts.oldProfile.departmentId) : isNull(assignmentRules.departmentId));
+  if (oldRules.length === 0) return;
+
+  const newRules = await tx
+    .select({ pathId: assignmentRules.pathId })
+    .from(assignmentRules)
+    .where(opts.newProfile.departmentId ? eq(assignmentRules.departmentId, opts.newProfile.departmentId) : isNull(assignmentRules.departmentId));
+  const keepPathIds = new Set(newRules.map((r) => r.pathId));
+  const obsoletePathIds = oldRules.map((r) => r.pathId).filter((id) => !keepPathIds.has(id));
+  if (obsoletePathIds.length === 0) return;
+
+  await tx
+    .update(assignments)
+    .set({ supersededAt: opts.now, updatedAt: opts.now, changedBy: opts.changedBy })
+    .where(
+      and(
+        eq(assignments.personId, opts.personId),
+        inArray(assignments.pathId, obsoletePathIds),
+        isNull(assignments.supersededAt),
+      ),
+    );
 }
 
 // Active staff with their department, for choosing people on admin pages.
