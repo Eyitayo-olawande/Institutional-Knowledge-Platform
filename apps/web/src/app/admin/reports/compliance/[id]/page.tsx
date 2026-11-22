@@ -29,14 +29,14 @@ export default async function ComplianceDrillDown({
           {t("reports.compliance_detail.back")}
         </Link>
         <span className="sub" style={{ fontSize: 13 }}>
-          Current version: v{item.publishedVersion}
+          {t("reports.compliance_detail.current_version_label", { version: item.publishedVersion })}
         </span>
       </div>
 
       <div className="report-kpi-strip" role="region" aria-label="Summary metrics">
         <div className={`report-kpi-stat${nonAttested.length > 0 ? " report-kpi-stat--warning" : ""}`}>
           <div className="report-kpi-stat-value">{nonAttested.length}</div>
-          <div className="report-kpi-stat-label">Not Yet Attested</div>
+          <div className="report-kpi-stat-label">{t("reports.compliance_detail.not_attested_kpi")}</div>
         </div>
       </div>
 
@@ -61,18 +61,18 @@ export default async function ComplianceDrillDown({
                     <td style={{ fontWeight: 500 }}>{row.fullName}</td>
                     <td>{row.department}</td>
                     <td style={{ textAlign: "right" }}>
-                      {row.lastAttestedAt ? row.lastAttestedAt.toISOString().slice(0, 10) : <span className="sub">Never</span>}
+                      {row.lastAttestedAt ? row.lastAttestedAt.toISOString().slice(0, 10) : <span className="sub">{t("reports.compliance_detail.never")}</span>}
                     </td>
                     <td style={{ textAlign: "right" }}>
                       {row.attestedVersion !== null ? (
                         <Badge tone={row.attestedVersion < row.currentVersion ? "warning" : "success"}>
-                          v{row.attestedVersion}
+                          {t("reports.compliance_detail.version", { version: row.attestedVersion })}
                         </Badge>
                       ) : (
-                        <span className="sub">Never</span>
+                        <span className="sub">{t("reports.compliance_detail.never")}</span>
                       )}
                     </td>
-                    <td style={{ textAlign: "right" }}>v{row.currentVersion}</td>
+                    <td style={{ textAlign: "right" }}>{t("reports.compliance_detail.version", { version: row.currentVersion })}</td>
                   </tr>
                 ))}
               </tbody>

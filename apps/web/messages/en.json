@@ -56,7 +56,8 @@
       "name": "Name",
       "email": "Work email",
       "department": "Department",
-      "status": "Status"
+      "status": "Status",
+      "outstanding": "Outstanding"
     },
     "statuses": {
       "active": "Active",
@@ -727,6 +728,8 @@
     "back": "Back to Reports",
     "export_csv": "Export CSV",
     "empty": "No data available yet.",
+    "section_metrics": "Key Metrics",
+    "section_areas": "Report Areas",
     "metrics": {
       "active_staff": "Active Staff",
       "published_items": "Published Library Items",
@@ -768,6 +771,12 @@
         "paths": "Paths Enrolled",
         "attestations": "Attestations Pending",
         "overdue_acks": "Overdue Acks"
+      },
+      "kpi": {
+        "joiners": "Joiners",
+        "pending_attestations": "Pending Attestations",
+        "overdue_acks": "Overdue Acks",
+        "paths_enrolled": "Total Paths Enrolled"
       }
     },
     "compliance_detail": {
@@ -781,7 +790,11 @@
         "last_attested": "Last Attested",
         "attested_version": "Version Attested",
         "current_version": "Current Version"
-      }
+      },
+      "not_attested_kpi": "Not Yet Attested",
+      "never": "Never",
+      "current_version_label": "Current version: v{version}",
+      "version": "v{version}"
     },
     "knowledge": {
       "title": "Knowledge Management",

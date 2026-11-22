@@ -54,19 +54,19 @@ export default async function OnboardingReport({
       <div className="report-kpi-strip" role="region" aria-label="Summary metrics">
         <div className="report-kpi-stat report-kpi-stat--neutral">
           <div className="report-kpi-stat-value">{rows.length}</div>
-          <div className="report-kpi-stat-label">Joiners</div>
+          <div className="report-kpi-stat-label">{t("reports.onboarding.kpi.joiners")}</div>
         </div>
         <div className={`report-kpi-stat${rows.some((r) => r.pendingAttestations > 0) ? " report-kpi-stat--warning" : ""}`}>
           <div className="report-kpi-stat-value">{rows.reduce((s, r) => s + r.pendingAttestations, 0)}</div>
-          <div className="report-kpi-stat-label">Pending Attestations</div>
+          <div className="report-kpi-stat-label">{t("reports.onboarding.kpi.pending_attestations")}</div>
         </div>
         <div className={`report-kpi-stat${rows.some((r) => r.overdueAcks > 0) ? " report-kpi-stat--danger" : ""}`}>
           <div className="report-kpi-stat-value">{rows.reduce((s, r) => s + r.overdueAcks, 0)}</div>
-          <div className="report-kpi-stat-label">Overdue Acks</div>
+          <div className="report-kpi-stat-label">{t("reports.onboarding.kpi.overdue_acks")}</div>
         </div>
         <div className="report-kpi-stat report-kpi-stat--neutral">
           <div className="report-kpi-stat-value">{rows.reduce((s, r) => s + r.pathsEnrolled, 0)}</div>
-          <div className="report-kpi-stat-label">Total Paths Enrolled</div>
+          <div className="report-kpi-stat-label">{t("reports.onboarding.kpi.paths_enrolled")}</div>
         </div>
       </div>
 
@@ -95,13 +95,13 @@ export default async function OnboardingReport({
                     <td style={{ textAlign: "right" }}>{row.joinedAt.toISOString().slice(0, 10)}</td>
                     <td style={{ textAlign: "right" }}>{row.daysSinceJoining}</td>
                     <td style={{ textAlign: "right" }}>
-                      {row.pathsEnrolled > 0 ? row.pathsEnrolled : <span className="sub">0</span>}
+                      {row.pathsEnrolled > 0 ? row.pathsEnrolled : <span className="sub">{0}</span>}
                     </td>
                     <td style={{ textAlign: "right" }}>
                       {row.pendingAttestations > 0 ? (
                         <Badge tone="warning">{row.pendingAttestations}</Badge>
                       ) : (
-                        <Badge tone="success">0</Badge>
+                        <Badge tone="success">{0}</Badge>
                       )}
                     </td>
                     <td style={{ textAlign: "right" }}>

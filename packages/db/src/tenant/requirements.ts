@@ -167,6 +167,7 @@ export async function addItemApplicabilityRule(
 }
 
 // Removes a single applicability rule by id.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function removeItemApplicabilityRule(db: TenantDb, ruleId: string, _actor: string): Promise<void> {
   await db.delete(itemApplicabilityRules).where(eq(itemApplicabilityRules.id, ruleId));
 }

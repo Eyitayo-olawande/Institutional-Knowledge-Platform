@@ -59,7 +59,7 @@ export default async function ReportsDashboard() {
         </div>
       </div>
 
-      <div className="report-hub-section">Key Metrics</div>
+      <div className="report-hub-section">{t("reports.section_metrics")}</div>
 
       <section aria-label="Key metrics" style={{ marginBottom: 0 }}>
         <div className="report-metrics-grid">
@@ -117,7 +117,7 @@ export default async function ReportsDashboard() {
         </div>
       </section>
 
-      <div className="report-hub-section">Report Areas</div>
+      <div className="report-hub-section">{t("reports.section_areas")}</div>
 
       <section aria-label="Report categories">
         <div className="report-category-grid">

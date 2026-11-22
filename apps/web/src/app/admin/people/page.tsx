@@ -36,7 +36,6 @@ export default async function People() {
             <div className="admin-banner-rule" />
           </div>
         </div>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/images/learning-professional.png" alt="" aria-hidden="true" className="admin-banner-person" />
       </div>
 
@@ -56,7 +55,7 @@ export default async function People() {
                     <th>{t("people.columns.email")}</th>
                     <th>{labels.department.singular}</th>
                     <th>{t("people.columns.status")}</th>
-                    <th style={{ textAlign: "right" }}>Outstanding</th>
+                    <th style={{ textAlign: "right" }}>{t("people.columns.outstanding")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -73,7 +72,7 @@ export default async function People() {
                         {outstanding > 0 ? (
                           <Badge tone="warning">{outstanding}</Badge>
                         ) : p.status === "active" ? (
-                          <Badge tone="success">0</Badge>
+                          <Badge tone="success">{0}</Badge>
                         ) : null}
                       </td>
                     </tr>
