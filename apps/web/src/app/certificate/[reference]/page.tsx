@@ -2,7 +2,7 @@ import { certificateByReference, certificateSignatory } from "@mantle/db/tenant"
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import QRCode from "qrcode";
-import { t } from "../../i18n.ts";
+import { t } from "../../../i18n.ts";
 import { tenantDb } from "../../../server/session.ts";
 import { resolveRequestTenant } from "../../../server/tenant.ts";
 
