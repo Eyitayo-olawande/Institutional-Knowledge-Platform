@@ -80,13 +80,11 @@ export default async function SignIn({
     <div className="sign-in">
       {/* Left: brand panel with office photo — decorative, aria-hidden */}
       <div className="sign-in-brand" aria-hidden="true">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img className="sign-in-photo" src="/images/sunu-office.jpg" alt="" />
         <div className="sign-in-photo-shade" />
 
         {/* Logo row: SUNU brand mark | divider | Nigeria eLearning product identity */}
         <div className="sign-in-branding">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img className="sign-in-logo" src="/images/sunu-logo.webp" alt="SUNU Assurances" />
           <span className="sign-in-brand-divider" />
           <div className="sign-in-brand-name">

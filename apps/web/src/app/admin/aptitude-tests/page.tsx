@@ -1,5 +1,5 @@
 import { listAptitudeTests } from "@mantle/db/tenant";
-import { Badge, Card } from "@mantle/ui";
+import { Card } from "@mantle/ui";
 import Link from "next/link";
 import { t } from "../../../i18n.ts";
 import { requireFeature, requirePermission } from "../../../server/session.ts";
@@ -26,7 +26,6 @@ export default async function AptitudeTestsPage() {
             <div className="admin-banner-rule" />
           </div>
         </div>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/images/learning-professional.png" alt="" aria-hidden="true" className="admin-banner-person" />
       </div>
 
@@ -61,8 +60,8 @@ export default async function AptitudeTestsPage() {
                     <td><Link href={`/admin/aptitude-tests/${test.id}`}><strong>{test.name}</strong></Link></td>
                     <td>{test.questionCount}</td>
                     <td>{test.assignedCount}</td>
-                    <td>{test.passMark}/{test.totalMarks}</td>
-                    <td>{test.durationMinutes} min</td>
+                    <td>{test.passMark}{"/"}{test.totalMarks}</td>
+                    <td>{test.durationMinutes}{" min"}</td>
                     <td style={{ textAlign: "right" }}>
                       <Link href={`/admin/aptitude-tests/${test.id}/results`} className="btn btn-sm btn-secondary">
                         {t("aptitude_tests.results_btn")}

@@ -191,7 +191,7 @@ async function createChangeAlerts(
 
   // People who have viewed this item and have an assignment that includes one
   // of those modules, joined to get their userId for notices.
-  const affected = await tx
+  const viewers = await tx
     .selectDistinct({
       personId: itemViews.personId,
       userId: people.userId,
@@ -208,6 +208,26 @@ async function createChangeAlerts(
         eq(assignments.personId, itemViews.personId),
       ),
     );
+
+  // Also alert active staff who have an assignment containing the item but have
+  // not yet viewed it, so they know to re-read the updated content.
+  const viewerPersonIds = new Set(viewers.map((r) => r.personId));
+  const assignedNotViewed = await tx
+    .selectDistinct({ personId: assignments.personId, userId: people.userId })
+    .from(assignments)
+    .innerJoin(people, eq(people.id, assignments.personId))
+    .innerJoin(pathStages, eq(pathStages.pathId, assignments.pathId))
+    .innerJoin(stageModules, eq(stageModules.stageId, pathStages.id))
+    .where(
+      and(
+        inArray(stageModules.moduleId, mIds),
+        isNull(assignments.supersededAt),
+        eq(people.status, "active"),
+      ),
+    )
+    .then((rows) => rows.filter((r) => !viewerPersonIds.has(r.personId)));
+
+  const affected = [...viewers, ...assignedNotViewed];
 
   if (affected.length === 0) return;
 

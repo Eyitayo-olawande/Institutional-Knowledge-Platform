@@ -141,6 +141,7 @@ export {
   addItemApplicabilityRule,
   applyKnowledgeRequirements,
   listItemApplicabilityRules,
+  outstandingCountsByPerson,
   outstandingRequirements,
   removeItemApplicabilityRule,
   type OrgAttrs,
@@ -148,14 +149,17 @@ export {
 } from "./requirements.ts";
 export {
   assessmentReport,
+  complianceDetailForItem,
   complianceReport,
   dashboardMetrics,
   intelligenceReport,
   knowledgeReport,
   learningReport,
+  onboardingReport,
   peopleReport,
   toCsv,
   type AssessmentRow,
+  type CompliancePersonRow,
   type ComplianceRow,
   type DashboardMetrics,
   type DeptPerformanceRow,
@@ -163,6 +167,7 @@ export {
   type LearningDeptRow,
   type LearningReport,
   type NominationSummaryRow,
+  type OnboardingRow,
   type PersonLearningRow,
 } from "./reports.ts";
 export {

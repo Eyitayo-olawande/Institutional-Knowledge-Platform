@@ -2,6 +2,7 @@ import { certificateByReference, certificateSignatory } from "@mantle/db/tenant"
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import QRCode from "qrcode";
+import { t } from "../../../i18n.ts";
 import { tenantDb } from "../../../server/session.ts";
 import { resolveRequestTenant } from "../../../server/tenant.ts";
 
@@ -220,7 +221,6 @@ export default async function CertificatePage({ params }: { params: Promise<{ re
           <div className="cert-footer-val cert-learning-path">{cert.pathName}</div>
           <div className="cert-footer-val cert-cert-ref">{cert.reference}</div>
 
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img className="cert-qr" src={qrDataUrl} alt="" aria-hidden="true" width={120} height={120} />
           <div className="cert-url">{certUrl}</div>
 
@@ -233,9 +233,8 @@ export default async function CertificatePage({ params }: { params: Promise<{ re
           <button
             className="cert-print-btn"
             type="button"
-            // eslint-disable-next-line react/no-danger-with-children
           >
-            Print
+            {t("certificate.print_btn")}
           </button>
         </div>
       </div>

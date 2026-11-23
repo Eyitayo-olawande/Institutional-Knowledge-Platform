@@ -32,12 +32,11 @@ export default async function CandidatesPage({
             <div className="admin-banner-rule" />
           </div>
         </div>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/images/learning-professional.png" alt="" aria-hidden="true" className="admin-banner-person" />
       </div>
 
       {params.registered ? (
-        <div className="alert alert-success" role="status"><p>Candidate registered successfully.</p></div>
+        <div className="alert alert-success" role="status"><p>{t("candidates.registered_success")}</p></div>
       ) : null}
 
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}>

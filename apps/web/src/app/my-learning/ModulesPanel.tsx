@@ -31,12 +31,12 @@ export function ModulesPanel({ flatModules, tab, modulesCompleted, inProgressCou
     try {
       const saved = localStorage.getItem("my_learning_view") as ViewMode | null;
       if (saved === "list" || saved === "grid") setView(saved);
-    } catch {}
+    } catch { /* ignore localStorage errors */ }
   }, []);
 
   function switchView(next: ViewMode) {
     setView(next);
-    try { localStorage.setItem("my_learning_view", next); } catch {}
+    try { localStorage.setItem("my_learning_view", next); } catch { /* ignore */ }
   }
 
   const visibleModules =
@@ -51,13 +51,13 @@ export function ModulesPanel({ flatModules, tab, modulesCompleted, inProgressCou
       <div className="my-modules-header">
         <nav className="my-tabs" aria-label="Filter modules">
           <Link href="/my-learning" aria-current={tab === "all" ? "true" : undefined} className="my-tab">
-            {t("learning.tabs_all")} ({flatModules.length})
+            {t("learning.tabs_all")}{" ("}{flatModules.length}{")"}
           </Link>
           <Link href="/my-learning?tab=in_progress" aria-current={tab === "in_progress" ? "true" : undefined} className="my-tab">
-            {t("learning.tabs_in_progress")} ({inProgressCount})
+            {t("learning.tabs_in_progress")}{" ("}{inProgressCount}{")"}
           </Link>
           <Link href="/my-learning?tab=completed" aria-current={tab === "completed" ? "true" : undefined} className="my-tab">
-            {t("learning.tabs_completed")} ({modulesCompleted})
+            {t("learning.tabs_completed")}{" ("}{modulesCompleted}{")"}
           </Link>
         </nav>
 

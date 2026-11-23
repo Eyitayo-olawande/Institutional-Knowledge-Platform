@@ -44,10 +44,10 @@ export default async function AptitudeResultsPage({
 
           <div style={{ marginBottom: 16 }}>
             <div style={{ fontSize: 64, fontWeight: 800, lineHeight: 1, color: scoreColor, letterSpacing: "-2px" }}>
-              {passPercent}%
+              {passPercent}{"%"}
             </div>
             <div style={{ fontSize: 15, color: "var(--mantle-color-text_muted)", marginTop: 6 }}>
-              {result.totalScore} / {result.totalMarks}
+              {result.totalScore}{" / "}{result.totalMarks}
             </div>
           </div>
 
@@ -65,7 +65,7 @@ export default async function AptitudeResultsPage({
             <div style={{ marginBottom: 14 }}>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, fontSize: 13 }}>
                 <span style={{ color: "var(--mantle-color-text_muted)" }}>{t("aptitude.results_section_ga")}</span>
-                <span style={{ fontWeight: 600, fontSize: 13 }}>{result.generalAptitudeScore} / {result.generalAptitudeMarks}</span>
+                <span style={{ fontWeight: 600, fontSize: 13 }}>{result.generalAptitudeScore}{" / "}{result.generalAptitudeMarks}</span>
               </div>
               <div style={{ height: 5, borderRadius: 3, background: "var(--mantle-color-border)" }}>
                 <div style={{ height: "100%", borderRadius: 3, width: `${gaPercent}%`, background: "var(--mantle-color-brand)", transition: "width 0.4s ease" }} />
@@ -74,7 +74,7 @@ export default async function AptitudeResultsPage({
             <div>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, fontSize: 13 }}>
                 <span style={{ color: "var(--mantle-color-text_muted)" }}>{t("aptitude.results_section_ck")}</span>
-                <span style={{ fontWeight: 600, fontSize: 13 }}>{result.companyKnowledgeScore} / {result.companyKnowledgeMarks}</span>
+                <span style={{ fontWeight: 600, fontSize: 13 }}>{result.companyKnowledgeScore}{" / "}{result.companyKnowledgeMarks}</span>
               </div>
               <div style={{ height: 5, borderRadius: 3, background: "var(--mantle-color-border)" }}>
                 <div style={{ height: "100%", borderRadius: 3, width: `${ckPercent}%`, background: "var(--mantle-color-brand)", transition: "width 0.4s ease" }} />
@@ -83,7 +83,7 @@ export default async function AptitudeResultsPage({
           </div>
 
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 12, color: "var(--mantle-color-text_muted)" }}>
-            <span>{t("aptitude.results_pass_mark")}: {result.passMark} / {result.totalMarks} ({passMarkPercent}%)</span>
+            <span>{t("aptitude.results_pass_mark")}{": "}{result.passMark}{" / "}{result.totalMarks}{" ("}{passMarkPercent}{"%)"}</span>
             <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
               <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <circle cx="6" cy="6" r="5.5" stroke="currentColor" strokeOpacity="0.5" />

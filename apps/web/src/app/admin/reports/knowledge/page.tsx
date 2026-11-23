@@ -83,7 +83,7 @@ export default async function KnowledgeReport() {
               <div key={r.id} className="report-insight-item">
                 <div className="report-insight-rank">{i + 1}</div>
                 <div className="report-insight-name">{r.title}</div>
-                <div className="report-insight-score">{r.viewCount} views</div>
+                <div className="report-insight-score">{r.viewCount}{t("reports.knowledge.views_suffix")}</div>
               </div>
             ))}
           </div>
@@ -95,7 +95,7 @@ export default async function KnowledgeReport() {
               <div key={r.id} className="report-insight-item">
                 <div className="report-insight-rank">{i + 1}</div>
                 <div className="report-insight-name">{r.title}</div>
-                <div className="report-insight-score">{r.attestedCount} attested</div>
+                <div className="report-insight-score">{r.attestedCount}{t("reports.knowledge.attested_suffix")}</div>
               </div>
             ))}
           </div>

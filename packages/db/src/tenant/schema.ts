@@ -785,6 +785,7 @@ export const certificates = pgTable(
     // The module ids that satisfied the stage at the time of issue.
     moduleIds: text("module_ids").array().notNull().default(sql`'{}'::text[]`),
     issuedAt: timestamp("issued_at", { withTimezone: true }).notNull().defaultNow(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }),
     // Human-readable verifiable code, e.g. CERT-2026-00001.
     reference: text("reference").notNull().unique(),
     ...auditColumns,

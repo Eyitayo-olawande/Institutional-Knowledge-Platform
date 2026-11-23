@@ -64,7 +64,7 @@ export default async function ComplianceReport() {
                 <div className="report-bar-track">
                   <div className={`report-bar-fill${tone}`} style={{ width: `${row.attestationRate}%` }} />
                 </div>
-                <div className="report-bar-pct">{row.attestationRate}%</div>
+                <div className="report-bar-pct">{`${row.attestationRate}%`}</div>
               </div>
             );
           })}
@@ -81,7 +81,7 @@ export default async function ComplianceReport() {
               <div key={r.id} className="report-insight-item">
                 <div className="report-insight-rank">{i + 1}</div>
                 <div className="report-insight-name">{r.title}</div>
-                <div className="report-insight-score">{r.attestationRate}%</div>
+                <div className="report-insight-score">{`${r.attestationRate}%`}</div>
               </div>
             ))}
           </div>
@@ -93,7 +93,7 @@ export default async function ComplianceReport() {
               <div key={r.id} className="report-insight-item">
                 <div className="report-insight-rank">{i + 1}</div>
                 <div className="report-insight-name">{r.title}</div>
-                <div className="report-insight-score">{r.attestationRate}%</div>
+                <div className="report-insight-score">{`${r.attestationRate}%`}</div>
               </div>
             ))}
           </div>
@@ -120,13 +120,17 @@ export default async function ComplianceReport() {
               <tbody>
                 {rows.map((row) => (
                   <tr key={row.id}>
-                    <td>{row.title}</td>
+                    <td>
+                      <Link href={`/admin/reports/compliance/${row.id}`} style={{ color: "inherit", textDecoration: "underline", textDecorationColor: "var(--mantle-color-text_muted)" }}>
+                        {row.title}
+                      </Link>
+                    </td>
                     <td style={{ textAlign: "right" }}>{row.publishedVersion}</td>
                     <td style={{ textAlign: "right" }}>{row.attestedCount}</td>
                     <td style={{ textAlign: "right" }}>{row.activeStaff}</td>
                     <td style={{ textAlign: "right" }}>
                       <Badge tone={row.attestationRate >= 80 ? "success" : row.attestationRate >= 50 ? "warning" : "danger"}>
-                        {row.attestationRate}%
+                        {`${row.attestationRate}%`}
                       </Badge>
                     </td>
                     <td style={{ textAlign: "right" }}>

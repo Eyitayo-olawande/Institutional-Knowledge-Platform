@@ -213,14 +213,14 @@ export default async function Item({
       {attestationOutstanding && found.published ? (
         <div className="change-alert-banner change-alert-banner--important" role="alert">
           <div className="change-alert-banner-body">
-            <span className="change-alert-badge">Attestation Required</span>
-            <p className="change-alert-banner-heading">Please read this document carefully and confirm you have understood it.</p>
+            <span className="change-alert-badge">{t("library.viewer.attestation_required_badge")}</span>
+            <p className="change-alert-banner-heading">{t("library.viewer.attestation_confirm_text")}</p>
           </div>
           <form action={attestItem} className="change-alert-banner-form">
             <input type="hidden" name="id" value={item.id} />
             <input type="hidden" name="version" value={found.published.version} />
             {moduleId ? <input type="hidden" name="moduleId" value={moduleId} /> : null}
-            <button type="submit" className="change-alert-ack-btn">I confirm I have read and understood this document</button>
+            <button type="submit" className="change-alert-ack-btn">{t("library.viewer.attestation_confirm_btn")}</button>
           </form>
         </div>
       ) : null}
@@ -241,7 +241,7 @@ export default async function Item({
                 // Results panel — shown after submission
                 <div className="quiz-results">
                   <div className={`quiz-results-banner ${attemptResults.passed ? "quiz-results-banner--pass" : "quiz-results-banner--fail"}`}>
-                    <div className="quiz-results-score">{attemptResults.score}%</div>
+                    <div className="quiz-results-score">{attemptResults.score}{"%"}</div>
                     <div className="quiz-results-verdict">
                       {attemptResults.passed
                         ? viewerPerson
@@ -250,7 +250,7 @@ export default async function Item({
                         : t("learning.quiz_failed")}
                     </div>
                     {moduleRecord ? (
-                      <div className="quiz-results-module">{t("learning.quiz_module_label")}: {moduleRecord.title}</div>
+                      <div className="quiz-results-module">{t("learning.quiz_module_label")}{": "}{moduleRecord.title}</div>
                     ) : null}
                     <div className="quiz-results-tally">
                       {t("learning.quiz_tally", { correct: String(attemptResults.correct), total: String(attemptResults.total) })}
@@ -273,14 +273,14 @@ export default async function Item({
                   <div className="quiz-review">
                     {attemptResults.responses.map((r, i) => (
                       <div key={r.questionId} className={`quiz-review-item ${r.isCorrect ? "quiz-review-item--correct" : "quiz-review-item--wrong"}`}>
-                        <div className="quiz-review-q">{i + 1}. {r.questionText}</div>
+                        <div className="quiz-review-q">{i + 1}{". "}{r.questionText}</div>
                         <div className="quiz-review-your">
-                          {t("learning.quiz_your_answer")}: <strong>{r.chosenOptionText}</strong>
+                          {t("learning.quiz_your_answer")}{": "}<strong>{r.chosenOptionText}</strong>
                           {r.isCorrect ? " ✓" : " ✗"}
                         </div>
                         {!r.isCorrect ? (
                           <div className="quiz-review-correct">
-                            {t("learning.quiz_correct_answer")}: <strong>{r.correctOptionText}</strong>
+                            {t("learning.quiz_correct_answer")}{": "}<strong>{r.correctOptionText}</strong>
                           </div>
                         ) : null}
                       </div>
@@ -322,7 +322,7 @@ export default async function Item({
                   <input type="hidden" name="itemId" value={item.id} />
                   {assessment.questions.map((q, i) => (
                     <div key={q.id} className="quiz-question">
-                      <div className="quiz-question-text">{i + 1}. {q.questionText}</div>
+                      <div className="quiz-question-text">{i + 1}{". "}{q.questionText}</div>
                       <div className="quiz-options">
                         {q.options.map((o) => (
                           <label key={o.id} className="quiz-option">
@@ -431,7 +431,7 @@ export default async function Item({
                   <div className={`lib-item-related-icon lib-item-related-icon--${r.typeLabel.toLowerCase().replace(/[^a-z]/g, "")}`}>{r.typeLabel.slice(0, 3).toUpperCase()}</div>
                   <div>
                     <div className="lib-item-related-title">{r.title}</div>
-                    {area ? <div className="lib-item-related-meta">{areaName(area)} · {r.typeLabel}</div> : null}
+                    {area ? <div className="lib-item-related-meta">{areaName(area)}{" · "}{r.typeLabel}</div> : null}
                   </div>
                 </Link>
               ))}
@@ -446,7 +446,7 @@ export default async function Item({
           <div className="lib-module-nav-inner">
             <div className="lib-module-nav-left">
               <Link href="/my-learning" className="lib-module-nav-back">
-                ← {t("learning.back_to_learning")}
+                {"← "}{t("learning.back_to_learning")}
               </Link>
               {moduleIdx >= 0 ? (
                 <span className="lib-module-nav-counter">
@@ -460,7 +460,7 @@ export default async function Item({
                   href={`/library/${prevModuleItem.id}?moduleId=${moduleId}`}
                   className="my-module-action-btn"
                 >
-                  ← {t("learning.action_prev")}
+                  {"← "}{t("learning.action_prev")}
                 </Link>
               ) : null}
               {nextModuleItem ? (
@@ -468,7 +468,7 @@ export default async function Item({
                   href={`/library/${nextModuleItem.id}?moduleId=${moduleId}`}
                   className="my-module-action-btn primary"
                 >
-                  {t("learning.action_next")}: {nextModuleItem.title} →
+                  {t("learning.action_next")}{": "}{nextModuleItem.title}{" →"}
                 </Link>
               ) : isLastModuleItem && !isAssessmentItem ? (
                 moduleHasOutstandingAlerts ? (
@@ -553,23 +553,23 @@ export default async function Item({
             </form>
           </Card>
           <Card>
-            <h2>Access Control</h2>
+            <h2>{t("library.viewer.access_control_heading")}</h2>
             <p className="sub" style={{ marginBottom: 12 }}>
-              Set who can see this item within its area. The default is all staff with area access.
+              {t("library.viewer.access_control_desc")}
             </p>
             <form action={setItemAccess}>
               <input type="hidden" name="id" value={item.id} />
               <label className="field">
-                Visibility
+                {t("library.viewer.visibility_label")}
                 <select className="input" name="visibility" defaultValue={item.visibility}>
-                  <option value="area">All staff in this area</option>
-                  <option value="role_level">Restricted by role level</option>
-                  <option value="restricted">Specific people only</option>
+                  <option value="area">{t("library.viewer.visibility_area")}</option>
+                  <option value="role_level">{t("library.viewer.visibility_role_level")}</option>
+                  <option value="restricted">{t("library.viewer.visibility_restricted")}</option>
                 </select>
               </label>
               {item.visibility === "role_level" && roleLevelOptions.length > 0 ? (
                 <div style={{ marginBottom: 12 }}>
-                  <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 6 }}>Allowed role levels</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 6 }}>{t("library.viewer.allowed_role_levels")}</div>
                   {roleLevelOptions.map((rl) => (
                     <label key={rl.id} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
                       <input
@@ -586,7 +586,7 @@ export default async function Item({
               {item.visibility === "restricted" ? (
                 <div style={{ marginBottom: 12 }}>
                   <label className="field">
-                    Allowed person IDs (one UUID per line)
+                    {t("library.viewer.allowed_people_label")}
                     <textarea
                       className="input"
                       name="refIdBlock"
@@ -595,16 +595,16 @@ export default async function Item({
                       defaultValue={accessRules.filter((r) => r.kind === "person").map((r) => r.refId).join("\n")}
                     />
                   </label>
-                  <p className="sub" style={{ fontSize: 12 }}>Find person IDs on the People admin page.</p>
+                  <p className="sub" style={{ fontSize: 12 }}>{t("library.viewer.allowed_people_hint")}</p>
                 </div>
               ) : null}
-              <Button type="submit" variant="secondary">Save Access Rules</Button>
+              <Button type="submit" variant="secondary">{t("library.viewer.save_access_btn")}</Button>
             </form>
           </Card>
           <Card>
-            <h2>Read and Understand Attestation</h2>
+            <h2>{t("library.viewer.attestation_heading")}</h2>
             <p className="sub" style={{ marginBottom: 12 }}>
-              When enabled, staff must formally confirm they have read and understood this document before progressing.
+              {t("library.viewer.attestation_desc")}
             </p>
             <form action={setAttestationRequired}>
               <input type="hidden" name="id" value={item.id} />
@@ -620,14 +620,14 @@ export default async function Item({
               </label>
               {item.requiresAttestation ? (
                 <p style={{ marginTop: 8, fontSize: 13, color: "var(--mantle-color-text_success)" }}>
-                  Attestation is currently required. Staff will see a confirmation banner.
+                  {t("library.viewer.attestation_active_msg")}
                 </p>
               ) : null}
             </form>
             {item.requiresAttestation ? (
               <div style={{ marginTop: 12 }}>
                 <Link href={`/admin/attestations?item=${item.id}`} className="btn-link">
-                  View attestation report
+                  {t("library.viewer.attestation_report_link")}
                 </Link>
               </div>
             ) : null}
@@ -698,7 +698,7 @@ export default async function Item({
                 </div>
                 <div className="lib-item-meta-row">
                   <span className="lib-item-meta-label">{t("library.assessment.passing_label")}</span>
-                  <span className="lib-item-meta-value">{assessment.passingScore}%</span>
+                  <span className="lib-item-meta-value">{assessment.passingScore}{"%"}</span>
                 </div>
                 <p className="sub" style={{ marginTop: 10, fontSize: 12 }}>{t("library.assessment.seeded_note")}</p>
               </div>

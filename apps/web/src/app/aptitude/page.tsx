@@ -24,7 +24,7 @@ export default async function AptitudeAccessPage({
 
           <form action={accessAction}>
             <label className="field">
-              {t("aptitude.ref_label")} <span style={{ color: "var(--mantle-color-brand)" }}>*</span>
+              {t("aptitude.ref_label")} <span style={{ color: "var(--mantle-color-brand)" }}>{"*"}</span>
               <input
                 className="input"
                 name="candidateRef"
@@ -35,7 +35,7 @@ export default async function AptitudeAccessPage({
               />
             </label>
             <label className="field">
-              {t("aptitude.pin_label")} <span style={{ color: "var(--mantle-color-brand)" }}>*</span>
+              {t("aptitude.pin_label")} <span style={{ color: "var(--mantle-color-brand)" }}>{"*"}</span>
               <input
                 className="input"
                 name="pin"

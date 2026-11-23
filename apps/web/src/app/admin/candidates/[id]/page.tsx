@@ -34,9 +34,9 @@ export default async function CandidateDetailPage({
         <h1 style={{ marginTop: 0 }}>{candidate.firstName} {candidate.surname}</h1>
 
         {qp.saved ? (
-          <div className="alert alert-success" role="status"><p>Candidate details saved.</p></div>
+          <div className="alert alert-success" role="status"><p>{t("candidates.saved_success")}</p></div>
         ) : qp.error ? (
-          <div className="alert alert-danger" role="alert"><p>Please fill in all required fields correctly.</p></div>
+          <div className="alert alert-danger" role="alert"><p>{t("candidates.required_fields_error")}</p></div>
         ) : null}
 
         <Card style={{ marginBottom: 20 }}>
@@ -52,16 +52,16 @@ export default async function CandidateDetailPage({
                 </tr>
               ))}
               <tr>
-                <th style={{ textAlign: "left", padding: "6px 16px 6px 0", fontSize: 13, color: "var(--mantle-color-text_muted)", fontWeight: 600 }}>Assessment status</th>
+                <th style={{ textAlign: "left", padding: "6px 16px 6px 0", fontSize: 13, color: "var(--mantle-color-text_muted)", fontWeight: 600 }}>{t("candidates.assessment_status_label")}</th>
                 <td style={{ padding: "6px 0" }}>
                   {status.status === "completed" ? (
                     <Badge tone={status.passed ? "success" : "danger"}>
-                      Completed: {status.totalScore}/{status.testName ? ` (${status.testName})` : ""}
+                      {t("candidates.status_completed_prefix")}{status.totalScore}{"/"}{status.testName ? ` (${status.testName})` : ""}
                     </Badge>
                   ) : status.status === "not_started" ? (
-                    <Badge tone="warning">Assigned, not started {status.testName ? `(${status.testName})` : ""}</Badge>
+                    <Badge tone="warning">{t("candidates.status_not_started_prefix")}{status.testName ? ` (${status.testName})` : ""}</Badge>
                   ) : (
-                    <Badge tone="neutral">Not assigned to a test</Badge>
+                    <Badge tone="neutral">{t("candidates.status_not_assigned_badge")}</Badge>
                   )}
                 </td>
               </tr>
@@ -75,11 +75,11 @@ export default async function CandidateDetailPage({
             <input type="hidden" name="candidateId" value={candidate.id} />
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 16px" }}>
               <label className="field">
-                {t("candidates.fields.first_name")} <span style={{ color: "var(--mantle-color-brand)" }}>*</span>
+                {t("candidates.fields.first_name")} <span style={{ color: "var(--mantle-color-brand)" }}>{"*"}</span>
                 <input className="input" name="firstName" defaultValue={candidate.firstName} required />
               </label>
               <label className="field">
-                {t("candidates.fields.surname")} <span style={{ color: "var(--mantle-color-brand)" }}>*</span>
+                {t("candidates.fields.surname")} <span style={{ color: "var(--mantle-color-brand)" }}>{"*"}</span>
                 <input className="input" name="surname" defaultValue={candidate.surname} required />
               </label>
             </div>
@@ -88,19 +88,19 @@ export default async function CandidateDetailPage({
               <input className="input" name="middleName" defaultValue={candidate.middleName ?? ""} />
             </label>
             <label className="field">
-              {t("candidates.fields.email")} <span style={{ color: "var(--mantle-color-brand)" }}>*</span>
+              {t("candidates.fields.email")} <span style={{ color: "var(--mantle-color-brand)" }}>{"*"}</span>
               <input className="input" type="email" name="email" defaultValue={candidate.email} required />
             </label>
             <label className="field">
-              {t("candidates.fields.phone")} <span style={{ color: "var(--mantle-color-brand)" }}>*</span>
+              {t("candidates.fields.phone")} <span style={{ color: "var(--mantle-color-brand)" }}>{"*"}</span>
               <input className="input" type="tel" name="phone" defaultValue={candidate.phone} required />
             </label>
             <label className="field">
-              {t("candidates.fields.position")} <span style={{ color: "var(--mantle-color-brand)" }}>*</span>
+              {t("candidates.fields.position")} <span style={{ color: "var(--mantle-color-brand)" }}>{"*"}</span>
               <input className="input" name="positionAppliedFor" defaultValue={candidate.positionAppliedFor} required />
             </label>
             <label className="field">
-              {t("candidates.fields.department")} <span style={{ color: "var(--mantle-color-brand)" }}>*</span>
+              {t("candidates.fields.department")} <span style={{ color: "var(--mantle-color-brand)" }}>{"*"}</span>
               <input className="input" name="department" defaultValue={candidate.department} required />
             </label>
             <label className="field">

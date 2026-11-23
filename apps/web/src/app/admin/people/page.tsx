@@ -1,4 +1,4 @@
-import { listPeople, wording } from "@mantle/db/tenant";
+import { listPeople, outstandingCountsByPerson, wording } from "@mantle/db/tenant";
 import { Badge, Button, Card, StatTile } from "@mantle/ui";
 import { cookies } from "next/headers";
 import { t } from "../../../i18n.ts";
@@ -13,8 +13,11 @@ export default async function People() {
   const ctx = await requirePermission("people.view");
   const { tenant, db } = ctx;
   await requireFeature(tenant, "people_import");
-  const people = await listPeople(db);
-  const labels = await wording(db);
+  const [people, labels, outstandingCounts] = await Promise.all([
+    listPeople(db),
+    wording(db),
+    outstandingCountsByPerson(db),
+  ]);
   const raw = (await cookies()).get(RESULT_COOKIE)?.value;
   const result = raw ? (JSON.parse(raw) as ImportResult) : undefined;
 
@@ -33,7 +36,6 @@ export default async function People() {
             <div className="admin-banner-rule" />
           </div>
         </div>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/images/learning-professional.png" alt="" aria-hidden="true" className="admin-banner-person" />
       </div>
 
@@ -53,18 +55,29 @@ export default async function People() {
                     <th>{t("people.columns.email")}</th>
                     <th>{labels.department.singular}</th>
                     <th>{t("people.columns.status")}</th>
+                    <th style={{ textAlign: "right" }}>{t("people.columns.outstanding")}</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {people.map((p) => (
+                  {people.map((p) => {
+                    const outstanding = p.status === "active" ? (outstandingCounts.get(p.id) ?? 0) : 0;
+                    return (
                     <tr key={p.id}>
                       <td>{p.employeeId}</td>
                       <td><strong>{p.fullName}</strong></td>
                       <td>{p.workEmail}</td>
                       <td>{p.department}</td>
                       <td><Badge tone={p.status === "active" ? "success" : "neutral"}>{t(`people.statuses.${p.status}`)}</Badge></td>
+                      <td style={{ textAlign: "right" }}>
+                        {outstanding > 0 ? (
+                          <Badge tone="warning">{outstanding}</Badge>
+                        ) : p.status === "active" ? (
+                          <Badge tone="success">{0}</Badge>
+                        ) : null}
+                      </td>
                     </tr>
-                  ))}
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

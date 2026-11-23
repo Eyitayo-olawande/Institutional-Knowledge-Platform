@@ -1,4 +1,4 @@
-import { and, eq, inArray, isNotNull, isNull, sql } from "drizzle-orm";
+import { and, eq, gte, inArray, isNotNull, isNull, lte, sql } from "drizzle-orm";
 import type { TenantDb } from "./client.ts";
 import {
   assessmentAttempts,
@@ -8,6 +8,8 @@ import {
   contentChangeAlerts,
   contentTypes,
   departments,
+  employmentEvents,
+  itemApplicabilityRules,
   itemViews,
   learningAreas,
   libraryItems,
@@ -538,4 +540,218 @@ export function toCsv(headers: string[], rows: (string | number | null | undefin
   const lines = [headers.map(escape).join(",")];
   for (const row of rows) lines.push(row.map(escape).join(","));
   return lines.join("\r\n");
+}
+
+// ---------------------------------------------------------------------------
+// Onboarding Report (Phase 4)
+// ---------------------------------------------------------------------------
+
+export type OnboardingRow = {
+  personId: string;
+  fullName: string;
+  department: string;
+  joinedAt: Date;
+  daysSinceJoining: number;
+  pathsEnrolled: number;
+  pendingAttestations: number;
+  overdueAcks: number;
+};
+
+export async function onboardingReport(
+  db: TenantDb,
+  opts: { from: Date; to: Date },
+): Promise<OnboardingRow[]> {
+  const joinEvents = await db
+    .select({ personId: employmentEvents.personId, eventAt: employmentEvents.createdAt })
+    .from(employmentEvents)
+    .where(
+      and(
+        eq(employmentEvents.type, "join"),
+        gte(employmentEvents.createdAt, opts.from),
+        lte(employmentEvents.createdAt, opts.to),
+      ),
+    );
+
+  if (joinEvents.length === 0) return [];
+
+  // Deduplicate by personId (re-joiners produce multiple join events; take latest).
+  const latestJoinByPerson = new Map<string, Date>();
+  for (const e of joinEvents) {
+    const prev = latestJoinByPerson.get(e.personId);
+    if (!prev || e.eventAt > prev) latestJoinByPerson.set(e.personId, e.eventAt);
+  }
+  const personIds = [...latestJoinByPerson.keys()];
+
+  const [personRows, allDepts, assignmentCounts, applicableItems, attestations, overdueAckRows] = await Promise.all([
+    db
+      .select({ id: people.id, fullName: people.fullName, departmentId: people.departmentId, joinedAt: people.joinedAt })
+      .from(people)
+      .where(inArray(people.id, personIds)),
+    db.select({ id: departments.id, name: departments.name }).from(departments),
+    db
+      .select({ personId: assignments.personId, n: sql<number>`count(*)::int` })
+      .from(assignments)
+      .where(and(inArray(assignments.personId, personIds), isNull(assignments.supersededAt)))
+      .groupBy(assignments.personId),
+    db
+      .select({
+        itemId: itemApplicabilityRules.itemId,
+        requiresAttestation: libraryItems.requiresAttestation,
+        publishedVersion: libraryItems.publishedVersion,
+      })
+      .from(itemApplicabilityRules)
+      .innerJoin(libraryItems, eq(libraryItems.id, itemApplicabilityRules.itemId))
+      .where(eq(libraryItems.status, "published")),
+    db
+      .select({ personId: staffAttestations.personId, itemId: staffAttestations.itemId, version: staffAttestations.version })
+      .from(staffAttestations)
+      .where(inArray(staffAttestations.personId, personIds)),
+    db
+      .select({ personId: changeAlertAcknowledgements.personId, n: sql<number>`count(*)::int` })
+      .from(changeAlertAcknowledgements)
+      .where(
+        and(
+          inArray(changeAlertAcknowledgements.personId, personIds),
+          isNull(changeAlertAcknowledgements.acknowledgedAt),
+          sql`${changeAlertAcknowledgements.dueBy} < ${new Date().toISOString().slice(0, 10)}`,
+        ),
+      )
+      .groupBy(changeAlertAcknowledgements.personId)
+      .catch(() => [] as { personId: string; n: number }[]),
+  ]);
+
+  const deptMap = new Map(allDepts.map((d) => [d.id, d.name]));
+  const assignMap = new Map(assignmentCounts.map((a) => [a.personId, a.n ?? 0]));
+  const overdueMap = new Map(overdueAckRows.map((r) => [r.personId, r.n ?? 0]));
+
+  // Deduplicate applicability rules by itemId
+  const itemMetaMap = new Map<string, { requiresAttestation: boolean; publishedVersion: number | null }>();
+  for (const r of applicableItems) {
+    if (!itemMetaMap.has(r.itemId)) {
+      itemMetaMap.set(r.itemId, { requiresAttestation: r.requiresAttestation ?? false, publishedVersion: r.publishedVersion });
+    }
+  }
+  const requiredItemIds = [...itemMetaMap.keys()];
+
+  // Latest attestation per person per item
+  const latestAttest = new Map<string, number>();
+  for (const a of attestations) {
+    const key = `${a.personId}|${a.itemId}`;
+    const prev = latestAttest.get(key) ?? -1;
+    if (a.version > prev) latestAttest.set(key, a.version);
+  }
+
+  const now = Date.now();
+
+  return personIds
+    .map((personId) => {
+      const person = personRows.find((p) => p.id === personId);
+      if (!person) return null;
+
+      let pendingAttestations = 0;
+      for (const itemId of requiredItemIds) {
+        const item = itemMetaMap.get(itemId)!;
+        const attestedVersion = latestAttest.get(`${person.id}|${itemId}`) ?? null;
+        const currentVersion = item.publishedVersion ?? 0;
+        if (item.requiresAttestation) {
+          if (attestedVersion === null || attestedVersion < currentVersion) pendingAttestations++;
+        } else {
+          if (attestedVersion === null) pendingAttestations++;
+        }
+      }
+
+      const joinedAt = person.joinedAt;
+      const daysSinceJoining = Math.floor((now - joinedAt.getTime()) / (1000 * 60 * 60 * 24));
+
+      return {
+        personId: person.id,
+        fullName: person.fullName,
+        department: deptMap.get(person.departmentId ?? "") ?? "",
+        joinedAt,
+        daysSinceJoining,
+        pathsEnrolled: assignMap.get(person.id) ?? 0,
+        pendingAttestations,
+        overdueAcks: overdueMap.get(person.id) ?? 0,
+      };
+    })
+    .filter(Boolean) as OnboardingRow[];
+}
+
+// ---------------------------------------------------------------------------
+// Compliance per-person drill-down (Phase 4)
+// ---------------------------------------------------------------------------
+
+export type CompliancePersonRow = {
+  personId: string;
+  fullName: string;
+  department: string;
+  lastAttestedAt: Date | null;
+  attestedVersion: number | null;
+  currentVersion: number;
+};
+
+export async function complianceDetailForItem(
+  db: TenantDb,
+  itemId: string,
+): Promise<{ item: { id: string; title: string; publishedVersion: number } | null; nonAttested: CompliancePersonRow[] }> {
+  const [itemRow] = await db
+    .select({
+      id: libraryItems.id,
+      title: libraryItems.title,
+      publishedVersion: libraryItems.publishedVersion,
+      areaKind: learningAreas.kind,
+      areaDeptId: learningAreas.departmentId,
+    })
+    .from(libraryItems)
+    .leftJoin(learningAreas, eq(libraryItems.areaId, learningAreas.id))
+    .where(eq(libraryItems.id, itemId));
+
+  if (!itemRow) return { item: null, nonAttested: [] };
+
+  const pv = itemRow.publishedVersion ?? 1;
+
+  const [allStaff, allDepts, attestations] = await Promise.all([
+    itemRow.areaKind === "department" && itemRow.areaDeptId
+      ? db
+          .select({ id: people.id, fullName: people.fullName, departmentId: people.departmentId })
+          .from(people)
+          .where(and(eq(people.status, "active"), eq(people.departmentId, itemRow.areaDeptId)))
+      : db
+          .select({ id: people.id, fullName: people.fullName, departmentId: people.departmentId })
+          .from(people)
+          .where(eq(people.status, "active")),
+    db.select({ id: departments.id, name: departments.name }).from(departments),
+    db
+      .select({ personId: staffAttestations.personId, version: staffAttestations.version, attestedAt: staffAttestations.attestedAt })
+      .from(staffAttestations)
+      .where(eq(staffAttestations.itemId, itemId)),
+  ]);
+
+  const deptMap = new Map(allDepts.map((d) => [d.id, d.name]));
+
+  const latestByPerson = new Map<string, { version: number; attestedAt: Date }>();
+  for (const a of attestations) {
+    const prev = latestByPerson.get(a.personId);
+    if (!prev || a.version > prev.version) latestByPerson.set(a.personId, { version: a.version, attestedAt: a.attestedAt });
+  }
+
+  const nonAttested: CompliancePersonRow[] = allStaff
+    .filter((p) => {
+      const latest = latestByPerson.get(p.id);
+      return !latest || latest.version < pv;
+    })
+    .map((p) => {
+      const latest = latestByPerson.get(p.id);
+      return {
+        personId: p.id,
+        fullName: p.fullName,
+        department: deptMap.get(p.departmentId ?? "") ?? "",
+        lastAttestedAt: latest?.attestedAt ?? null,
+        attestedVersion: latest?.version ?? null,
+        currentVersion: pv,
+      };
+    })
+    .sort((a, b) => a.fullName.localeCompare(b.fullName));
+
+  return { item: { id: itemRow.id, title: itemRow.title, publishedVersion: pv }, nonAttested };
 }

@@ -39,7 +39,7 @@ export default async function Notices() {
                   <p style={{ margin: "4px 0 0", color: "var(--mantle-color-text_muted)", fontSize: 14 }}>{n.body}</p>
                   {n.link ? (
                     <Link href={n.link} style={{ display: "inline-block", marginTop: 8, fontSize: 13, fontWeight: 600, color: "var(--mantle-color-primary)" }}>
-                      {t("notices.view_link")} →
+                      {t("notices.view_link")}{" →"}
                     </Link>
                   ) : null}
                 </div>

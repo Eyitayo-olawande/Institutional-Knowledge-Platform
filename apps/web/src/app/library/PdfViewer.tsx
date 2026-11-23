@@ -3,6 +3,7 @@
 import * as pdfjsLib from "pdfjs-dist";
 import type { PDFDocumentProxy, PDFPageProxy, RenderTask } from "pdfjs-dist";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { t } from "../../i18n.ts";
 
 // Worker served from /public so no bundler config needed
 pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
@@ -112,7 +113,7 @@ export function PdfViewer({ fileUrl, fileName }: Props) {
       canvas.height = viewport.height;
       canvas.style.width = `${viewport.width / dpr}px`;
       canvas.style.height = `${viewport.height / dpr}px`;
-      const task = page.render({ canvasContext: ctx, viewport });
+      const task = page.render({ canvas, viewport });
       renderTaskRef.current = task;
       try {
         await task.promise;
@@ -141,7 +142,7 @@ export function PdfViewer({ fileUrl, fileName }: Props) {
           if (!ctx) return;
           canvas.width = viewport.width;
           canvas.height = viewport.height;
-          await page.render({ canvasContext: ctx, viewport }).promise;
+          await page.render({ canvas, viewport }).promise;
         } catch {
           // ignore
         }
@@ -191,7 +192,7 @@ export function PdfViewer({ fileUrl, fileName }: Props) {
     return (
       <div className="pdf-loading">
         <div className="pdf-loading-spinner" />
-        <p>Loading document…</p>
+        <p>{t("library.viewer.pdf.loading")}</p>
       </div>
     );
   }
@@ -208,7 +209,7 @@ export function PdfViewer({ fileUrl, fileName }: Props) {
     <div ref={containerRef} className="pdf-viewer">
       {/* Left: page thumbnails */}
       <div className="pdf-thumbs">
-        <div className="pdf-thumbs-heading">Pages ({numPages})</div>
+        <div className="pdf-thumbs-heading">{t("library.viewer.pdf.pages", { count: numPages })}</div>
         <div className="pdf-thumbs-list">
           {Array.from({ length: numPages }, (_, i) => i + 1).map((n) => (
             <button
@@ -240,7 +241,7 @@ export function PdfViewer({ fileUrl, fileName }: Props) {
             <button type="button" className="pdf-toolbar-btn" onClick={() => goToPage(currentPage - 1)} disabled={currentPage <= 1} aria-label="Previous page">
               <ChevronLeftSvg />
             </button>
-            <span className="pdf-toolbar-page">Page {currentPage} of {numPages}</span>
+            <span className="pdf-toolbar-page">{t("library.viewer.pdf.page_of", { page: currentPage, total: numPages })}</span>
             <button type="button" className="pdf-toolbar-btn" onClick={() => goToPage(currentPage + 1)} disabled={currentPage >= numPages} aria-label="Next page">
               <ChevronRightSvg />
             </button>
@@ -250,7 +251,7 @@ export function PdfViewer({ fileUrl, fileName }: Props) {
             <button type="button" className="pdf-toolbar-btn" onClick={zoomOut} disabled={zoom <= ZOOM_STEPS[0]!} aria-label="Zoom out">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width={15} height={15} aria-hidden="true"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /><line x1="8" y1="11" x2="14" y2="11" /></svg>
             </button>
-            <span className="pdf-toolbar-zoom-pct">{Math.round(zoom * 100)}%</span>
+            <span className="pdf-toolbar-zoom-pct">{`${Math.round(zoom * 100)}%`}</span>
             <button type="button" className="pdf-toolbar-btn" onClick={zoomIn} disabled={zoom >= ZOOM_STEPS[ZOOM_STEPS.length - 1]!} aria-label="Zoom in">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width={15} height={15} aria-hidden="true"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /><line x1="11" y1="8" x2="11" y2="14" /><line x1="8" y1="11" x2="14" y2="11" /></svg>
             </button>

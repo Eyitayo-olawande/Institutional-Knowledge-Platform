@@ -49,7 +49,7 @@ export default async function AptitudeStartPage({
             </div>
             <div>
               <span style={{ fontSize: 12, color: "var(--mantle-color-text_muted)", display: "block" }}>{t("aptitude.start_pass_mark")}</span>
-              <strong>{test.passMark}/{test.totalMarks}</strong>
+              <strong>{test.passMark}{"/"}{test.totalMarks}</strong>
             </div>
           </div>
           {test.instructions ? (

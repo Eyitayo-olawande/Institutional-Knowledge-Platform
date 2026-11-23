@@ -27,30 +27,30 @@ export default async function AptitudeResultsPage({
   return (
     <AppShell ctx={ctx} active="aptitude_tests">
       <Link href={`/admin/aptitude-tests/${id}`} className="muted" style={{ fontSize: 13, display: "inline-block", marginBottom: 20 }}>
-        {"←"} Back to test
+        {"← "}{t("aptitude_tests.results.back_link")}
       </Link>
-      <h1 style={{ marginTop: 0 }}>{t("aptitude_tests.results_heading")}: {test.name}</h1>
+      <h1 style={{ marginTop: 0 }}>{t("aptitude_tests.results_heading")}{": "}{test.name}</h1>
 
       <div style={{ display: "flex", gap: 16, marginBottom: 24, flexWrap: "wrap" }}>
         <Card style={{ flex: "0 0 auto", minWidth: 120, textAlign: "center", padding: "16px 24px" }}>
           <div style={{ fontSize: 28, fontWeight: 700 }}>{results.length}</div>
-          <div style={{ fontSize: 12, color: "var(--mantle-color-text_muted)", marginTop: 4 }}>Assigned</div>
+          <div style={{ fontSize: 12, color: "var(--mantle-color-text_muted)", marginTop: 4 }}>{t("aptitude_tests.results.assigned_label")}</div>
         </Card>
         <Card style={{ flex: "0 0 auto", minWidth: 120, textAlign: "center", padding: "16px 24px" }}>
           <div style={{ fontSize: 28, fontWeight: 700 }}>{submitCount}</div>
-          <div style={{ fontSize: 12, color: "var(--mantle-color-text_muted)", marginTop: 4 }}>Submitted</div>
+          <div style={{ fontSize: 12, color: "var(--mantle-color-text_muted)", marginTop: 4 }}>{t("aptitude_tests.results.submitted_label")}</div>
         </Card>
         <Card style={{ flex: "0 0 auto", minWidth: 120, textAlign: "center", padding: "16px 24px" }}>
           <div style={{ fontSize: 28, fontWeight: 700, color: submitCount > 0 ? "var(--mantle-color-success)" : undefined }}>
-            {submitCount > 0 ? Math.round((passCount / submitCount) * 100) : 0}%
+            {submitCount > 0 ? Math.round((passCount / submitCount) * 100) : 0}{"%"}
           </div>
-          <div style={{ fontSize: 12, color: "var(--mantle-color-text_muted)", marginTop: 4 }}>Pass rate</div>
+          <div style={{ fontSize: 12, color: "var(--mantle-color-text_muted)", marginTop: 4 }}>{t("aptitude_tests.results.pass_rate_label")}</div>
         </Card>
       </div>
 
       {results.length === 0 ? (
         <Card>
-          <p className="sub" style={{ margin: 0 }}>No candidates assigned to this test yet.</p>
+          <p className="sub" style={{ margin: 0 }}>{t("aptitude_tests.results.no_candidates")}</p>
         </Card>
       ) : (
         <Card>

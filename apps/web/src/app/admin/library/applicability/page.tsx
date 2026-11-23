@@ -1,6 +1,7 @@
 import { listItemApplicabilityRules, listLibraryItems, listStructure } from "@mantle/db/tenant";
 import { Button, Card } from "@mantle/ui";
 import Link from "next/link";
+import { t } from "../../../../i18n.ts";
 import { requirePermission } from "../../../../server/session.ts";
 import { AppShell, PageHead } from "../../../_components/AppShell.tsx";
 import { addRuleAction, removeRuleAction } from "./actions.ts";
@@ -43,9 +44,9 @@ export default async function ApplicabilityPage({
         {/* Left: list of published library items */}
         <div style={{ flex: "0 0 300px" }}>
           <Card>
-            <h2 style={{ marginBottom: 12 }}>Published items</h2>
+            <h2 style={{ marginBottom: 12 }}>{t("library.applicability.published_heading")}</h2>
             {items.length === 0 ? (
-              <p className="sub">No published library items found.</p>
+              <p className="sub">{t("library.applicability.no_items")}</p>
             ) : (
               <ul className="list" style={{ gap: 2 }}>
                 {items.map((item) => (
@@ -68,7 +69,7 @@ export default async function ApplicabilityPage({
         <div style={{ flex: 1, minWidth: 0 }}>
           {!selectedItem ? (
             <Card>
-              <p className="sub">Select an item on the left to manage its applicability rules.</p>
+              <p className="sub">{t("library.applicability.select_prompt")}</p>
             </Card>
           ) : (
             <Card>
@@ -82,7 +83,7 @@ export default async function ApplicabilityPage({
                   </p>
                 </div>
                 <Link href={`/library/${selectedItem.id}`} className="btn-link" style={{ fontSize: 13 }}>
-                  View item
+                  {t("library.applicability.view_item_link")}
                 </Link>
               </div>
 
@@ -98,7 +99,7 @@ export default async function ApplicabilityPage({
                         </svg>
                       </div>
                       <span className="pb-rule-text">
-                        {nameOf(departments, r.departmentId)} / {nameOf(roleLevels, r.roleLevelId)} / {nameOf(units, r.unitId)}
+                        {nameOf(departments, r.departmentId)}{" / "}{nameOf(roleLevels, r.roleLevelId)}{" / "}{nameOf(units, r.unitId)}
                       </span>
                       <form action={removeRuleAction}>
                         <input type="hidden" name="itemId" value={selectedItem.id} />
@@ -124,18 +125,18 @@ export default async function ApplicabilityPage({
                 <form action={addRuleAction} className="pb-rule-form">
                   <input type="hidden" name="itemId" value={selectedItem.id} />
                   <select className="input pb-rule-select" name="departmentId" defaultValue="" aria-label="Department">
-                    <option value="">Any department</option>
+                    <option value="">{t("library.applicability.any_dept")}</option>
                     {departments.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
                   </select>
                   <select className="input pb-rule-select" name="roleLevelId" defaultValue="" aria-label="Role level">
-                    <option value="">Any role level</option>
+                    <option value="">{t("library.applicability.any_role_level")}</option>
                     {roleLevels.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
                   </select>
                   <select className="input pb-rule-select" name="unitId" defaultValue="" aria-label="Unit">
-                    <option value="">Any unit</option>
+                    <option value="">{t("library.applicability.any_unit")}</option>
                     {units.map((u) => <option key={u.id} value={u.id}>{u.name}</option>)}
                   </select>
-                  <Button type="submit" variant="secondary" size="sm">Add rule</Button>
+                  <Button type="submit" variant="secondary" size="sm">{t("library.applicability.add_rule_btn")}</Button>
                 </form>
               </div>
             </Card>

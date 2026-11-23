@@ -16,7 +16,6 @@ export default async function Library({ searchParams }: { searchParams: Promise<
   const { tenant, db, roles } = ctx;
   await requireFeature(tenant, "knowledge_library");
   const editor = can(roles, "library.edit");
-  const isAdmin = can(roles, "activity.view");
   const params = await searchParams;
   const { retired } = params;
   const q = (params.q ?? "").slice(0, 200);
@@ -74,7 +73,6 @@ export default async function Library({ searchParams }: { searchParams: Promise<
             <div className="lib-hero-rule" />
           </div>
         </div>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/images/library_person.webp" alt="" aria-hidden="true" className="lib-hero-person" />
       </div>
 
@@ -118,7 +116,7 @@ export default async function Library({ searchParams }: { searchParams: Promise<
           {displayTypes.length > 0 ? (
             <nav className="lib-tabs-row" aria-label={t("library.areas.type_filter_label")}>
               <Link href={link(area ? { area: area.id } : {})} aria-current={!type ? "true" : undefined} className="lib-tab">
-                {t("library.areas.all_types")} ({areaItems.length})
+                {t("library.areas.all_types")}{" ("}{areaItems.length}{")"}
               </Link>
               {displayTypes.filter((ty) => (countByType[ty.id] ?? 0) > 0).map((ty) => (
                 <Link
@@ -127,7 +125,7 @@ export default async function Library({ searchParams }: { searchParams: Promise<
                   aria-current={ty.id === type?.id ? "true" : undefined}
                   className="lib-tab"
                 >
-                  {ty.label} ({countByType[ty.id] ?? 0})
+                  {ty.label}{" ("}{countByType[ty.id] ?? 0}{")"}
                 </Link>
               ))}
             </nav>
