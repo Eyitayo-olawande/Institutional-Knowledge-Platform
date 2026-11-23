@@ -1,8 +1,8 @@
 import "server-only";
 import { loadConfig } from "@mantle/db";
-import { connectTenant, visibleAreas, type TenantDb, type VisibleAreas } from "@mantle/db/tenant";
+import { connectTenant, loadGrants, visibleAreas, type TenantDb, type VisibleAreas } from "@mantle/db/tenant";
 import { isFeatureOn, type Feature } from "@mantle/db/control";
-import { can, type Action } from "@mantle/platform/identity";
+import { can, type Action, type Grants } from "@mantle/platform/identity";
 import type { TenantRecord } from "@mantle/platform/tenancy";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -29,8 +29,10 @@ export async function requireSignedIn() {
   const { host, protocol } = await requestHost();
   const session = await authFor(resolution.tenant, host, protocol).api.getSession({ headers: await headers() });
   if (!session) redirect("/sign-in");
+  const db = tenantDb(resolution.tenant);
   const roles = (session.user as { roles?: string }).roles ?? "";
-  return { tenant: resolution.tenant, user: session.user, roles, db: tenantDb(resolution.tenant) };
+  const grants = await loadGrants(db);
+  return { tenant: resolution.tenant, user: session.user, roles, db, grants };
 }
 
 // Resolves the tenant and the signed in person, and checks a permission on
@@ -41,9 +43,11 @@ export async function requirePermission(action: Action) {
   const { host, protocol } = await requestHost();
   const session = await authFor(resolution.tenant, host, protocol).api.getSession({ headers: await headers() });
   if (!session) redirect("/sign-in");
+  const db = tenantDb(resolution.tenant);
   const roles = (session.user as { roles?: string }).roles ?? "";
-  if (!can(roles, action)) redirect("/");
-  return { tenant: resolution.tenant, user: session.user, roles, db: tenantDb(resolution.tenant) };
+  const grants = await loadGrants(db);
+  if (!can(roles, action, grants)) redirect("/");
+  return { tenant: resolution.tenant, user: session.user, roles, db, grants };
 }
 
 // Unfinished or switched off features are hidden per tenant (CLAUDE.md).
@@ -56,6 +60,6 @@ export async function requireFeature(tenant: TenantRecord, feature: Feature): Pr
 }
 
 // The learning areas the signed in person may see, for every library read.
-export async function viewerAreas(ctx: { db: TenantDb; roles: string; user: { id: string } }): Promise<VisibleAreas> {
-  return visibleAreas(ctx.db, { userId: ctx.user.id, allAreas: can(ctx.roles, "library.all_areas") });
+export async function viewerAreas(ctx: { db: TenantDb; roles: string; grants: Grants; user: { id: string } }): Promise<VisibleAreas> {
+  return visibleAreas(ctx.db, { userId: ctx.user.id, allAreas: can(ctx.roles, "library.all_areas", ctx.grants) });
 }

@@ -172,6 +172,19 @@ export {
   type PersonLearningRow,
 } from "./reports.ts";
 export {
+  archiveTenantRole,
+  createTenantRole,
+  getTenantRole,
+  listTenantRoles,
+  loadGrants,
+  unarchiveTenantRole,
+  updateTenantRole,
+  type RoleArchiveResult,
+  type RoleCreateResult,
+  type RoleUpdateResult,
+  type TenantRole,
+} from "./roles.ts";
+export {
   assignCandidateToTest,
   createAptitudeTest,
   deleteQuestion,

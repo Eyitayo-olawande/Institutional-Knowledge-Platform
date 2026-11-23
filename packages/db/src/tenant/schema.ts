@@ -843,3 +843,18 @@ export const staffAttestations = pgTable(
     index("staff_attestations_person_idx").on(t.personId),
   ],
 );
+
+
+// Configurable RBAC (Phase 3). Tenant-scoped role definitions with
+// associated actions. System roles mirror the original seven hardcoded
+// roles and may have their label and actions edited but not archived.
+// Custom roles may be archived when no users hold them.
+export const tenantRoles = pgTable("tenant_roles", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull().unique(),
+  label: text("label").notNull(),
+  actions: text("actions").notNull().default(""),
+  isSystem: boolean("is_system").notNull().default(false),
+  archivedAt: timestamp("archived_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
