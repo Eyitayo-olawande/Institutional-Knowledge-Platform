@@ -56,7 +56,9 @@ export {
 } from "./areas.ts";
 export { addNotice, deliveriesFor, markAllRead, noticesFor, recipients, recordDelivery, unreadCount } from "./notices.ts";
 export {
+  archiveStructureEntry,
   cleanName,
+  createStructureEntry,
   ensureDepartment,
   isStructureKind,
   listStructure,
@@ -64,11 +66,15 @@ export {
   moveRoleLevel,
   nameKey,
   renameStructure,
+  unarchiveStructureEntry,
   STRUCTURE_KINDS,
+  type ArchiveResult,
+  type CreateResult,
   type MergeResult,
   type RenameResult,
   type StructureEntry,
   type StructureKind,
+  type UnarchiveResult,
 } from "./structure.ts";
 export {
   addOption,

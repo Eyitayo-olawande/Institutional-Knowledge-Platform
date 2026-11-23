@@ -1,4 +1,4 @@
-import { and, asc, count, eq, max, sql } from "drizzle-orm";
+import { and, asc, count, eq, isNull, max, sql } from "drizzle-orm";
 import { recordActivity } from "./activity.ts";
 import { ensureDepartmentArea, mergeDepartmentAreas } from "./areas.ts";
 import type { TenantDb } from "./client.ts";
@@ -108,6 +108,7 @@ export interface StructureEntry {
   readonly id: string;
   readonly name: string;
   readonly people: number;
+  readonly archived: boolean;
   // Units only: the department the unit belongs to.
   readonly departmentId?: string;
   readonly departmentName?: string;
@@ -116,7 +117,8 @@ export interface StructureEntry {
 }
 
 // One kind of entry with the number of active people linked to each.
-export async function listStructure(db: TenantDb, kind: StructureKind): Promise<StructureEntry[]> {
+// Pass includeArchived to include soft-deleted entries.
+export async function listStructure(db: TenantDb, kind: StructureKind, includeArchived = false): Promise<StructureEntry[]> {
   const column = PERSON_COLUMN[kind];
   const counts = new Map(
     (
@@ -130,19 +132,31 @@ export async function listStructure(db: TenantDb, kind: StructureKind): Promise<
   const n = (id: string) => counts.get(id) ?? 0;
   if (kind === "unit") {
     const rows = await db
-      .select({ id: units.id, name: units.name, departmentId: units.departmentId, departmentName: departments.name })
+      .select({ id: units.id, name: units.name, departmentId: units.departmentId, departmentName: departments.name, archivedAt: units.archivedAt })
       .from(units)
       .innerJoin(departments, eq(units.departmentId, departments.id))
+      .where(includeArchived ? undefined : isNull(units.archivedAt))
       .orderBy(asc(departments.name), asc(units.name));
-    return rows.map((r) => ({ ...r, people: n(r.id) }));
+    return rows.map((r) => ({ id: r.id, name: r.name, departmentId: r.departmentId, departmentName: r.departmentName, archived: r.archivedAt !== null, people: n(r.id) }));
   }
   if (kind === "role_level") {
-    const rows = await db.select({ id: roleLevels.id, name: roleLevels.name, rank: roleLevels.rank }).from(roleLevels).orderBy(asc(roleLevels.rank));
-    return rows.map((r) => ({ ...r, people: n(r.id) }));
+    const rows = await db
+      .select({ id: roleLevels.id, name: roleLevels.name, rank: roleLevels.rank, archivedAt: roleLevels.archivedAt })
+      .from(roleLevels)
+      .where(includeArchived ? undefined : isNull(roleLevels.archivedAt))
+      .orderBy(asc(roleLevels.rank));
+    return rows.map((r) => ({ id: r.id, name: r.name, rank: r.rank, archived: r.archivedAt !== null, people: n(r.id) }));
   }
-  const table = TABLES[kind];
-  const rows = await db.select({ id: table.id, name: table.name }).from(table).orderBy(asc(table.name));
-  return rows.map((r) => ({ ...r, people: n(r.id) }));
+  if (kind === "location") {
+    const rows = await db.select({ id: locations.id, name: locations.name }).from(locations).orderBy(asc(locations.name));
+    return rows.map((r) => ({ id: r.id, name: r.name, archived: false, people: n(r.id) }));
+  }
+  const rows = await db
+    .select({ id: departments.id, name: departments.name, archivedAt: departments.archivedAt })
+    .from(departments)
+    .where(includeArchived ? undefined : isNull(departments.archivedAt))
+    .orderBy(asc(departments.name));
+  return rows.map((r) => ({ id: r.id, name: r.name, archived: r.archivedAt !== null, people: n(r.id) }));
 }
 
 async function entry(tx: Db, kind: StructureKind, id: string): Promise<{ id: string; name: string; departmentId?: string } | null> {
@@ -274,5 +288,94 @@ export async function ensureDepartment(db: TenantDb, name: string, actor: string
     const { departmentId } = await structureResolver(tx, actor).forRow({ department: name });
     if (!departmentId) throw new Error("A department needs a name.");
     return departmentId;
+  });
+}
+
+export type CreateResult = "created" | "name_taken" | "missing_department";
+
+// Creates a new structure entry and registers it in structure_names so
+// staff imports recognise the name without creating a duplicate.
+export async function createStructureEntry(
+  db: TenantDb,
+  kind: StructureKind,
+  name: string,
+  departmentId: string | null,
+  actor: string,
+): Promise<{ result: CreateResult; id?: string }> {
+  const clean = cleanName(name);
+  if (!clean) return { result: "name_taken" };
+  if (kind === "unit" && !departmentId) return { result: "missing_department" };
+  return db.transaction(async (tx) => {
+    const scope = kind === "unit" ? (departmentId ?? "") : "";
+    const existing = await findByName(tx, kind, clean, scope);
+    if (existing) return { result: "name_taken" };
+    let id: string;
+    if (kind === "department") {
+      const [row] = await tx.insert(departments).values({ name: clean, changedBy: actor }).returning({ id: departments.id });
+      id = row!.id;
+      await ensureDepartmentArea(tx, id, actor);
+    } else if (kind === "unit") {
+      const [row] = await tx.insert(units).values({ name: clean, departmentId: departmentId!, changedBy: actor }).returning({ id: units.id });
+      id = row!.id;
+    } else if (kind === "role_level") {
+      const top = (await tx.select({ top: max(roleLevels.rank) }).from(roleLevels))[0]?.top ?? 0;
+      const [row] = await tx.insert(roleLevels).values({ name: clean, rank: top + 1, changedBy: actor }).returning({ id: roleLevels.id });
+      id = row!.id;
+    } else {
+      const [row] = await tx.insert(locations).values({ name: clean, changedBy: actor }).returning({ id: locations.id });
+      id = row!.id;
+    }
+    await addName(tx, kind, clean, id, actor, scope);
+    await recordActivity(tx, { actor, action: "structure.created", entityType: kind, entityId: id, details: { name: clean } });
+    return { result: "created", id };
+  });
+}
+
+export type ArchiveResult = "archived" | "has_people" | "missing";
+
+// Soft-deletes a structure entry. Refused if any active people are linked.
+export async function archiveStructureEntry(db: TenantDb, kind: StructureKind, id: string, actor: string): Promise<ArchiveResult> {
+  return db.transaction(async (tx) => {
+    const found = await entry(tx, kind, id);
+    if (!found) return "missing";
+    const column = PERSON_COLUMN[kind];
+    const countRow = (await tx
+      .select({ n: count() })
+      .from(people)
+      .where(and(eq(people.status, "active"), eq(column, id))))[0];
+    if ((countRow?.n ?? 0) > 0) return "has_people";
+    const now = new Date();
+    if (kind === "department") {
+      await tx.update(departments).set({ archivedAt: now, updatedAt: now, changedBy: actor }).where(eq(departments.id, id));
+    } else if (kind === "unit") {
+      await tx.update(units).set({ archivedAt: now, updatedAt: now, changedBy: actor }).where(eq(units.id, id));
+    } else if (kind === "role_level") {
+      await tx.update(roleLevels).set({ archivedAt: now, updatedAt: now, changedBy: actor }).where(eq(roleLevels.id, id));
+    }
+    await recordActivity(tx, { actor, action: "structure.archived", entityType: kind, entityId: id, details: { name: found.name } });
+    return "archived";
+  });
+}
+
+export type UnarchiveResult = "unarchived" | "name_taken" | "missing";
+
+// Restores a soft-deleted entry. Refused if its name is now taken by another active entry.
+export async function unarchiveStructureEntry(db: TenantDb, kind: StructureKind, id: string, actor: string): Promise<UnarchiveResult> {
+  return db.transaction(async (tx) => {
+    const found = await entry(tx, kind, id);
+    if (!found) return "missing";
+    const scope = found.departmentId ?? "";
+    const owner = await findByName(tx, kind, found.name, scope);
+    if (owner && owner !== id) return "name_taken";
+    const now = new Date();
+    if (kind === "department") {
+      await tx.update(departments).set({ archivedAt: null, updatedAt: now, changedBy: actor }).where(eq(departments.id, id));
+    } else if (kind === "unit") {
+      await tx.update(units).set({ archivedAt: null, updatedAt: now, changedBy: actor }).where(eq(units.id, id));
+    } else if (kind === "role_level") {
+      await tx.update(roleLevels).set({ archivedAt: null, updatedAt: now, changedBy: actor }).where(eq(roleLevels.id, id));
+    }
+    await recordActivity(tx, { actor, action: "structure.unarchived", entityType: kind, entityId: id, details: { name: found.name } });
+    return "unarchived";
   });
 }
