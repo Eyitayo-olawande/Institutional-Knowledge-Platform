@@ -287,7 +287,13 @@
       "ack_done": "Acknowledged",
       "add_to_favourites": "Add to favourites",
       "remove_from_favourites": "Remove from favourites",
-      "more_actions": "More actions"
+      "more_actions": "More actions",
+      "pdf": {
+        "loading": "Loading document…",
+        "pages": "Pages ({count})",
+        "page_of": "Page {page} of {total}",
+        "zoom_pct": "{pct}%"
+      }
     }
   },
   "notices": {
