@@ -63,7 +63,6 @@ export default async function Home() {
   }
   const destinations = buildNav({ roles, libraryOn, peopleImportOn, pathsOn, aptitudeOn }).filter((i) => i.key !== "home");
   const mainDestinations = destinations.filter((d) => d.section === "main");
-  const adminDestinations = destinations.filter((d) => d.section === "admin");
   const firstName = session.user.name.split(" ")[0] ?? session.user.name;
 
   // My Learning: load summary for the journey widget and progress card.
@@ -122,7 +121,6 @@ export default async function Home() {
               <div className="admin-banner-rule" />
             </div>
           </div>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/images/administrator-colleagues.png"
             alt=""
@@ -142,7 +140,6 @@ export default async function Home() {
               <div className="lib-hero-rule" />
             </div>
           </div>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/images/Collaborative-Smiles-trans2.png" alt="" aria-hidden="true" className="lib-hero-person" />
         </div>
       )}
@@ -173,7 +170,7 @@ export default async function Home() {
                 <div className="admin-progress-content">
                   <div className="admin-progress-ring">
                     <div className="admin-progress-ring-inner">
-                      <strong>—</strong>
+                      <strong>{"—"}</strong>
                       <span style={{ fontSize: 11, color: "var(--mantle-color-text_muted)", marginTop: 4 }}>{t("home.admin.overview_heading")}</span>
                     </div>
                   </div>
@@ -182,7 +179,7 @@ export default async function Home() {
                       <div key={label} className="admin-progress-stat">
                         <span className={`admin-progress-dot admin-progress-dot-${i}`} />
                         <dt>{label}</dt>
-                        <dd>—</dd>
+                        <dd>{"—"}</dd>
                       </div>
                     ))}
                   </dl>
@@ -196,7 +193,7 @@ export default async function Home() {
                     <div key={name} className="admin-department-row">
                       <span>{name}</span>
                       <div className="admin-empty-track" />
-                      <span style={{ color: "var(--mantle-color-text_muted)", fontSize: 12 }}>—</span>
+                      <span style={{ color: "var(--mantle-color-text_muted)", fontSize: 12 }}>{"—"}</span>
                     </div>
                   ))}
                 </div>
@@ -300,14 +297,14 @@ export default async function Home() {
             <div className="row" style={{ alignItems: "flex-start", justifyContent: "space-between", gap: 16 }}>
               <div>
                 <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.68)", marginBottom: 4 }}>{t("home.my_learning.in_progress")}</div>
-                <div className="learning-progress-pct">{learningSummary.completionRate}%</div>
+                <div className="learning-progress-pct">{learningSummary.completionRate}{"%"}</div>
                 <div style={{ fontSize: 14, color: "rgba(255,255,255,0.72)", marginTop: 4 }}>
                   {t("home.my_learning.modules_summary", { done: learningSummary.modulesCompleted, total: learningSummary.modulesTotal })}
                 </div>
               </div>
               <div className="learning-status-pill">
                 <span className="learning-status-dot" />
-                {t("home.my_learning.tiles.paths")}: {learningSummary.pathsEnrolled}
+                {t("home.my_learning.tiles.paths")}{": "}{learningSummary.pathsEnrolled}
               </div>
             </div>
             <div className="learning-progress-bar">

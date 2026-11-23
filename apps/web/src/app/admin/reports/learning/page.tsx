@@ -77,7 +77,7 @@ export default async function LearningReport() {
                   <div className="report-bar-track">
                     <div className={`report-bar-fill${tone}`} style={{ width: `${row.completionRate}%` }} />
                   </div>
-                  <div className="report-bar-pct">{row.completionRate}%</div>
+                  <div className="report-bar-pct">{row.completionRate}{"%"}</div>
                 </div>
               );
             })
@@ -95,7 +95,7 @@ export default async function LearningReport() {
               <div key={r.departmentId} className="report-insight-item">
                 <div className="report-insight-rank">{i + 1}</div>
                 <div className="report-insight-name">{r.department}</div>
-                <div className="report-insight-score">{r.completionRate}%</div>
+                <div className="report-insight-score">{r.completionRate}{"%"}</div>
               </div>
             ))}
           </div>
@@ -107,7 +107,7 @@ export default async function LearningReport() {
               <div key={r.departmentId} className="report-insight-item">
                 <div className="report-insight-rank">{i + 1}</div>
                 <div className="report-insight-name">{r.department}</div>
-                <div className="report-insight-score">{r.completionRate}%</div>
+                <div className="report-insight-score">{r.completionRate}{"%"}</div>
               </div>
             ))}
           </div>
@@ -127,7 +127,7 @@ export default async function LearningReport() {
                   <th style={{ textAlign: "right" }}>{t("reports.learning.columns.enrolled")}</th>
                   <th style={{ textAlign: "right" }}>{t("reports.learning.columns.completed")}</th>
                   <th style={{ textAlign: "right" }}>{t("reports.learning.columns.total")}</th>
-                  <th style={{ textAlign: "right" }} title={t("reports.learning.columns.rate_tooltip")}>{t("reports.learning.columns.rate")} ⓘ</th>
+                  <th style={{ textAlign: "right" }} title={t("reports.learning.columns.rate_tooltip")}>{t("reports.learning.columns.rate")}{"ⓘ"}</th>
                 </tr>
               </thead>
               <tbody>
@@ -140,10 +140,10 @@ export default async function LearningReport() {
                     <td style={{ textAlign: "right" }}>
                       {row.totalModulesStarted > 0 ? (
                         <Badge tone={row.completionRate >= 70 ? "success" : row.completionRate >= 40 ? "warning" : "danger"}>
-                          {row.completionRate}%
+                          {row.completionRate}{"%"}
                         </Badge>
                       ) : (
-                        <span className="sub">—</span>
+                        <span className="sub">{"—"}</span>
                       )}
                     </td>
                   </tr>

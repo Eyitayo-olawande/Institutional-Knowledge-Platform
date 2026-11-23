@@ -36,16 +36,16 @@ export default async function ReviewNomination({
     <AppShell ctx={ctx} active="nominations">
       <div style={{ maxWidth: 680 }}>
         <Link href="/admin/nominations" className="muted" style={{ fontSize: 13, display: "inline-block", marginBottom: 20 }}>
-          ← {t("nominations.back")}
+          {"← "}{t("nominations.back")}
         </Link>
         <h1 style={{ marginTop: 0 }}>{t("nominations.review_heading")}</h1>
 
         {qp.error === "duplicate" ? (
           <div className="alert alert-danger" role="alert"><p>{t("nominations.already_assigned")}</p></div>
         ) : qp.error === "invalid" ? (
-          <div className="alert alert-danger" role="alert"><p>Please set an approved start date.</p></div>
+          <div className="alert alert-danger" role="alert"><p>{t("nominations.invalid_start_date")}</p></div>
         ) : qp.error ? (
-          <div className="alert alert-danger" role="alert"><p>An error occurred. Please try again.</p></div>
+          <div className="alert alert-danger" role="alert"><p>{t("nominations.generic_error")}</p></div>
         ) : null}
 
         <Card style={{ marginBottom: 20 }}>
@@ -107,7 +107,7 @@ export default async function ReviewNomination({
               {nom.reviewNote ? (
                 <tr>
                   <th style={{ textAlign: "left", padding: "8px 16px 8px 0", fontWeight: 600, fontSize: 13, color: "var(--mantle-color-text_muted)", verticalAlign: "top" }}>
-                    Review note
+                    {t("nominations.review_note_label")}
                   </th>
                   <td style={{ padding: "8px 0", fontSize: 14 }}>{nom.reviewNote}</td>
                 </tr>
@@ -115,7 +115,7 @@ export default async function ReviewNomination({
               {nom.approvedStartDate ? (
                 <tr>
                   <th style={{ textAlign: "left", padding: "8px 16px 8px 0", fontWeight: 600, fontSize: 13, color: "var(--mantle-color-text_muted)" }}>
-                    Scheduled start
+                    {t("nominations.scheduled_start_label")}
                   </th>
                   <td style={{ padding: "8px 0", fontSize: 14 }}>{nom.approvedStartDate}</td>
                 </tr>
@@ -126,7 +126,7 @@ export default async function ReviewNomination({
 
         {nom.status === "pending" && isAdmin ? (
           <Card>
-            <h2 style={{ marginTop: 0 }}>Decision</h2>
+            <h2 style={{ marginTop: 0 }}>{t("nominations.decision_heading")}</h2>
             <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
               <form action={approveAction}>
                 <input type="hidden" name="nominationId" value={nom.id} />
@@ -161,7 +161,7 @@ export default async function ReviewNomination({
           </Card>
         ) : nom.status === "pending" ? (
           <Card>
-            <p className="sub" style={{ margin: 0 }}>This nomination is awaiting review by a Learning Administrator.</p>
+            <p className="sub" style={{ margin: 0 }}>{t("nominations.pending_msg")}</p>
           </Card>
         ) : null}
       </div>

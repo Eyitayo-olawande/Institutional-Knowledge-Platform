@@ -18,7 +18,7 @@ export default async function AptitudeTestPage({
   if (!resolution.ok) notFound();
   const db = tenantDb(resolution.tenant);
 
-  const { testId, candidateId, attemptId } = parsed;
+  const { testId, attemptId } = parsed;
   if (attemptId === "pending") redirect(`/aptitude/${token}/start`);
 
   const data = await getTestForCandidate(db, testId, attemptId);
@@ -51,7 +51,7 @@ export default async function AptitudeTestPage({
       <div className="at-header">
         <span style={{ fontWeight: 600 }}>{test.name}</span>
         <div>
-          <span style={{ fontSize: 12, color: "var(--mantle-color-text_muted)", marginRight: 8 }}>{t("aptitude.timer_label")}:</span>
+          <span style={{ fontSize: 12, color: "var(--mantle-color-text_muted)", marginRight: 8 }}>{t("aptitude.timer_label")}{":"}</span>
           <span className="at-timer" id="at-timer" suppressHydrationWarning>{initialTimer}</span>
         </div>
       </div>
@@ -73,7 +73,7 @@ export default async function AptitudeTestPage({
               </h2>
               {section.questions.map((q, qi) => (
                 <div className="at-question" key={q.id}>
-                  <p>{qi + 1}. {q.questionText}</p>
+                  <p>{qi + 1}{". "}{q.questionText}</p>
                   {q.options.map((opt) => (
                     <label className="at-option" key={opt.id}>
                       <input type="radio" name={`q_${q.id}`} value={opt.id} />
@@ -92,7 +92,7 @@ export default async function AptitudeTestPage({
           <p style={{ margin: "0 0 10px" }}>{t("aptitude.confirm_submit")}</p>
           <div style={{ display: "flex", gap: 8 }}>
             <button type="submit" form="at-form" className="btn btn-primary">{t("aptitude.submit_btn")}</button>
-            <button type="button" className="btn btn-secondary" data-cancel-confirm="">Cancel</button>
+            <button type="button" className="btn btn-secondary" data-cancel-confirm="">{t("aptitude_tests.cancel_btn")}</button>
           </div>
         </div>
         <button type="button" className="btn btn-primary" id="at-open-confirm">{t("aptitude.submit_btn")}</button>

@@ -85,7 +85,7 @@ export default async function AssessmentReport() {
               <div key={r.assessmentId} className="report-insight-item">
                 <div className="report-insight-rank">{i + 1}</div>
                 <div className="report-insight-name">{r.itemTitle}</div>
-                <div className="report-insight-score">{r.passRate}% pass</div>
+                <div className="report-insight-score">{r.passRate}{t("reports.assessment.pct_pass")}</div>
               </div>
             ))}
           </div>
@@ -95,7 +95,7 @@ export default async function AssessmentReport() {
               <div key={r.assessmentId} className="report-insight-item">
                 <div className="report-insight-rank">{i + 1}</div>
                 <div className="report-insight-name">{r.itemTitle}</div>
-                <div className="report-insight-score">{r.passRate}% pass</div>
+                <div className="report-insight-score">{r.passRate}{t("reports.assessment.pct_pass")}</div>
               </div>
             ))}
           </div>
@@ -129,10 +129,10 @@ export default async function AssessmentReport() {
                     <td style={{ textAlign: "right" }}>{row.failCount}</td>
                     <td style={{ textAlign: "right" }}>
                       <Badge tone={row.passRate >= 70 ? "success" : row.passRate >= 50 ? "warning" : "danger"}>
-                        {row.passRate}%
+                        {row.passRate}{"%"}
                       </Badge>
                     </td>
-                    <td style={{ textAlign: "right" }}>{row.avgScore}%</td>
+                    <td style={{ textAlign: "right" }}>{row.avgScore}{"%"}</td>
                   </tr>
                 ))}
               </tbody>

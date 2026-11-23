@@ -29,7 +29,6 @@ export default async function Paths() {
             <div className="lib-hero-rule" />
           </div>
         </div>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/images/Collaborative-Smiles-trans2.png" alt="" aria-hidden="true" className="lib-hero-person" />
       </div>
 

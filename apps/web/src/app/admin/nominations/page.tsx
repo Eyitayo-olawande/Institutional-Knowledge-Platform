@@ -42,18 +42,17 @@ export default async function Nominations({
             <div className="admin-banner-rule" />
           </div>
         </div>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/images/learning-professional.png" alt="" aria-hidden="true" className="admin-banner-person" />
       </div>
 
       {params.submitted ? (
-        <div className="alert alert-success" role="status"><p>Nomination submitted for review.</p></div>
+        <div className="alert alert-success" role="status"><p>{t("nominations.submitted_success")}</p></div>
       ) : params.approved ? (
         <div className="alert alert-success" role="status"><p>{t("nominations.success_approved")}</p></div>
       ) : params.rejected ? (
         <div className="alert alert-brand" role="status"><p>{t("nominations.success_rejected")}</p></div>
       ) : params.error === "unauthorized" ? (
-        <div className="alert alert-danger" role="alert"><p>Only Learning Administrators can approve or reject nominations.</p></div>
+        <div className="alert alert-danger" role="alert"><p>{t("nominations.unauthorized_error")}</p></div>
       ) : null}
 
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}>
@@ -71,7 +70,7 @@ export default async function Nominations({
         <>
           {pending.length > 0 ? (
             <Card style={{ marginBottom: 20 }}>
-              <h2 style={{ marginTop: 0 }}>{t("nominations.pending_tab")} ({pending.length})</h2>
+              <h2 style={{ marginTop: 0 }}>{t("nominations.pending_tab")}{" ("}{pending.length}{")"}</h2>
               <div className="table-wrap">
                 <table className="table">
                   <thead>
@@ -92,7 +91,7 @@ export default async function Nominations({
                         <td>{n.createdAt.toISOString().slice(0, 10)}</td>
                         <td>
                           <Link href={`/admin/nominations/${n.id}`} className="muted" style={{ fontSize: 13 }}>
-                            Review
+                            {t("nominations.review_link")}
                           </Link>
                         </td>
                       </tr>
@@ -105,7 +104,7 @@ export default async function Nominations({
 
           {approved.length > 0 || rejected.length > 0 ? (
             <Card>
-              <h2 style={{ marginTop: 0 }}>{t("nominations.approved_tab")} &amp; {t("nominations.rejected_tab")}</h2>
+              <h2 style={{ marginTop: 0 }}>{t("nominations.approved_tab")}{" & "}{t("nominations.rejected_tab")}</h2>
               <div className="table-wrap">
                 <table className="table">
                   <thead>

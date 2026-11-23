@@ -14,8 +14,8 @@ export async function GET(req: Request) {
   const url = new URL(req.url);
   const category = url.searchParams.get("category") ?? "";
 
-  let csv = "";
-  let filename = "report.csv";
+  let csv: string;
+  let filename: string;
 
   if (category === "knowledge") {
     const rows = await knowledgeReport(ctx.db);

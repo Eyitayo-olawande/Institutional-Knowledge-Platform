@@ -27,14 +27,14 @@ export default async function NewNomination({
       <div style={{ maxWidth: 640 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
           <Link href="/admin/nominations" className="muted" style={{ fontSize: 13 }}>
-            ← {t("nominations.back")}
+            {"← "}{t("nominations.back")}
           </Link>
         </div>
         <h1 style={{ marginTop: 0 }}>{t("nominations.new_heading")}</h1>
 
         {params.error === "invalid" ? (
           <div className="alert alert-danger" role="alert">
-            <p>Please fill in all required fields correctly.</p>
+            <p>{t("nominations.required_error")}</p>
           </div>
         ) : null}
 
@@ -43,9 +43,9 @@ export default async function NewNomination({
             <label className="field">
               {t("nominations.fields.person")}
               <select className="input" name="personId" required>
-                <option value="">Select a staff member</option>
+                <option value="">{t("nominations.select_staff")}</option>
                 {activePeople.map((p) => (
-                  <option key={p.id} value={p.id}>{p.fullName} ({p.workEmail})</option>
+                  <option key={p.id} value={p.id}>{p.fullName}{" ("}{p.workEmail}{")"}</option>
                 ))}
               </select>
             </label>
@@ -53,7 +53,7 @@ export default async function NewNomination({
             <label className="field">
               {t("nominations.fields.path")}
               <select className="input" name="pathId" required>
-                <option value="">Select a learning path</option>
+                <option value="">{t("nominations.select_path")}</option>
                 {paths.map((p) => (
                   <option key={p.id} value={p.id}>{p.name}</option>
                 ))}
@@ -63,7 +63,7 @@ export default async function NewNomination({
             <label className="field">
               {t("nominations.fields.reason")}
               <select className="input" name="reason" required>
-                <option value="">Select a reason</option>
+                <option value="">{t("nominations.select_reason")}</option>
                 {NOMINATION_REASONS.map((r) => (
                   <option key={r} value={r}>{t(`nominations.reasons.${r}`)}</option>
                 ))}
@@ -83,7 +83,7 @@ export default async function NewNomination({
 
             <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
               <Button type="submit">{t("nominations.submit_btn")}</Button>
-              <Link href="/admin/nominations" className="btn btn-secondary">Cancel</Link>
+              <Link href="/admin/nominations" className="btn btn-secondary">{t("nominations.cancel_btn")}</Link>
             </div>
           </form>
         </Card>

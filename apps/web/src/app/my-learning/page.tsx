@@ -1,4 +1,5 @@
 import { certificatesForPerson, listLibraryItems, listModuleItems, myLearning, noticesFor, outstandingRequirements, personByUserId, tenantSchema, type AssignmentStageView, STAGE_ORDER } from "@mantle/db/tenant";
+// eslint-disable-next-line no-restricted-imports
 import { eq } from "drizzle-orm";
 import Link from "next/link";
 import { t } from "../../i18n.ts";
@@ -74,7 +75,6 @@ export default async function MyLearning({
               <div className="lib-hero-rule" />
             </div>
           </div>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/images/Collaborative-Smiles-trans3.png" alt="" aria-hidden="true" className="lib-hero-person" />
         </div>
         <p className="sub">{t("learning.empty_body")}</p>
@@ -102,7 +102,6 @@ export default async function MyLearning({
               <div className="lib-hero-rule" />
             </div>
           </div>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/images/Collaborative-Smiles-trans3.png" alt="" aria-hidden="true" className="lib-hero-person" />
         </div>
         <p className="sub">{t("learning.empty_body")}</p>
@@ -155,7 +154,7 @@ export default async function MyLearning({
   // First assignment for the journey view
   const firstAssignment = data.assignments[0]!;
 
-  const { completionRate, modulesCompleted, modulesTotal } = data;
+  const { completionRate, modulesCompleted } = data;
   const inProgressCount = flatModules.filter((m) => m.unlocked && !m.completed).length;
   const notStartedCount = flatModules.filter((m) => !m.unlocked && !m.completed).length;
 
@@ -176,7 +175,6 @@ export default async function MyLearning({
             <div className="lib-hero-rule" />
           </div>
         </div>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/images/Collaborative-Smiles-trans3.png" alt="" aria-hidden="true" className="lib-hero-person" />
       </div>
 
@@ -194,7 +192,7 @@ export default async function MyLearning({
               <line x1="12" y1="9" x2="12" y2="13" />
               <line x1="12" y1="17" x2="12.01" y2="17" />
             </svg>
-            Outstanding Requirements
+            {t("learning.outstanding_heading")}
           </h2>
           <p className="sub" style={{ marginBottom: 12 }}>
             {outstanding.length === 1
@@ -281,7 +279,7 @@ export default async function MyLearning({
                     strokeLinecap="round"
                   />
                 </svg>
-                <span>{completionRate}%</span>
+                <span>{completionRate}{"%"}</span>
               </div>
               <dl className="my-progress-dl">
                 <div>
@@ -322,7 +320,7 @@ export default async function MyLearning({
                     href={`/library/${nextModule.itemId}?moduleId=${nextModule.id}`}
                     className="my-milestone-btn"
                   >
-                    {t("learning.milestone_open")} →
+                    {t("learning.milestone_open")}{" →"}
                   </Link>
                 ) : null}
               </div>
@@ -345,7 +343,7 @@ export default async function MyLearning({
                     href={`/library/${nextModule.itemId}?moduleId=${nextModule.id}`}
                     className="my-milestone-btn"
                   >
-                    {t("learning.milestone_open")} →
+                    {t("learning.milestone_open")}{" →"}
                   </Link>
                 ) : null}
               </div>
@@ -388,7 +386,7 @@ export default async function MyLearning({
                       <Link href={`/certificate/${cert.reference}`} style={{ color: "var(--mantle-color-primary)" }}>
                         {cert.reference}
                       </Link>
-                      {" "}&middot;{" "}
+                      {" "}{"·"}{" "}
                       <span style={{ color: "var(--mantle-color-text_muted)" }}>
                         {t("learning.certs_issued", { date: cert.issuedAt.toISOString().slice(0, 10) })}
                       </span>

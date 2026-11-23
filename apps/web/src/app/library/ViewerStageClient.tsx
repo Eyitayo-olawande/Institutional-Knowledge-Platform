@@ -14,7 +14,7 @@ const PdfViewer = dynamic(
     loading: () => (
       <div className="pdf-loading">
         <div className="pdf-loading-spinner" />
-        <p>Loading document…</p>
+        <p>{t("library.loading_document")}</p>
       </div>
     ),
   },
@@ -112,7 +112,6 @@ export function ViewerStageClient({ fileUrl, contentType, fileName, conversionFa
             imgBroken ? (
               <div className="lib-item-no-file"><p>{t("library.files.unavailable")}</p></div>
             ) : (
-              // eslint-disable-next-line @next/next/no-img-element
               <img src={fileUrl} alt={fileName} onError={() => setImgBroken(true)} />
             )
           ) : isVideo ? (

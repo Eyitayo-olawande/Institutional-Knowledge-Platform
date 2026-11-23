@@ -1,5 +1,5 @@
 import { and, eq, inArray, sql } from "drizzle-orm";
-import { createHash, createHmac, randomBytes } from "node:crypto";
+import { createHash, createHmac } from "node:crypto";
 import type { TenantDb } from "./client.ts";
 import {
   aptitudeAssignments,

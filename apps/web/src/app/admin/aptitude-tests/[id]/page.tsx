@@ -63,16 +63,16 @@ export default async function AptitudeTestDetailPage({
         </Link>
       </div>
 
-      {qp.saved ? <div className="alert alert-success" role="status"><p>Test details saved.</p></div> : null}
-      {qp.assigned ? <div className="alert alert-success" role="status"><p>Candidate assigned.</p></div> : null}
-      {qp.qsaved ? <div className="alert alert-success" role="status"><p>Question saved.</p></div> : null}
-      {(qp.error || qp.qerror) ? <div className="alert alert-danger" role="alert"><p>Please check all required fields.</p></div> : null}
-      {qp.aerror === "duplicate" ? <div className="alert alert-danger" role="alert"><p>This candidate is already assigned to this test.</p></div> : null}
+      {qp.saved ? <div className="alert alert-success" role="status"><p>{t("aptitude_tests.saved_success")}</p></div> : null}
+      {qp.assigned ? <div className="alert alert-success" role="status"><p>{t("aptitude_tests.assigned_success")}</p></div> : null}
+      {qp.qsaved ? <div className="alert alert-success" role="status"><p>{t("aptitude_tests.question_saved_success")}</p></div> : null}
+      {(qp.error || qp.qerror) ? <div className="alert alert-danger" role="alert"><p>{t("aptitude_tests.required_fields_error")}</p></div> : null}
+      {qp.aerror === "duplicate" ? <div className="alert alert-danger" role="alert"><p>{t("aptitude_tests.duplicate_candidate_error")}</p></div> : null}
       {qp.pin ? (
         <div className="alert alert-success" role="status">
           <p style={{ margin: "0 0 6px", fontWeight: 600 }}>{t("aptitude_tests.pin_generated")}</p>
           <code style={{ fontSize: 24, letterSpacing: 6, display: "block" }}>{qp.pin}</code>
-          <p style={{ margin: "6px 0 0", fontSize: 12, color: "var(--mantle-color-text_muted)" }}>Write this down and hand it to the candidate. It will not be shown again.</p>
+          <p style={{ margin: "6px 0 0", fontSize: 12, color: "var(--mantle-color-text_muted)" }}>{t("aptitude_tests.pin_note")}</p>
         </div>
       ) : null}
 
@@ -82,7 +82,7 @@ export default async function AptitudeTestDetailPage({
         <form action={editTestAction}>
           <input type="hidden" name="testId" value={test.id} />
           <label className="field">
-            {t("aptitude_tests.fields.name")} <span style={{ color: "var(--mantle-color-brand)" }}>*</span>
+            {t("aptitude_tests.fields.name")} <span style={{ color: "var(--mantle-color-brand)" }}>{"*"}</span>
             <input className="input" name="name" defaultValue={test.name} required />
           </label>
           <label className="field">
@@ -91,19 +91,19 @@ export default async function AptitudeTestDetailPage({
           </label>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 16px" }}>
             <label className="field">
-              {t("aptitude_tests.fields.duration")} <span style={{ color: "var(--mantle-color-brand)" }}>*</span>
+              {t("aptitude_tests.fields.duration")} <span style={{ color: "var(--mantle-color-brand)" }}>{"*"}</span>
               <input className="input" type="number" name="durationMinutes" defaultValue={test.durationMinutes} min={1} required />
             </label>
             <label className="field">
-              {t("aptitude_tests.fields.num_questions")} <span style={{ color: "var(--mantle-color-brand)" }}>*</span>
+              {t("aptitude_tests.fields.num_questions")} <span style={{ color: "var(--mantle-color-brand)" }}>{"*"}</span>
               <input className="input" type="number" name="numQuestions" defaultValue={test.numQuestions} min={1} required />
             </label>
             <label className="field">
-              {t("aptitude_tests.fields.total_marks")} <span style={{ color: "var(--mantle-color-brand)" }}>*</span>
+              {t("aptitude_tests.fields.total_marks")} <span style={{ color: "var(--mantle-color-brand)" }}>{"*"}</span>
               <input className="input" type="number" name="totalMarks" defaultValue={test.totalMarks} min={1} required />
             </label>
             <label className="field">
-              {t("aptitude_tests.fields.pass_mark")} <span style={{ color: "var(--mantle-color-brand)" }}>*</span>
+              {t("aptitude_tests.fields.pass_mark")} <span style={{ color: "var(--mantle-color-brand)" }}>{"*"}</span>
               <input className="input" type="number" name="passMark" defaultValue={test.passMark} min={1} required />
             </label>
           </div>
@@ -124,17 +124,17 @@ export default async function AptitudeTestDetailPage({
                   : t("aptitude_tests.sections.company_knowledge")}
               </h3>
               {sqs.length === 0 ? (
-                <p className="sub" style={{ fontSize: 13 }}>No questions yet in this section.</p>
+                <p className="sub" style={{ fontSize: 13 }}>{t("aptitude_tests.no_questions")}</p>
               ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 12 }}>
                   {sqs.map((q, qi) => (
                     <div key={q.id} style={{ border: "1px solid var(--mantle-color-border)", borderRadius: 6, padding: "10px 14px" }}>
                       <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
-                        <p style={{ margin: "0 0 6px", fontWeight: 600, fontSize: 14 }}>{qi + 1}. {q.questionText} <span style={{ fontWeight: 400, color: "var(--mantle-color-text_muted)", fontSize: 12 }}>({q.marks} mark{q.marks !== 1 ? "s" : ""})</span></p>
+                        <p style={{ margin: "0 0 6px", fontWeight: 600, fontSize: 14 }}>{qi + 1}{". "}{q.questionText}{" "}<span style={{ fontWeight: 400, color: "var(--mantle-color-text_muted)", fontSize: 12 }}>{"("}{q.marks}{" mark"}{q.marks !== 1 ? "s" : ""}{")"}</span></p>
                         <form action={deleteQuestionAction} style={{ flexShrink: 0 }}>
                           <input type="hidden" name="testId" value={id} />
                           <input type="hidden" name="questionId" value={q.id} />
-                          <button type="submit" className="btn btn-sm btn-danger-ghost" style={{ fontSize: 12 }}>Delete</button>
+                          <button type="submit" className="btn btn-sm btn-danger-ghost" style={{ fontSize: 12 }}>{t("aptitude_tests.delete_btn")}</button>
                         </form>
                       </div>
                       <ol style={{ margin: 0, paddingLeft: 20, fontSize: 13 }}>
@@ -159,21 +159,21 @@ export default async function AptitudeTestDetailPage({
                     <input type="hidden" name="sectionId" value={section.id} />
                     <input type="hidden" name="sortOrder" value={sqs.length + 1} />
                     <label className="field">
-                      Question text <span style={{ color: "var(--mantle-color-brand)" }}>*</span>
+                      {t("aptitude_tests.question_text_field")} <span style={{ color: "var(--mantle-color-brand)" }}>{"*"}</span>
                       <textarea className="input" name="questionText" rows={2} required />
                     </label>
                     <label className="field" style={{ maxWidth: 160 }}>
-                      Marks <span style={{ color: "var(--mantle-color-brand)" }}>*</span>
+                      {t("aptitude_tests.marks_field")} <span style={{ color: "var(--mantle-color-brand)" }}>{"*"}</span>
                       <input className="input" type="number" name="marks" min={1} defaultValue={1} required />
                     </label>
-                    <p style={{ fontWeight: 600, fontSize: 13, marginBottom: 6 }}>Answer options (tick the correct one)</p>
+                    <p style={{ fontWeight: 600, fontSize: 13, marginBottom: 6 }}>{t("aptitude_tests.answer_options_field")}</p>
                     {[0, 1, 2, 3].map((i) => (
                       <div key={i} style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: "4px 10px", alignItems: "center", marginBottom: 6 }}>
                         <input type="radio" name="correctOption" value={i} defaultChecked={i === 0} required />
                         <input className="input" name="optionText" placeholder={`Option ${i + 1}`} required style={{ marginBottom: 0 }} />
                       </div>
                     ))}
-                    <Button type="submit" style={{ marginTop: 10 }}>Save question</Button>
+                    <Button type="submit" style={{ marginTop: 10 }}>{t("aptitude_tests.save_question_btn")}</Button>
                   </form>
                 </div>
               </details>
@@ -186,16 +186,16 @@ export default async function AptitudeTestDetailPage({
       <Card style={{ marginBottom: 24 }}>
         <h2 style={{ marginTop: 0 }}>{t("aptitude_tests.assign_heading")}</h2>
         {assigned.length === 0 ? (
-          <p className="sub" style={{ fontSize: 13 }}>No candidates assigned yet.</p>
+          <p className="sub" style={{ fontSize: 13 }}>{t("aptitude_tests.no_candidates")}</p>
         ) : (
           <div className="table-wrap" style={{ marginBottom: 16 }}>
             <table className="table">
               <thead>
                 <tr>
-                  <th>Ref</th>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>PIN</th>
+                  <th>{t("aptitude_tests.table.ref")}</th>
+                  <th>{t("aptitude_tests.table.name")}</th>
+                  <th>{t("aptitude_tests.table.email")}</th>
+                  <th>{t("aptitude_tests.table.pin")}</th>
                   <th></th>
                 </tr>
               </thead>
@@ -207,7 +207,7 @@ export default async function AptitudeTestDetailPage({
                     <td style={{ fontSize: 13, color: "var(--mantle-color-text_muted)" }}>{a.email}</td>
                     <td>
                       {a.hasPinSet ? (
-                        <Badge tone="success">PIN set</Badge>
+                        <Badge tone="success">{t("aptitude_tests.pin_set")}</Badge>
                       ) : (
                         <form action={generatePinAction}>
                           <input type="hidden" name="testId" value={id} />
@@ -220,7 +220,7 @@ export default async function AptitudeTestDetailPage({
                       <form action={unassignCandidateAction}>
                         <input type="hidden" name="testId" value={id} />
                         <input type="hidden" name="candidateId" value={a.candidateId} />
-                        <button type="submit" className="btn btn-sm btn-danger-ghost" style={{ fontSize: 12 }}>Remove</button>
+                        <button type="submit" className="btn btn-sm btn-danger-ghost" style={{ fontSize: 12 }}>{t("aptitude_tests.remove_btn")}</button>
                       </form>
                     </td>
                   </tr>
@@ -235,16 +235,16 @@ export default async function AptitudeTestDetailPage({
             <label className="field" style={{ flex: 1, marginBottom: 0 }}>
               {t("aptitude_tests.assign_btn")}
               <select className="input" name="candidateId" required>
-                <option value="">Select a candidate...</option>
+                <option value="">{t("aptitude_tests.select_candidate")}</option>
                 {unassigned.map((c) => (
-                  <option key={c.id} value={c.id}>{c.firstName} {c.surname} ({c.candidateRef})</option>
+                  <option key={c.id} value={c.id}>{c.firstName}{" "}{c.surname}{" ("}{c.candidateRef}{")"}</option>
                 ))}
               </select>
             </label>
-            <Button type="submit" style={{ flexShrink: 0 }}>Assign</Button>
+            <Button type="submit" style={{ flexShrink: 0 }}>{t("aptitude_tests.assign_action_btn")}</Button>
           </form>
         ) : (
-          <p className="sub" style={{ fontSize: 13, margin: 0 }}>All registered candidates have been assigned.</p>
+          <p className="sub" style={{ fontSize: 13, margin: 0 }}>{t("aptitude_tests.all_assigned")}</p>
         )}
       </Card>
     </AppShell>

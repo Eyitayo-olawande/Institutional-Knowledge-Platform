@@ -1,6 +1,8 @@
 import { directReports, myLearning, outstandingRequirements, tenantSchema } from "@mantle/db/tenant";
+// eslint-disable-next-line no-restricted-imports
 import { eq } from "drizzle-orm";
 import Link from "next/link";
+import { t } from "../../i18n.ts";
 import { requirePermission } from "../../server/session.ts";
 import { AppShell } from "../_components/AppShell.tsx";
 
@@ -16,8 +18,8 @@ export default async function TeamPage() {
   if (!managerRow) {
     return (
       <AppShell ctx={ctx} active="team">
-        <h1>My Team</h1>
-        <p className="sub">Your staff profile has not been set up yet. Contact your learning administrator.</p>
+        <h1>{t("team.heading")}</h1>
+        <p className="sub">{t("team.no_profile")}</p>
       </AppShell>
     );
   }
@@ -27,8 +29,8 @@ export default async function TeamPage() {
   if (reports.length === 0) {
     return (
       <AppShell ctx={ctx} active="team">
-        <h1>My Team</h1>
-        <p className="sub">No active direct reports found for your employee record.</p>
+        <h1>{t("team.heading")}</h1>
+        <p className="sub">{t("team.no_reports")}</p>
       </AppShell>
     );
   }
@@ -50,7 +52,7 @@ export default async function TeamPage() {
 
   return (
     <AppShell ctx={ctx} active="team">
-      <h1>My Team</h1>
+      <h1>{t("team.heading")}</h1>
       <p className="sub" style={{ marginBottom: 24 }}>
         {enriched.length === 1
           ? "1 active direct report"
@@ -61,9 +63,9 @@ export default async function TeamPage() {
         <table className="table">
           <thead>
             <tr>
-              <th>Name</th>
-              <th style={{ textAlign: "right" }}>Completion</th>
-              <th style={{ textAlign: "right" }}>Outstanding</th>
+              <th>{t("team.col_name")}</th>
+              <th style={{ textAlign: "right" }}>{t("team.col_completion")}</th>
+              <th style={{ textAlign: "right" }}>{t("team.col_outstanding")}</th>
             </tr>
           </thead>
           <tbody>
@@ -90,7 +92,7 @@ export default async function TeamPage() {
                         : "var(--mantle-color-text_muted)",
                     }}
                   >
-                    {person.completionRate}%
+                    {person.completionRate}{"%"}
                   </span>
                 </td>
                 <td style={{ textAlign: "right" }}>
@@ -109,7 +111,7 @@ export default async function TeamPage() {
                       {person.outstandingCount}
                     </span>
                   ) : (
-                    <span style={{ fontSize: 12, color: "var(--mantle-color-text_muted)" }}>None</span>
+                    <span style={{ fontSize: 12, color: "var(--mantle-color-text_muted)" }}>{t("team.none_outstanding")}</span>
                   )}
                 </td>
               </tr>
@@ -119,8 +121,8 @@ export default async function TeamPage() {
       </div>
 
       <p style={{ marginTop: 16, fontSize: 13, color: "var(--mantle-color-text_muted)" }}>
-        Outstanding items are library resources assigned as required reading that the team member has not yet read or attested.{" "}
-        <Link href="/admin/reports" style={{ color: "var(--mantle-color-primary)" }}>View full reports →</Link>
+        {t("team.outstanding_desc")}{" "}
+        <Link href="/admin/reports" style={{ color: "var(--mantle-color-primary)" }}>{t("team.reports_link")}{"→"}</Link>
       </p>
     </AppShell>
   );

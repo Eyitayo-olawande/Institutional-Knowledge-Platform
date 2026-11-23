@@ -74,7 +74,7 @@ export default async function IntelligenceReport() {
                   <div className="report-bar-track">
                     <div className={`report-bar-fill${tone}`} style={{ width: `${row.completionRate}%` }} />
                   </div>
-                  <div className="report-bar-pct">{row.completionRate}%</div>
+                  <div className="report-bar-pct">{row.completionRate}{"%"}</div>
                 </div>
               );
             })
@@ -92,19 +92,19 @@ export default async function IntelligenceReport() {
               <div key={r.departmentId} className="report-insight-item">
                 <div className="report-insight-rank">{i + 1}</div>
                 <div className="report-insight-name">{r.department}</div>
-                <div className="report-insight-score">{r.completionRate}%</div>
+                <div className="report-insight-score">{r.completionRate}{"%"}</div>
               </div>
             ))}
           </div>
           <div className="report-insight-panel report-insight-panel--attention">
             <div className="report-insight-title">{t("reports.insight.attention_depts")}</div>
             {attentionDepts.length === 0 ? (
-              <div className="report-insight-empty">All departments enrolled</div>
+              <div className="report-insight-empty">{t("reports.intelligence.all_enrolled")}</div>
             ) : attentionDepts.map((r, i) => (
               <div key={r.departmentId} className="report-insight-item">
                 <div className="report-insight-rank">{i + 1}</div>
                 <div className="report-insight-name">{r.department}</div>
-                <div className="report-insight-score">0 enrolled</div>
+                <div className="report-insight-score">{t("reports.intelligence.zero_enrolled")}</div>
               </div>
             ))}
           </div>
@@ -140,20 +140,20 @@ export default async function IntelligenceReport() {
                     <td style={{ textAlign: "right" }}>
                       {row.modulesCompleted > 0 || row.pathsEnrolled > 0 ? (
                         <Badge tone={row.completionRate >= 70 ? "success" : row.completionRate >= 40 ? "warning" : "danger"}>
-                          {row.completionRate}%
+                          {row.completionRate}{"%"}
                         </Badge>
                       ) : (
-                        <span className="sub">—</span>
+                        <span className="sub">{"—"}</span>
                       )}
                     </td>
                     <td style={{ textAlign: "right" }}>{row.assessmentAttempts}</td>
                     <td style={{ textAlign: "right" }}>
                       {row.assessmentAttempts > 0 ? (
                         <Badge tone={row.assessmentPassRate >= 70 ? "success" : row.assessmentPassRate >= 50 ? "warning" : "danger"}>
-                          {row.assessmentPassRate}%
+                          {row.assessmentPassRate}{"%"}
                         </Badge>
                       ) : (
-                        <span className="sub">—</span>
+                        <span className="sub">{"—"}</span>
                       )}
                     </td>
                     <td style={{ textAlign: "right" }}>{row.nominationsCount}</td>

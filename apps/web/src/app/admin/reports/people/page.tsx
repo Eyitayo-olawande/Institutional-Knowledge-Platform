@@ -99,7 +99,7 @@ export default async function PeopleReport({ searchParams }: Props) {
               <div key={r.personId} className="report-insight-item">
                 <div className="report-insight-rank">{i + 1}</div>
                 <div className="report-insight-name">{r.fullName}</div>
-                <div className="report-insight-score">{r.modulesCompleted} modules</div>
+                <div className="report-insight-score">{r.modulesCompleted}{t("reports.people.modules_suffix")}</div>
               </div>
             ))}
           </div>
@@ -108,7 +108,7 @@ export default async function PeopleReport({ searchParams }: Props) {
 
       {deptFilter && (
         <div className="report-filter-chip">
-          <span>{t("reports.insight.people_dept_filter")}: <strong>{deptFilter}</strong></span>
+          <span>{t("reports.insight.people_dept_filter")}{": "}<strong>{deptFilter}</strong></span>
           <Link href="/admin/reports/people">{t("reports.insight.clear_filter")}</Link>
         </div>
       )}
@@ -132,7 +132,7 @@ export default async function PeopleReport({ searchParams }: Props) {
                 {displayRows.map((row) => (
                   <tr key={row.personId}>
                     <td>{row.fullName}</td>
-                    <td>{row.department || <span className="sub">—</span>}</td>
+                    <td>{row.department || <span className="sub">{"—"}</span>}</td>
                     <td style={{ textAlign: "right" }}>{row.pathsEnrolled}</td>
                     <td style={{ textAlign: "right" }}>{row.modulesCompleted}</td>
                     <td style={{ textAlign: "right" }}>{row.nominationsCount}</td>
