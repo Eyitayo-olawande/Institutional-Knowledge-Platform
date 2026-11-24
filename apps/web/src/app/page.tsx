@@ -14,7 +14,7 @@ import { AppShell } from "./_components/AppShell.tsx";
 import { Icon } from "./_components/Icon.tsx";
 import { cardThumbBg } from "./library/card-cover.ts";
 
-function KpiTile({ href, icon, value, label }: { href?: string; icon: Parameters<typeof Icon>[0]["name"]; value: number; label: string }) {
+function KpiTile({ href, icon, value, label }: { href?: string | undefined; icon: Parameters<typeof Icon>[0]["name"]; value: number; label: string }) {
   const inner = (
     <>
       <span className="admin-kpi-icon"><Icon name={icon} size={28} /></span>

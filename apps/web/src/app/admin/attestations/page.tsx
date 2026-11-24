@@ -27,7 +27,7 @@ export default async function AttestationsReport({
   const outstanding = detail ? detail.filter((r) => !r.attested).length : 0;
 
   return (
-    <AppShell ctx={ctx} active="admin">
+    <AppShell ctx={ctx} active="reports">
       <PageHead
         title="Attestation Report"
         sub="Track staff read-and-understand attestations for documents that require them."

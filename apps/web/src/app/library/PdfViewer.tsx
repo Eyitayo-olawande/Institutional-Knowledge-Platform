@@ -112,7 +112,7 @@ export function PdfViewer({ fileUrl, fileName }: Props) {
       canvas.height = viewport.height;
       canvas.style.width = `${viewport.width / dpr}px`;
       canvas.style.height = `${viewport.height / dpr}px`;
-      const task = page.render({ canvasContext: ctx, viewport });
+      const task = page.render({ canvasContext: ctx, viewport, canvas });
       renderTaskRef.current = task;
       try {
         await task.promise;
@@ -141,7 +141,7 @@ export function PdfViewer({ fileUrl, fileName }: Props) {
           if (!ctx) return;
           canvas.width = viewport.width;
           canvas.height = viewport.height;
-          await page.render({ canvasContext: ctx, viewport }).promise;
+          await page.render({ canvasContext: ctx, viewport, canvas }).promise;
         } catch {
           // ignore
         }
