@@ -6,7 +6,7 @@ import { t } from "../i18n.ts";
 import { authFor, requestHost } from "../server/auth.ts";
 import { buildNav } from "../server/nav.ts";
 import { featureOn, tenantDb, viewerAreas } from "../server/session.ts";
-import { listActiveStaff, listLibraryItems, listPaths, listStructure, myLearning, noticesFor, personByUserId, recentActivity, STAGE_ORDER, tenantSchema, unreadCount } from "@mantle/db/tenant";
+import { listActiveStaff, listLibraryItems, listPaths, listStructure, loadGrants, myLearning, noticesFor, personByUserId, recentActivity, STAGE_ORDER, tenantSchema, unreadCount } from "@mantle/db/tenant";
 import { can } from "@mantle/platform/identity";
 import { resolveRequestTenant } from "../server/tenant.ts";
 import { tenantView } from "../server/tenant_view.ts";
@@ -50,7 +50,8 @@ export default async function Home() {
 
   const db = tenantDb(resolution.tenant);
   const roles = (session.user as { roles?: string }).roles ?? "";
-  const isAdmin = can(roles, "activity.view");
+  const grants = await loadGrants(db);
+  const isAdmin = can(roles, "activity.view", grants);
   const [unread, libraryOn, peopleImportOn, pathsOn, aptitudeOn] = await Promise.all([
     unreadCount(db, session.user.id),
     featureOn(resolution.tenant, "knowledge_library"),
@@ -61,7 +62,7 @@ export default async function Home() {
   if (!isAdmin && pathsOn) {
     redirect("/my-learning");
   }
-  const destinations = buildNav({ roles, libraryOn, peopleImportOn, pathsOn, aptitudeOn }).filter((i) => i.key !== "home");
+  const destinations = buildNav({ roles, grants, libraryOn, peopleImportOn, pathsOn, aptitudeOn }).filter((i) => i.key !== "home");
   const mainDestinations = destinations.filter((d) => d.section === "main");
   const adminDestinations = destinations.filter((d) => d.section === "admin");
   const firstName = session.user.name.split(" ")[0] ?? session.user.name;
@@ -97,7 +98,7 @@ export default async function Home() {
   let featuredResources: Awaited<ReturnType<typeof listLibraryItems>> | null = null;
   let recentNotices: Awaited<ReturnType<typeof noticesFor>> | null = null;
   if (!isAdmin) {
-    const visible = await viewerAreas({ db, roles, user: session.user });
+    const visible = await viewerAreas({ db, roles, grants, user: session.user });
     const [items, notices] = await Promise.all([
       libraryOn ? listLibraryItems(db, { publishedOnly: true, areas: visible }) : Promise.resolve([]),
       noticesFor(db, session.user.id, 4),
@@ -107,7 +108,7 @@ export default async function Home() {
   }
 
   return (
-    <AppShell ctx={{ tenant: resolution.tenant, db, roles, user: session.user }} active="home">
+    <AppShell ctx={{ tenant: resolution.tenant, db, roles, grants, user: session.user }} active="home">
       {isAdmin ? (
         <div className="admin-hero-wrap">
           <div className="admin-banner">

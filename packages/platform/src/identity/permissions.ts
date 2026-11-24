@@ -35,27 +35,26 @@ export const ACTIONS = [
 
 export type Action = (typeof ACTIONS)[number];
 
-// Only what is built so far; later work packages add their actions here.
-const GRANTS: Record<Action, readonly Role[]> = {
+// Grants map type for DB-driven or static permission checks.
+// Keys are role names (slugs); values are the actions each role may perform.
+export type Grants = Record<string, readonly string[]>;
+
+// Static fallback: exact match of the original hardcoded permissions.
+// Used when no DB grants map is provided (e.g. in contexts without DB access).
+const STATIC_GRANTS: Record<Action, readonly Role[]> = {
   "people.view": ["learning_administrator"],
   "people.import": ["learning_administrator"],
   "roles.manage": ["learning_administrator"],
   "wording.edit": ["learning_administrator"],
   "structure.manage": ["learning_administrator"],
   "activity.view": ["learning_administrator"],
-  // External learners only see what is assigned to them (later work).
   "library.view": ["learner", "line_manager", "content_owner", "compliance_reviewer", "learning_administrator"],
   "library.edit": ["content_owner", "learning_administrator"],
-  // Everyone else sees Common Staff Learning, their own department's area
-  // and areas granted to them (checked on every library read).
   "library.all_areas": ["learning_administrator"],
   "areas.manage": ["learning_administrator"],
   "paths.edit": ["content_owner", "learning_administrator"],
-  // Nominations: content owners and line managers nominate; learning admins approve.
   "nominations.manage": ["content_owner", "line_manager", "learning_administrator"],
-  // Aptitude testing: candidate registration and test administration.
   "candidates.manage": ["learning_administrator"],
-  // Reports & Insights: full org-wide reporting for learning administrators.
   "reports.view": ["learning_administrator"],
   // Team view: line managers see their direct reports' progress.
   "team.view": ["line_manager", "learning_administrator"],
@@ -77,7 +76,14 @@ export function formatRoles(roles: Iterable<Role>): string {
   return ROLES.filter((r) => set.has(r)).join(",");
 }
 
-export function can(roles: string | null | undefined, action: Action): boolean {
+// Check whether a person may perform an action.
+// When a grants map is provided (loaded from DB via loadGrants), it is used
+// for dynamic checks; otherwise falls back to the static STATIC_GRANTS map.
+export function can(roles: string | null | undefined, action: Action, grants?: Grants): boolean {
+  if (grants) {
+    const roleList = (roles ?? "").split(",").map((r) => r.trim()).filter(Boolean);
+    return roleList.some((role) => (grants[role] ?? []).includes(action));
+  }
   const held = parseRoles(roles);
-  return GRANTS[action].some((role) => held.includes(role));
+  return STATIC_GRANTS[action].some((role) => held.includes(role));
 }

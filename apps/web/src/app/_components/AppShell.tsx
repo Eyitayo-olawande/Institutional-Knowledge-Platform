@@ -1,4 +1,5 @@
 import { personDepartmentByUserId, unreadCount, type TenantDb } from "@mantle/db/tenant";
+import type { Grants } from "@mantle/platform/identity";
 import type { TenantRecord } from "@mantle/platform/tenancy";
 import { Button } from "@mantle/ui";
 import Link from "next/link";
@@ -13,6 +14,7 @@ export interface ShellContext {
   tenant: TenantRecord;
   db: TenantDb;
   roles: string;
+  grants: Grants;
   user: { id: string; name: string };
 }
 
@@ -27,7 +29,7 @@ export async function AppShell({ ctx, active, children }: { ctx: ShellContext; a
     unreadCount(ctx.db, ctx.user.id),
     personDepartmentByUserId(ctx.db, ctx.user.id),
   ]);
-  const items = buildNav({ roles: ctx.roles, libraryOn, peopleImportOn, pathsOn, aptitudeOn });
+  const items = buildNav({ roles: ctx.roles, grants: ctx.grants, libraryOn, peopleImportOn, pathsOn, aptitudeOn });
   const main = items.filter((i) => i.section === "main");
   const admin = items.filter((i) => i.section === "admin");
 
