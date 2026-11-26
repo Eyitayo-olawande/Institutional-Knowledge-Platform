@@ -1,4 +1,4 @@
-import { canPersonSeeItem, canSeeArea, getAssessmentForItem, getAttemptResults, getAttestation, getItemAccessRules, getLibraryItem, getModule, getOutstandingChangeAlertForItem, hasOutstandingChangeAlerts, hasViewedAllModuleItems, itemFiles, listAreas, listLibraryItems, listModuleItems, listStructure, personByUserId, recordItemView } from "@mantle/db/tenant";
+import { canPersonSeeItem, canSeeArea, completeModule, getAssessmentForItem, getAttemptResults, getAttestation, getItemAccessRules, getLibraryItem, getModule, getOutstandingChangeAlertForItem, hasOutstandingChangeAlerts, hasViewedAllModuleItems, itemFiles, listAreas, listLibraryItems, listModuleItems, listStructure, personByUserId, recordItemView } from "@mantle/db/tenant";
 import { needsConversion } from "@mantle/documents/convert";
 import { ACCEPT_ATTR } from "@mantle/platform/files";
 import { can } from "@mantle/platform/identity";
@@ -8,7 +8,7 @@ import { notFound } from "next/navigation";
 import { t } from "../../../i18n.ts";
 import { requireFeature, requirePermission, viewerAreas } from "../../../server/session.ts";
 import { AppShell } from "../../_components/AppShell.tsx";
-import { completeModuleAction, submitAssessmentAction } from "../../actions.ts";
+import { submitAssessmentAction } from "../../actions.ts";
 import { acknowledgeChangeAlert, attestItem, deleteItemFile, placeLibraryItem, publishItem, retireLibraryItem, saveItemDraft, setAttestationRequired, setItemAccess, uploadItemFile } from "../actions.ts";
 import { areaChoices, areaName } from "../areas.ts";
 import { PlacementFields } from "../PlacementFields.tsx";
@@ -126,6 +126,11 @@ export default async function Item({
   // Assessment items record their own view in submitAssessmentAction on submission.
   if (moduleId && !isAssessmentItem && viewerPerson) {
     await recordItemView(db, viewerPerson.id, moduleId, item.id, `user:${viewer.id}`);
+    // Auto-complete the module when the last content item is viewed and all content is seen.
+    if (isLastModuleItem) {
+      const gate1 = await hasViewedAllModuleItems(db, viewerPerson.id, moduleId);
+      if (gate1) await completeModule(db, viewerPerson.id, moduleId, `user:${viewer.id}`);
+    }
   }
 
   // Gate 1 pre-check: has this person viewed all content items in the module?
@@ -140,11 +145,7 @@ export default async function Item({
     ? await getOutstandingChangeAlertForItem(db, viewerPerson.id, item.id)
     : null;
 
-  // Gate 1.5 — module completion block: true if any item in this module has
-  // an unacknowledged alert for this person. Used to gate the "Mark done" btn.
-  const moduleHasOutstandingAlerts = isLastModuleItem && viewerPerson && moduleId
-    ? await hasOutstandingChangeAlerts(db, viewerPerson.id, moduleId)
-    : false;
+
 
   // Attestation — shown when item.requiresAttestation is true and the person
   // has not yet attested to the current published version. Shown for all
@@ -470,19 +471,6 @@ export default async function Item({
                 >
                   {t("learning.action_next")}: {nextModuleItem.title} →
                 </Link>
-              ) : isLastModuleItem && !isAssessmentItem ? (
-                moduleHasOutstandingAlerts ? (
-                  <span className="my-module-action-btn my-module-action-btn--blocked" title={t("library.change_alert_gate_hint")}>
-                    {t("learning.action_mark_done")}
-                  </span>
-                ) : (
-                  <form action={completeModuleAction}>
-                    <input type="hidden" name="moduleId" value={moduleId} />
-                    <button type="submit" className="my-module-action-btn primary">
-                      {t("learning.action_mark_done")}
-                    </button>
-                  </form>
-                )
               ) : null}
             </div>
           </div>
