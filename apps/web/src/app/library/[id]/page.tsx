@@ -2,7 +2,7 @@ import { canPersonSeeItem, canSeeArea, getAssessmentForItem, getAttemptResults, 
 import { needsConversion } from "@mantle/documents/convert";
 import { ACCEPT_ATTR } from "@mantle/platform/files";
 import { can } from "@mantle/platform/identity";
-import { Badge, Button, Card } from "@mantle/ui";
+import { Badge, Button, buttonStyle, Card } from "@mantle/ui";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { t } from "../../../i18n.ts";
@@ -688,24 +688,29 @@ export default async function Item({
           ) : (
             <div className="alert alert-warning" role="status"><p>{t("library.retire.already_retired")}</p></div>
           )}
-          <Card>
-            <h2>{t("library.assessment.heading")}</h2>
-            {assessment ? (
-              <div>
-                <div className="lib-item-meta-row">
-                  <span className="lib-item-meta-label">{t("library.assessment.questions_label")}</span>
-                  <span className="lib-item-meta-value">{assessment.questions.length}</span>
+          {item.assessmentOnly ? (
+            <Card>
+              <h2>{t("library.assessment.heading")}</h2>
+              {assessment ? (
+                <div>
+                  <div className="lib-item-meta-row">
+                    <span className="lib-item-meta-label">{t("library.assessment.questions_label")}</span>
+                    <span className="lib-item-meta-value">{assessment.questions.length}</span>
+                  </div>
+                  <div className="lib-item-meta-row">
+                    <span className="lib-item-meta-label">{t("library.assessment.passing_label")}</span>
+                    <span className="lib-item-meta-value">{assessment.passingScore}%</span>
+                  </div>
+                  <Link href={`/admin/library/${item.id}/assessment`} style={{ ...buttonStyle("secondary", "sm"), marginTop: 12 }}>Edit knowledge check</Link>
                 </div>
-                <div className="lib-item-meta-row">
-                  <span className="lib-item-meta-label">{t("library.assessment.passing_label")}</span>
-                  <span className="lib-item-meta-value">{assessment.passingScore}%</span>
+              ) : (
+                <div>
+                  <p className="sub" style={{ marginBottom: 12 }}>{t("library.assessment.none")}</p>
+                  <Link href={`/admin/library/${item.id}/assessment`} style={buttonStyle("primary", "sm")}>Create knowledge check</Link>
                 </div>
-                <p className="sub" style={{ marginTop: 10, fontSize: 12 }}>{t("library.assessment.seeded_note")}</p>
-              </div>
-            ) : (
-              <p className="sub">{t("library.assessment.none")}</p>
-            )}
-          </Card>
+              )}
+            </Card>
+          ) : null}
         </div>
       ) : null}
     </AppShell>

@@ -311,6 +311,79 @@ export async function getAttemptResults(
   };
 }
 
+// ── Admin read (includes isCorrect for the builder UI) ───────────────────────
+
+export type AssessmentAdminOption = { id: string; optionText: string; isCorrect: boolean; sortOrder: number };
+export type AssessmentAdminQuestion = { id: string; questionText: string; sortOrder: number; options: AssessmentAdminOption[] };
+export type AssessmentAdmin = { id: string; passingScore: number; questions: AssessmentAdminQuestion[] };
+
+export async function getAssessmentForAdmin(db: TenantDb, itemId: string): Promise<AssessmentAdmin | null> {
+  const [row] = await db
+    .select({ id: assessments.id, passingScore: assessments.passingScore })
+    .from(assessments)
+    .where(eq(assessments.itemId, itemId));
+  if (!row) return null;
+
+  const questions = await db
+    .select({ id: assessmentQuestions.id, questionText: assessmentQuestions.questionText, sortOrder: assessmentQuestions.sortOrder })
+    .from(assessmentQuestions)
+    .where(eq(assessmentQuestions.assessmentId, row.id))
+    .orderBy(assessmentQuestions.sortOrder);
+
+  const qIds = questions.map((q) => q.id);
+  const options = qIds.length > 0
+    ? await db
+        .select({ id: assessmentOptions.id, questionId: assessmentOptions.questionId, optionText: assessmentOptions.optionText, isCorrect: assessmentOptions.isCorrect, sortOrder: assessmentOptions.sortOrder })
+        .from(assessmentOptions)
+        .where(inArray(assessmentOptions.questionId, qIds))
+        .orderBy(assessmentOptions.sortOrder)
+    : [];
+
+  return {
+    id: row.id,
+    passingScore: row.passingScore,
+    questions: questions.map((q) => ({ ...q, options: options.filter((o) => o.questionId === q.id) })),
+  };
+}
+
+// ── Admin mutations ───────────────────────────────────────────────────────────
+
+export async function updatePassingScore(db: TenantDb, assessmentId: string, passingScore: number, changedBy: string): Promise<void> {
+  await db.update(assessments).set({ passingScore, updatedAt: new Date(), changedBy }).where(eq(assessments.id, assessmentId));
+}
+
+export async function updateQuestion(db: TenantDb, questionId: string, questionText: string, changedBy: string): Promise<void> {
+  await db.update(assessmentQuestions).set({ questionText, updatedAt: new Date(), changedBy }).where(eq(assessmentQuestions.id, questionId));
+}
+
+export async function deleteAssessmentQuestion(db: TenantDb, questionId: string): Promise<void> {
+  await db.delete(assessmentQuestions).where(eq(assessmentQuestions.id, questionId));
+}
+
+export async function upsertAssessmentOption(db: TenantDb, questionId: string, optionId: string | null, optionText: string, sortOrder: number, changedBy: string): Promise<string> {
+  if (optionId) {
+    await db.update(assessmentOptions).set({ optionText, sortOrder, updatedAt: new Date(), changedBy }).where(eq(assessmentOptions.id, optionId));
+    return optionId;
+  }
+  const [row] = await db.insert(assessmentOptions).values({ questionId, optionText, isCorrect: false, sortOrder, changedBy }).returning({ id: assessmentOptions.id });
+  if (!row) throw new Error("Option insert failed");
+  return row.id;
+}
+
+export async function setCorrectOption(db: TenantDb, questionId: string, optionId: string, changedBy: string): Promise<void> {
+  const now = new Date();
+  await db.update(assessmentOptions).set({ isCorrect: false, updatedAt: now, changedBy }).where(eq(assessmentOptions.questionId, questionId));
+  await db.update(assessmentOptions).set({ isCorrect: true, updatedAt: now, changedBy }).where(eq(assessmentOptions.id, optionId));
+}
+
+export async function deleteOption(db: TenantDb, optionId: string): Promise<void> {
+  await db.delete(assessmentOptions).where(eq(assessmentOptions.id, optionId));
+}
+
+export async function deleteAssessment(db: TenantDb, assessmentId: string): Promise<void> {
+  await db.delete(assessments).where(eq(assessments.id, assessmentId));
+}
+
 // ── Seeding helpers ───────────────────────────────────────────────────────────
 
 export async function createAssessment(
