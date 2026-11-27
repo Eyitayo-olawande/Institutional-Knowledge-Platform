@@ -63,3 +63,78 @@ Node 20 or newer and npm workspaces (apps/* and packages/*).
 * `npm run dev -w @mantle/web` (port 3000), `npm run dev -w @mantle/console` (port 3001), `npm run dev -w @mantle/worker`: run one app locally
 
 GitHub Actions runs the same checks, plus `npm audit` for high or critical vulnerabilities, on every pull request and every push to main (.github/workflows/ci.yml). Dependabot opens weekly update pull requests.
+
+---
+
+## SUNU Operational Context
+
+This section captures live deployment facts for the SUNU Assurances Nigeria instance. Update it whenever something changes.
+
+### Branches
+
+| Purpose | Branch |
+|---|---|
+| Production (SUNU) | `claude/reports-insights-phase1` |
+| Main (merge target for PRs) | `main` |
+
+**Always branch from `claude/reports-insights-phase1`**, not `main`. It is 127+ commits ahead of main and carries the full production design. Never branch from a base that is behind what is running in production.
+
+### Production server
+
+| Property | Value |
+|---|---|
+| Host | `134.209.27.242` (DigitalOcean London) |
+| App path | `/var/www/ikp` |
+| PM2 process | `ikp-web` (id 3), port 4000 |
+| nginx | reverse proxy on 443 |
+| Domain | `sununigeria.mantle360.com` |
+
+**Deploy sequence (run on production server):**
+```bash
+cd /var/www/ikp && git pull origin claude/reports-insights-phase1
+npm run build
+pm2 restart ikp-web && pm2 save
+```
+
+**psql auth note:** `psql -U postgres` fails with peer auth. Use `sudo -u postgres psql mantle_tenant_sunu` or find the TCP URL with `pm2 env 3 | grep MANTLE_PG_SERVER_URL`.
+
+### Databases
+
+| DB | Purpose |
+|---|---|
+| `mantle_tenant_sunu` | Live SUNU production data |
+| `mantle_tenant_alpha` | Local dev / seed target |
+
+Seed scripts default to `mantle_tenant_alpha`. To run a seed against production, pass the env var:
+```bash
+MANTLE_PG_SERVER_URL="<url>" MANTLE_PG_TENANT_DB=mantle_tenant_sunu npx tsx src/tenant/<seed>.ts
+```
+
+Run all seed scripts from `packages/db` (not the repo root).
+
+### Two-gate LMS model
+
+Modules complete via two gates -- not a manual button:
+
+- **Gate 1:** all content items (not `assessmentOnly`) viewed. Auto-completes the module when the last content item is rendered for a person in a module context.
+- **Gate 2:** knowledge check passed at >= passing score. Fires `completeModule` on quiz submission.
+
+An `assessmentOnly: true` library item shows the quiz UI when navigated via `?moduleId=`. It never shows the body/video -- it is a pure quiz item. It is excluded from Gate 1 view counting.
+
+There is no "Mark as complete" button. Modules auto-complete.
+
+### Known naming conflicts
+
+The aptitude testing module already exports `deleteQuestion` and `upsertQuestion` from `packages/db/src/tenant/aptitude.ts`. The assessment builder uses the renamed variants:
+
+- `deleteAssessmentQuestion` (not `deleteQuestion`)
+- `upsertAssessmentOption` (not `upsertOption`)
+
+### Style rules
+
+- Never use an em dash in any content or UI text. Use a comma, colon or parentheses instead.
+- All UI text goes through `t()` -- no raw strings in JSX.
+
+### Deployment safety constraint
+
+All implementation runs against the local instance only. Deployment to the cloud (Mantle360 production) requires explicit approval and only when development is complete.
